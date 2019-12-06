@@ -1,3 +1,5 @@
+#![feature(associated_type_defaults)]
+#![feature(const_generics)]
 mod datatype;
 mod ffi;
 mod session;

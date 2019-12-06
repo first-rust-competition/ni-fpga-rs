@@ -5,6 +5,8 @@ pub type Offset = u32;
 pub type Session = u32;
 pub type Status = i32;
 
+pub type Func<T> = unsafe fn(Session, Offset, T) -> Status;
+
 #[link(name = "NiFpga")]
 extern "C" {
     #[link_name = "NiFpgaDll_Open"]
@@ -27,59 +29,24 @@ extern "C" {
         indicator: Offset,
         value: *mut bool,
     ) -> Status;
-    #[link_name = "NiFpgaDll_ReadU8"]
-    pub fn ReadU8(
+    #[link_name = "NiFpgaDll_ReadArrayBool"]
+    pub fn ReadArrayBool(
         session: Session,
         indicator: Offset,
-        value: *mut u8,
+        array: *mut bool,
+        size: usize,
     ) -> Status;
-    #[link_name = "NiFpgaDll_ReadU16"]
-    pub fn ReadU16(
-        session: Session,
-        indicator: Offset,
-        value: *mut u16,
-    ) -> Status;
-    #[link_name = "NiFpgaDll_ReadU32"]
-    pub fn ReadU32(
-        session: Session,
-        indicator: Offset,
-        value: *mut u32,
-    ) -> Status;
-    #[link_name = "NiFpgaDll_ReadU64"]
-    pub fn ReadU64(
-        session: Session,
-        indicator: Offset,
-        value: *mut u64,
-    ) -> Status;
-    #[link_name = "NiFpgaDll_ReadI8"]
-    pub fn ReadI8(
-        session: Session,
-        indicator: Offset,
-        value: *mut i8,
-    ) -> Status;
-    #[link_name = "NiFpgaDll_ReadI16"]
-    pub fn ReadI16(
-        session: Session,
-        indicator: Offset,
-        value: *mut i16,
-    ) -> Status;
-    #[link_name = "NiFpgaDll_ReadI324"]
-    pub fn ReadI32(
-        session: Session,
-        indicator: Offset,
-        value: *mut i32,
-    ) -> Status;
-    #[link_name = "NiFpgaDll_ReadI64"]
-    pub fn ReadI64(
-        session: Session,
-        indicator: Offset,
-        value: *mut i64,
-    ) -> Status;
-
     #[link_name = "NiFpgaDll_WriteBool"]
     pub fn WriteBool(
         session: Session,
         indicator: Offset,
         value: bool,
+    ) -> Status;
+    #[link_name = "NiFpgaDll_WriteArrayBool"]
+    pub fn WriteArrayBool(
+        session: Session,
+        indicator: Offset,
+        array: *const bool,
+        size: usize,
     ) -> Status;
 }

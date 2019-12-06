@@ -33,7 +33,7 @@ impl Session {
         }
     }
     pub fn read<T: Datatype>(
-        self,
+        &self,
         offset: Offset,
     ) -> Result<T, Status> {
         Datatype::read(
@@ -42,7 +42,7 @@ impl Session {
         )
     }
     pub fn write<T: Datatype>(
-        self,
+        &self,
         offset: Offset,
         value: T,
     ) -> Result<(), Status> {
