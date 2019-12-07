@@ -1,5 +1,5 @@
 # ni_fpga-rs
-Use this Rust interface to interact with NI FPGAs!
+Use this Rust interface to interact with NI FPGAs! See NI's [documentation](http://zone.ni.com/reference/en-XX/help/372928G-01/) about the FPGA C interface for more information.
 
 ## Supported types
 This interface supports reading and writing the following types, both indvidually and in fixed-sized arrays:
