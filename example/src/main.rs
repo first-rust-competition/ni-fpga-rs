@@ -8,23 +8,22 @@ use ni_fpga::Session;
 use ni_fpga_macros::prelude::*;
 
 cluster! {
-    LEDs {
-        comm: u8,
-        mode: u8,
-        rsl: bool,
+    Cluster {
+        period: u16,
+        min_high: u16,
     }
 }
 
 fn main() {
-    assert_eq!(LEDs::packed_bits(), 17);
+    println!("{}, {}", Cluster::packed_bits(), std::mem::size_of::<Cluster>());
     let session = Session::open(
         "/boot/user.lvbitx",
         "C571384F0C3E586B64ADFE11551DAAD0",
         "RIO0",
     ).unwrap();
     loop {
-        let leds: LEDs = session.read(98320).unwrap();
-        println!("LED state: {}", leds);
+        let val: Cluster = session.read(98528).unwrap();
+        println!("{}", val);
         thread::sleep(time::Duration::from_secs(1));
     }
 }

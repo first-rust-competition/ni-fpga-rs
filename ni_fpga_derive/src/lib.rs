@@ -28,10 +28,10 @@ pub fn cluster(item: TokenStream) -> TokenStream {
     let fields = &input.fields;
 
     let output = quote! {
-        #[repr(C, align(32))]
+        #[repr(C, align(4))]
         #[derive(Clone, Copy)]
         #[derive(PackedStruct)]
-        #[packed_struct(bit_numbering="msb0")]
+        #[packed_struct(bit_numbering="msb0", endian="msb")]
         pub struct #name {
             #[packed_field(bits="0..")]
             #fields
@@ -39,18 +39,19 @@ pub fn cluster(item: TokenStream) -> TokenStream {
 
         impl ni_fpga::Datatype for #name {
             const FFI_READ: ni_fpga::ffi::Func<*mut Self> = |session, offset, target| unsafe {
-                let mut uninit_raw_target = std::mem::MaybeUninit::<[u8; std::mem::size_of::<Self>() / 8]>::uninit();
+                let mut uninit_raw_target = std::mem::MaybeUninit::<[u8; std::mem::size_of::<Self>()]>::uninit();
                 let status = ni_fpga::ffi::ReadArrayU8(
                     session,
                     offset,
                     uninit_raw_target.as_mut_ptr() as *mut u8,
-                    std::mem::size_of::<Self>() / 8,
+                    std::mem::size_of::<Self>(),
                 );
                 if status != ni_fpga::Status::Success.into() {
                     return status;
                 }
                 let raw_target = uninit_raw_target.assume_init();
-                *target = Self::unpack_from_slice(&raw_target).unwrap();
+                let slice_size_needed: usize = (Self::packed_bits() - 1) / 8 + 1;
+                *target = Self::unpack_from_slice(&raw_target[0..slice_size_needed]).unwrap();
                 ni_fpga::Status::Success.into()
             };
             const FFI_WRITE: ni_fpga::ffi::Func<Self> = |session, offset, value| unsafe {
