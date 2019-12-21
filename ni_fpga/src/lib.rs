@@ -1,6 +1,6 @@
 #![feature(const_generics)]
 mod datatype;
-mod ffi;
+pub mod ffi;
 mod session;
 mod status;
 

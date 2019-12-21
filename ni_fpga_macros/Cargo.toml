@@ -1,0 +1,12 @@
+[package]
+name = "ni_fpga_macros"
+version = "0.1.0"
+authors = ["Connor Worley <connorbworley@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ni_fpga_derive = { path = "../ni_fpga_derive" }
+packed_struct = "0.3.0"
+packed_struct_codegen = "0.3.0"

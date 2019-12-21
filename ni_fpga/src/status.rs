@@ -130,3 +130,9 @@ impl From<ffi::Status> for Status {
         Status(status)
     }
 }
+
+impl Into<ffi::Status> for Status {
+    fn into(self) -> ffi::Status {
+        self.0
+    }
+}
