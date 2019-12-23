@@ -38,25 +38,17 @@ pub fn cluster(item: TokenStream) -> TokenStream {
         }
 
         impl ni_fpga::Datatype for #name {
-            const FFI_READ: ni_fpga::ffi::Func<*mut Self> = |session, offset, target| unsafe {
-                let mut uninit_raw_target = std::mem::MaybeUninit::<[u8; std::mem::size_of::<Self>()]>::uninit();
-                let status = ni_fpga::ffi::ReadArrayU8(
-                    session,
-                    offset,
-                    uninit_raw_target.as_mut_ptr() as *mut u8,
-                    std::mem::size_of::<Self>(),
-                );
-                if status != ni_fpga::Status::Success.into() {
-                    return status;
-                }
-                let raw_target = uninit_raw_target.assume_init();
-                let slice_size_needed: usize = (Self::packed_bits() - 1) / 8 + 1;
-                *target = Self::unpack_from_slice(&raw_target[0..slice_size_needed]).unwrap();
-                ni_fpga::Status::Success.into()
-            };
-            const FFI_WRITE: ni_fpga::ffi::Func<Self> = |session, offset, value| unsafe {
-                ni_fpga::Status::Success.into()
-            };
+            fn read(session: &ni_fpga::Session, offset:ni_fpga:: Offset) -> Result<Self, ni_fpga::Status> {
+                let raw_data: [u8; std::mem::size_of::<Self>()] = session.read(offset)?;
+                let slice_size = Self::packed_bytes();
+                Ok(Self::unpack_from_slice(&raw_data[0..slice_size]).unwrap())
+            }
+            fn write(session: &ni_fpga::Session, offset: ni_fpga::Offset, value: Self) -> Result<(), ni_fpga::Status> {
+                let mut raw_data: [u8; std::mem::size_of::<Self>()] = Default::default();
+                let slice_size = Self::packed_bytes();
+                value.pack_to_slice(&mut raw_data[0..slice_size]).unwrap();
+                session.write(offset, raw_data)
+            }
         }
     };
 

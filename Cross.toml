@@ -1,2 +1,2 @@
 [target.arm-unknown-linux-gnueabi]
-image = "firstrustcompetition/cross:2019.1.0"
+image = "firstrustcompetition/cross:2020_v10"
