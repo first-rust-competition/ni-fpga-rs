@@ -1,4 +1,5 @@
 [workspace]
 members = [
     "ni_fpga",
+    "ni-fpga-sys",
 ]
