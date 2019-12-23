@@ -1,6 +1,8 @@
 #![feature(const_generics)]
+
+extern crate ni_fpga_sys as ffi;
+
 mod datatype;
-pub mod ffi;
 mod session;
 mod status;
 

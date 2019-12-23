@@ -5,8 +5,6 @@ pub type Offset = u32;
 pub type Session = u32;
 pub type Status = i32;
 
-pub type Func<T> = unsafe fn(Session, Offset, T) -> Status;
-
 #[link(name = "NiFpga")]
 extern "C" {
     #[link_name = "NiFpgaDll_Open"]

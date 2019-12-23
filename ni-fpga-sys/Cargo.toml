@@ -1,8 +1,10 @@
 [package]
-name = "ni_fpga"
+name = "ni-fpga-sys"
 version = "0.1.0"
 authors = ["Connor Worley <connorbworley@gmail.com>"]
 edition = "2018"
 
+links = "NiFpga"
+build = "build.rs"
+
 [dependencies]
-ni-fpga-sys = { version = "0.1", path = "../ni-fpga-sys" }
