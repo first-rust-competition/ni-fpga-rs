@@ -1,5 +1,5 @@
 [package]
-name = "ni_fpga"
+name = "ni-fpga"
 version = "0.1.0"
 authors = ["Connor Worley <connorbworley@gmail.com>"]
 edition = "2018"
