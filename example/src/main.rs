@@ -6,7 +6,7 @@ use ni_fpga::Session;
 use ni_fpga_macros::prelude::*;
 
 cluster! {
-    PWMConfig {
+    struct PWMConfig {
         period: u16,
         min_high: u16,
     }
@@ -17,26 +17,6 @@ fn main() {
         "/boot/user.lvbitx",
         "C571384F0C3E586B64ADFE11551DAAD0",
         "RIO0",
-    ).unwrap();
-
-    println!("{}", session.read::<PWMConfig>(98528).unwrap());
-
-    session.write(
-        98528,
-        PWMConfig {
-            period: 10000,
-            min_high: 500,
-        },
-    ).unwrap();
-
-    println!("{}", session.read::<PWMConfig>(98528).unwrap());
-
-    session.write(
-        98528,
-        PWMConfig {
-            period: 5000,
-            min_high: 500,
-        },
     ).unwrap();
 
     println!("{}", session.read::<PWMConfig>(98528).unwrap());

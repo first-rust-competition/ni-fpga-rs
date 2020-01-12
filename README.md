@@ -1,4 +1,4 @@
-# ni_fpga-rs
+# ni-fpga-rs
 Use this Rust interface to interact with NI FPGAs! See NI's [documentation](http://zone.ni.com/reference/en-XX/help/372928G-01/) about the FPGA C interface for more information.
 
 ## Supported types
@@ -29,7 +29,7 @@ fn main() {
         "RIO0",
     ).unwrap();
     loop {
-        // The VinVoltage register lives at offset 99174 
+        // The VinVoltage register lives at offset 99174
         let voltage: u16 = session.read(99174).unwrap();
         println!("Input voltage: {}", voltage);
         thread::sleep(time::Duration::from_secs(1));
