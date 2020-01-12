@@ -20,11 +20,14 @@ pub fn cluster(item: TokenStream) -> TokenStream {
     // Packed_struct also requires that we explicitly annotate that the first field
     // of each cluster starts at bit 0.
     let first_field_attr: syn::Attribute = syn::parse_quote! { #[packed_field(bits="0..")] };
-    match input.fields {
-        syn::Fields::Named(ref mut fields) => fields.named.iter_mut().nth(0),
-        syn::Fields::Unnamed(ref mut fields) => fields.unnamed.iter_mut().nth(0),
+    let maybe_first_field = match input.fields {
+        syn::Fields::Named(ref mut fields) => fields.named.iter_mut().next(),
+        syn::Fields::Unnamed(ref mut fields) => fields.unnamed.iter_mut().next(),
         syn::Fields::Unit => None,
-    }.map(|field| { field.attrs.push(first_field_attr); });
+    };
+    if let Some(field) = maybe_first_field {
+        field.attrs.push(first_field_attr);
+    }
 
     // Clusters need to be public to work with the ni-fpga interface. We can save
     // the user a little effort by ensuring the cluster is public for them.
