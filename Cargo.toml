@@ -2,7 +2,6 @@
 members = [
     "example",
     "ni-fpga",
-    "ni-fpga-derive",
     "ni-fpga-macros",
     "ni-fpga-sys",
 ]
