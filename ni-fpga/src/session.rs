@@ -1,5 +1,7 @@
 use std::ffi::CString;
 
+use bitvec::prelude::*;
+
 use crate::Datatype;
 use crate::ffi;
 use crate::Offset;
@@ -39,21 +41,51 @@ impl Session {
         &self,
         offset: Offset,
     ) -> Result<T, Status> {
-        Datatype::read(
-            self,
-            offset,
-        )
+        // Ideally we would declare an array of `[u8; (T::SIZE_IN_BITS - 1) / 8 + 1`,
+        // read from the FPGA, and take a BitSlice from it. However, this declaration
+        // is not allowed: https://github.com/rust-lang/rust/issues/68436.
+        // When this issue is fixed, we should use the described approach.
+        let mut bv = BitVec::with_capacity(((T::SIZE_IN_BITS - 1) / 8 + 1) * 8);
+        unsafe { bv.set_len(((T::SIZE_IN_BITS - 1) / 8 + 1) * 8); }
+        let fpga_bits = bv.as_mut_bitslice();
+        let status = Status::from(unsafe {
+            ffi::ReadArrayU8(
+                self.handle,
+                offset,
+                fpga_bits.as_mut_slice().as_mut_ptr(),
+                (T::SIZE_IN_BITS - 1) / 8 + 1,
+            )
+        });
+        println!("Offset {}: {}", offset, fpga_bits);
+        match status {
+            Status::Success => Ok(Datatype::unpack(&fpga_bits[((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS ..])),
+            _ => Err(status)
+        }
     }
     pub fn write<T: Datatype>(
         &self,
         offset: Offset,
-        value: T,
+        data: T,
     ) -> Result<(), Status> {
-        Datatype::write(
-            self,
-            offset,
-            value,
-        )
+        // Same as above - it would be better to declare an uninit fixed size array,
+        // take a mutable BitSlice from it, pack into it, then write the array to the
+        // FPGA.
+        let mut bv = BitVec::with_capacity(((T::SIZE_IN_BITS - 1) / 8 + 1) * 8);
+        unsafe { bv.set_len(((T::SIZE_IN_BITS - 1) / 8 + 1) * 8); }
+        let fpga_bits = bv.as_mut_bitslice();
+        Datatype::pack(&mut fpga_bits[((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS ..], data);
+        let status = Status::from(unsafe {
+            ffi::WriteArrayU8(
+                self.handle,
+                offset,
+                fpga_bits.as_slice().as_ptr(),
+                (T::SIZE_IN_BITS - 1) / 8 + 1,
+            )
+        });
+        match status {
+            Status::Success => Ok(()),
+            _ => Err(status)
+        }
     }
 }
 

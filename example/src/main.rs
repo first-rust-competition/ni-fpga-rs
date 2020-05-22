@@ -18,6 +18,16 @@ struct LEDs {
     rsl: bool,
 }
 
+#[derive(Clone, Copy, Debug)]
+#[derive(Cluster)]
+struct AnalogTriggerOutput {
+    in_hysteresis: bool,
+    over_limit: bool,
+    rising: bool,
+    falling: bool,
+}
+
+
 fn main() {
     let session = Session::open(
         "/boot/user.lvbitx",
@@ -25,7 +35,7 @@ fn main() {
         "RIO0",
     ).unwrap();
 
-    println!("{}", <PWMConfig as ni_fpga::Datatype>::FPGA_SIZE);
-
     println!("{:?}", session.read::<LEDs>(98320).unwrap());
+    println!("{:?}", session.read::<PWMConfig>(98536).unwrap());
+    println!("{:?}", session.read::<[AnalogTriggerOutput; 8]>(98424).unwrap());
 }
