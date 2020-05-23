@@ -30,6 +30,7 @@ pub fn derive_cluster(item: TokenStream) -> TokenStream {
                 })*
             }
 
+            #[allow(clippy::eval_order_dependence)]
             fn unpack(fpga_bits: &ni_fpga::FpgaBits) -> Self {
                 let mut remaining_bits = fpga_bits;
                 Self{#(
