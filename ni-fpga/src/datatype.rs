@@ -1,243 +1,144 @@
-use crate::ffi;
-use crate::Offset;
-use crate::Session;
-use crate::Status;
+use bitvec::prelude::*;
 
-type FFIFunc<T> = unsafe extern "C" fn(ffi::Session, ffi::Offset, T) -> ffi::Status;
-type FFIArrayFunc<T> = unsafe extern "C" fn(ffi::Session, ffi::Offset, T, usize) -> ffi::Status;
+#[cfg(target_endian = "little")]
+pub type FpgaBits = BitSlice<Msb0, u8>;
+#[cfg(target_endian = "big")]
+pub type FpgaBits = BitSlice<Lsb0, u8>;
 
-fn ffi_read<T>(
-    ffi_func: FFIFunc<*mut T>,
-    session: &Session,
-    offset: Offset,
-) -> Result<T, Status> {
-    let mut target = std::mem::MaybeUninit::<T>::uninit();
-    let status = Status::from(unsafe {
-        ffi_func(
-            session.handle,
-            offset,
-            target.as_mut_ptr(),
-        )
-    });
-    match status {
-        Status::Success => Ok(unsafe { target.assume_init() }),
-        _ => Err(status),
-    }
+pub trait Datatype {
+    const SIZE_IN_BITS: usize;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self);
+    fn unpack(fpga_bits: &FpgaBits) -> Self;
 }
 
-fn ffi_read_array<T, const N: usize>(
-    ffi_func: FFIArrayFunc<*mut T>,
-    session: &Session,
-    offset: Offset,
-) -> Result<[T; N], Status> {
-    let mut target = std::mem::MaybeUninit::<[T; N]>::uninit();
-    let status = Status::from(unsafe {
-        ffi_func(
-            session.handle,
-            offset,
-            target.as_mut_ptr() as *mut T,
-            N,
-        )
-    });
-    match status {
-        Status::Success => Ok(unsafe { target.assume_init() }),
-        _ => Err(status),
-    }
-}
+// Support array versions of any Datatype
+impl<T: Datatype, const N: usize> Datatype for [T; N] {
+    const SIZE_IN_BITS: usize = T::SIZE_IN_BITS * N;
 
-fn ffi_write<T>(
-    ffi_func: FFIFunc<T>,
-    session: &Session,
-    offset: Offset,
-    value: T,
-) -> Result<(), Status> {
-    let status = Status::from(unsafe {
-        ffi_func(
-            session.handle,
-            offset,
-            value,
-        )
-    });
-    match status {
-        Status::Success => Ok(()),
-        _ => Err(status),
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) {
+        data.iter()
+            .zip(fpga_bits.chunks_mut(T::SIZE_IN_BITS))
+            .for_each(|(src, bits)| Datatype::pack(bits, src))
     }
-}
 
-fn ffi_write_array<T, const N: usize>(
-    ffi_func: FFIArrayFunc<*const T>,
-    session: &Session,
-    offset: Offset,
-    value: [T; N],
-) -> Result<(), Status> {
-    let status = Status::from(unsafe {
-        ffi_func(
-            session.handle,
-            offset,
-            value.as_ptr(),
-            N,
-        )
-    });
-    match status {
-        Status::Success => Ok(()),
-        _ => Err(status),
+    fn unpack(fpga_bits: &FpgaBits) -> Self {
+        let mut data: [std::mem::MaybeUninit<T>; N] = std::mem::MaybeUninit::uninit_array();
+        data.iter_mut()
+            .zip(fpga_bits.chunks(T::SIZE_IN_BITS))
+            .for_each(|(dest, bits)| *dest = std::mem::MaybeUninit::new(Datatype::unpack(bits)));
+        // This is hack until https://github.com/rust-lang/rust/issues/61956 is addressed
+        let ptr = &mut data as *mut _ as *mut [T; N];
+        let res = unsafe { ptr.read() };
+        std::mem::forget(data);
+        res
     }
-}
-
-pub trait Datatype: Copy {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status>;
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status>;
 }
 
 impl Datatype for bool {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read(ffi::ReadBool, session, offset)
+    const SIZE_IN_BITS: usize = 1;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) {
+        fpga_bits.set(0, *data);
     }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write(ffi::WriteBool, session, offset, value)
-    }
-}
-impl<const N: usize> Datatype for [bool; N] {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read_array(ffi::ReadArrayBool, session, offset)
-    }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write_array(ffi::WriteArrayBool, session, offset, value)
+
+    fn unpack(fpga_bits: &FpgaBits) -> Self {
+        fpga_bits[0]
     }
 }
 
 impl Datatype for u8 {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read(ffi::ReadU8, session, offset)
+    const SIZE_IN_BITS: usize = 8;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) {
+        fpga_bits.store_be::<Self>(*data);
     }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write(ffi::WriteU8, session, offset, value)
-    }
-}
-impl<const N: usize> Datatype for [u8; N] {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read_array(ffi::ReadArrayU8, session, offset)
-    }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write_array(ffi::WriteArrayU8, session, offset, value)
+
+    fn unpack(fpga_bits: &FpgaBits) -> Self {
+        fpga_bits.load_be::<Self>()
     }
 }
 
 impl Datatype for u16 {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read(ffi::ReadU16, session, offset)
+    const SIZE_IN_BITS: usize = 16;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) {
+        fpga_bits.store_be::<Self>(*data);
     }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write(ffi::WriteU16, session, offset, value)
-    }
-}
-impl<const N: usize> Datatype for [u16; N] {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read_array(ffi::ReadArrayU16, session, offset)
-    }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write_array(ffi::WriteArrayU16, session, offset, value)
+
+    fn unpack(fpga_bits: &FpgaBits) -> Self {
+        fpga_bits.load_be::<Self>()
     }
 }
 
 impl Datatype for u32 {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read(ffi::ReadU32, session, offset)
+    const SIZE_IN_BITS: usize = 32;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) {
+        fpga_bits.store_be::<Self>(*data);
     }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write(ffi::WriteU32, session, offset, value)
-    }
-}
-impl<const N: usize> Datatype for [u32; N] {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read_array(ffi::ReadArrayU32, session, offset)
-    }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write_array(ffi::WriteArrayU32, session, offset, value)
+
+    fn unpack(fpga_bits: &FpgaBits) -> Self {
+        fpga_bits.load_be::<Self>()
     }
 }
 
 impl Datatype for u64 {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read(ffi::ReadU64, session, offset)
+    const SIZE_IN_BITS: usize = 64;
+
+    fn pack(_fpga_bits: &mut FpgaBits, _data: &Self) {
+        unimplemented!();
     }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write(ffi::WriteU64, session, offset, value)
-    }
-}
-impl<const N: usize> Datatype for [u64; N] {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read_array(ffi::ReadArrayU64, session, offset)
-    }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write_array(ffi::WriteArrayU64, session, offset, value)
+
+    fn unpack(_fpga_bits: &FpgaBits) -> Self {
+        unimplemented!();
     }
 }
 
 impl Datatype for i8 {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read(ffi::ReadI8, session, offset)
+    const SIZE_IN_BITS: usize = 8;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) {
+        u8::pack(fpga_bits, &(*data as u8))
     }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write(ffi::WriteI8, session, offset, value)
-    }
-}
-impl<const N: usize> Datatype for [i8; N] {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read_array(ffi::ReadArrayI8, session, offset)
-    }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write_array(ffi::WriteArrayI8, session, offset, value)
+
+    fn unpack(fpga_bits: &FpgaBits) -> Self {
+        u8::unpack(fpga_bits) as Self
     }
 }
 
 impl Datatype for i16 {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read(ffi::ReadI16, session, offset)
+    const SIZE_IN_BITS: usize = 16;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) {
+        u16::pack(fpga_bits, &(*data as u16))
     }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write(ffi::WriteI16, session, offset, value)
-    }
-}
-impl<const N: usize> Datatype for [i16; N] {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read_array(ffi::ReadArrayI16, session, offset)
-    }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write_array(ffi::WriteArrayI16, session, offset, value)
+
+    fn unpack(fpga_bits: &FpgaBits) -> Self {
+        u16::unpack(fpga_bits) as Self
     }
 }
 
 impl Datatype for i32 {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read(ffi::ReadI32, session, offset)
+    const SIZE_IN_BITS: usize = 32;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) {
+        u32::pack(fpga_bits, &(*data as u32))
     }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write(ffi::WriteI32, session, offset, value)
-    }
-}
-impl<const N: usize> Datatype for [i32; N] {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read_array(ffi::ReadArrayI32, session, offset)
-    }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write_array(ffi::WriteArrayI32, session, offset, value)
+
+    fn unpack(fpga_bits: &FpgaBits) -> Self {
+        u32::unpack(fpga_bits) as Self
     }
 }
 
 impl Datatype for i64 {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read(ffi::ReadI64, session, offset)
+    const SIZE_IN_BITS: usize = 64;
+
+    fn pack(_fpga_bits: &mut FpgaBits, _data: &Self) {
+        unimplemented!();
     }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write(ffi::WriteI64, session, offset, value)
-    }
-}
-impl<const N: usize> Datatype for [i64; N] {
-    fn read(session: &Session, offset: Offset) -> Result<Self, Status> {
-        ffi_read_array(ffi::ReadArrayI64, session, offset)
-    }
-    fn write(session: &Session, offset: Offset, value: Self) -> Result<(), Status> {
-        ffi_write_array(ffi::WriteArrayI64, session, offset, value)
+
+    fn unpack(_fpga_bits: &FpgaBits) -> Self {
+        unimplemented!();
     }
 }
