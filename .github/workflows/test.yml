@@ -25,10 +25,22 @@ jobs:
         components: rustfmt, clippy
         default: true
     - name: Install cross
-      run: cargo install cross
+      uses: actions-rs/cargo@v1
+      with:
+        command: install
+        args: cross
     - name: Build
       run: cross build --verbose --target=arm-unknown-linux-gnueabi
     - name: Run tests
-      run:
-        cross test --verbose --target=arm-unknown-linux-gnueabi &&
+      run: cross test --verbose --target=arm-unknown-linux-gnueabi &&
         rustfmt --check
+    - name: cargo fmt
+      uses: actions-rs/cargo@v1
+      with:
+        command: fmt
+        args: --all -- --check
+    - name: cargo clippy
+      uses: actions-rs/cargo@v1
+      with:
+        command: clippy
+        args: -- -D warnings
