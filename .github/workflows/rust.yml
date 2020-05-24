@@ -1,0 +1,25 @@
+name: Rust
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup
+      run:
+        sudo apt update
+        sudo apt install -y qemu-system-arm
+        sudo update-binfmt --enable
+        cargo install cross
+    - name: Build
+      run: cross build --verbose --target=arm-unknown-linux-gnueabi
+    - name: Run tests
+      run: cross test --verbose --target=arm-unknown-linux-gnueabi
