@@ -15,8 +15,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Setup
       run:
-        sudo apt update &&
-        sudo apt install -y qemu-system-arm &&
+        sudo apt=get update &&
+        sudo apt-get install -y binfmt-support qemu qemu-user-static qemu-system-arm &&
         sudo update-binfmts --enable &&
         cargo install cross
     - name: Build
