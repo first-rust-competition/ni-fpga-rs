@@ -8,5 +8,5 @@ description = "Safe Rust interface to NI FPGAs."
 
 [dependencies]
 bitvec = "0.17.4"
-ni-fpga-sys = "0.1.0"
+ni-fpga-sys = { path = "../ni-fpga-sys" }
 thiserror = "1.0.19"
