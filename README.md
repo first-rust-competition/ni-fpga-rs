@@ -1,4 +1,8 @@
 # ni-fpga-rs
+[![crates.io](https://img.shields.io/crates/v/ni-fpga.svg)](https://crates.io/crates/ni-fpga)
+[![docs.rs](https://docs.rs/ni-fpga/badge.svg)](https://docs.rs/ni-fpga)
+[![CI](https://github.com/first-rust-competition/ni-fpga-rs/workflows/CI/badge.svg)](https://github.com/first-rust-competition/ni-fpga-rs/actions?query=workflow%3ACI)
+
 Use this Rust interface to interact with NI FPGAs! See NI's [documentation](http://zone.ni.com/reference/en-XX/help/372928G-01/) about the FPGA C interface for more information.
 
 ## Supported types
