@@ -17,7 +17,7 @@ jobs:
       run:
         sudo apt update
         sudo apt install -y qemu-system-arm
-        sudo update-binfmt --enable
+        sudo update-binfmts --enable
         cargo install cross
     - name: Build
       run: cross build --verbose --target=arm-unknown-linux-gnueabi
