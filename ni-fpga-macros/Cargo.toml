@@ -3,6 +3,8 @@ name = "ni-fpga-macros"
 version = "0.1.0"
 authors = ["Connor Worley <connorbworley@gmail.com>"]
 edition = "2018"
+license = "MIT"
+description = "Macros to be used with the ni-fpga crate."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
