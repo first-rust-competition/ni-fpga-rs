@@ -20,9 +20,9 @@ jobs:
       working-directory: ./ni-fpga-macros
       env:
         CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_ACCESS_TOKEN }}
-      run: cargo publish --no-verify
+      run: cargo publish --no-verify || true
     - name: Publish ni-fpga-sys
-      working-directory: ./ni-fpga-sys || true
+      working-directory: ./ni-fpga-sys
       env:
         CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_ACCESS_TOKEN }}
       run: cargo publish --no-verify || true
