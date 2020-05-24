@@ -1,10 +1,11 @@
 [package]
 name = "ni-fpga-sys"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["Connor Worley <connorbworley@gmail.com>"]
 edition = "2018"
 license = "MIT"
 description = "Rust bindings to the NI FPGA C API."
+repository = "https://github.com/first-rust-competition/ni-fpga-rs"
 
 links = "NiFpga"
 build = "build.rs"

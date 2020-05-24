@@ -1,12 +1,14 @@
 [package]
 name = "ni-fpga"
-version = "0.1.0"
+version = "1.0.0"
 authors = ["Connor Worley <connorbworley@gmail.com>"]
 edition = "2018"
 license = "MIT"
 description = "Safe Rust interface to NI FPGAs."
+repository = "https://github.com/first-rust-competition/ni-fpga-rs"
+readme = "../README.md"
 
 [dependencies]
 bitvec = "0.17.4"
-ni-fpga-sys = { version = "0.1.0", path = "../ni-fpga-sys" }
+ni-fpga-sys = { version = "1.0.0", path = "../ni-fpga-sys" }
 thiserror = "1.0.19"
