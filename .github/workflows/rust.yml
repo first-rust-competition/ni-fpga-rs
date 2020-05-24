@@ -15,9 +15,9 @@ jobs:
     - uses: actions/checkout@v2
     - name: Setup
       run:
-        sudo apt update
-        sudo apt install -y qemu-system-arm
-        sudo update-binfmts --enable
+        sudo apt update &&
+        sudo apt install -y qemu-system-arm &&
+        sudo update-binfmts --enable &&
         cargo install cross
     - name: Build
       run: cross build --verbose --target=arm-unknown-linux-gnueabi
