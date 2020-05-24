@@ -26,7 +26,21 @@ struct PWMConfig {
 ```
 
 ### Enums
-Enums are currently unsupported.
+Enums are supported via a derive macro. Arrays of Enums are also supported. One of `u8`, `u16`, `u32`, or `u64` will be chosen as a backing type depending on the number of variants.
+```rust
+#[derive(Enum)]
+enum SPIDebugState {
+    Idle,
+    CheckWindow,
+    CheckAvailable,
+    SetFIFOMark,
+    EnableSPI,
+    StuffFIFO,
+    CheckMark,
+    ShuffleData,
+    Disable,
+}
+```
 
 ### Fixed-point number types
 FXP types are currently unsupported.
@@ -36,28 +50,46 @@ Register offset can be found by introspecting `/boot/user.lvbitx` on a roboRIO. 
 
 ## Full example
 ```rust
-use std::{thread, time};
-
 use ni_fpga::Session;
-use ni_fpga_macros::Cluster;
+use ni_fpga_macros::{Cluster, Enum};
 
 #[derive(Cluster, Debug)]
 struct PWMConfig {
     period: u16,
     min_high: u16,
 }
+#[derive(Cluster, Debug)]
+struct AnalogTriggerOutput {
+    in_hysteresis: bool,
+    over_limit: bool,
+    rising: bool,
+    falling: bool,
+}
 
-fn main(){
+#[derive(Enum, Debug)]
+enum SPIDebugState {
+    Idle,
+    CheckWindow,
+    CheckAvailable,
+    SetFIFOMark,
+    EnableSPI,
+    StuffFIFO,
+    CheckMark,
+    ShuffleData,
+    Disable,
+}
+
+fn main() -> Result<(), ni_fpga::Error> {
     let session = Session::open(
         "/boot/user.lvbitx",
-        "C571384F0C3E586B64ADFE11551DAAD0",
+        "264D0BA312FF00B741D4742415E1D470",
         "RIO0",
-    ).unwrap();
-    
-    // Offsets will vary between FPGA images
-    let voltage: u16 = session.read(99174).unwrap();
-    println!("Input voltage: {:?}", voltage);
-    
-    println!("PWM configuration: {:?}", session.read::<PWMConfig>(98536).unwrap());
+    )?;
+
+    println!("Input voltage: {:?}", session.read::<u16>(99174)?);
+    println!("{:#?}", session.read::<PWMConfig>(98536)?);
+    println!("{:#?}", session.read::<[AnalogTriggerOutput; 8]>(98424)?);
+    println!("{:#?}", session.read::<SPIDebugState>(99314)?);
+    Ok(())
 }
 ```
