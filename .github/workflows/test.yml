@@ -13,12 +13,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Setup
+    - name: Setup QEMU/binfmts
       run:
         sudo apt-get update &&
         sudo apt-get install -y binfmt-support qemu qemu-user-static qemu-system-arm &&
-        sudo update-binfmts --enable &&
-        cargo install cross rustfmt
+        sudo update-binfmts --enable
+    - name: Install latest nightly
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        components: rustfmt, clippy
+        default: true
+    - name: Install cross
+      run: cargo install cross
     - name: Build
       run: cross build --verbose --target=arm-unknown-linux-gnueabi
     - name: Run tests
