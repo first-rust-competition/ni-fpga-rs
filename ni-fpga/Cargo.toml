@@ -3,6 +3,8 @@ name = "ni-fpga"
 version = "0.1.0"
 authors = ["Connor Worley <connorbworley@gmail.com>"]
 edition = "2018"
+license = "MIT"
+description = "Safe Rust interface to NI FPGAs."
 
 [dependencies]
 bitvec = "0.17.4"
