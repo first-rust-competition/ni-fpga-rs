@@ -1,0 +1,45 @@
+name: Rust
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup QEMU/binfmts
+      run:
+        sudo apt-get update &&
+        sudo apt-get install -y binfmt-support qemu qemu-user-static qemu-system-arm &&
+        sudo update-binfmts --enable
+    - name: Install latest nightly
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: nightly
+        components: rustfmt, clippy
+        default: true
+    - name: cargo install cross
+      uses: actions-rs/cargo@v1
+      with:
+        command: install
+        args: cross
+    - name: cross build
+      run: cross build --verbose --target=arm-unknown-linux-gnueabi
+    - name: cross test
+      run: cross test --verbose --target=arm-unknown-linux-gnueabi
+    - name: cargo fmt
+      uses: actions-rs/cargo@v1
+      with:
+        command: fmt
+        args: --all -- --check
+    - name: cargo clippy
+      uses: actions-rs/cargo@v1
+      with:
+        command: clippy
+        args: -- -D warnings -A incomplete_features
