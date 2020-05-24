@@ -24,16 +24,15 @@ jobs:
         toolchain: nightly
         components: rustfmt, clippy
         default: true
-    - name: Install cross
+    - name: cargo install cross
       uses: actions-rs/cargo@v1
       with:
         command: install
         args: cross
-    - name: Build
+    - name: cross build
       run: cross build --verbose --target=arm-unknown-linux-gnueabi
-    - name: Run tests
-      run: cross test --verbose --target=arm-unknown-linux-gnueabi &&
-        rustfmt --check
+    - name: cross test
+      run: cross test --verbose --target=arm-unknown-linux-gnueabi
     - name: cargo fmt
       uses: actions-rs/cargo@v1
       with:
