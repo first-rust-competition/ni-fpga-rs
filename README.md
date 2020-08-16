@@ -18,6 +18,8 @@ This interface supports reading and writing the following types, both indviduall
 * i16
 * i32
 * i64
+* f32 (for SGL registers)
+* f64 (for DBL registers)
 
 ### Clusters
 Clusters are supported via a derive macro. Arrays of Clusters are not guaranteed to be supported.
