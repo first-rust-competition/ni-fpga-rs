@@ -11,11 +11,7 @@ struct TestCluster {
     u: u16,
 }
 
-fn test_case<T: PartialEq + std::fmt::Debug>(
-    test_case_name: &str,
-    expected: T,
-    actual: T,
-) {
+fn test_case<T: PartialEq + std::fmt::Debug>(test_case_name: &str, expected: T, actual: T) {
     eprint!("{}...", test_case_name);
     if expected != actual {
         eprintln!(
@@ -40,11 +36,7 @@ fn main() -> Result<(), ni_fpga::Error> {
         "RIO0",
     )?;
 
-    test_case(
-        "read plain U8",
-        session.read::<u8>(98306)?,
-        0b00000001,
-    );
+    test_case("read plain U8", session.read::<u8>(98306)?, 0b00000001);
     test_case(
         "read plain U16",
         session.read::<u16>(98310)?,
@@ -61,11 +53,7 @@ fn main() -> Result<(), ni_fpga::Error> {
         0b1111111101111111001111110001111100001111000001110000001100000001,
     );
 
-    test_case(
-        "read plain I8",
-        session.read::<i8>(98322)?,
-        0b10000000,
-    );
+    test_case("read plain I8", session.read::<i8>(98322)?, 0b10000000);
     test_case(
         "read plain I16",
         session.read::<i16>(98326)?,
@@ -86,16 +74,8 @@ fn main() -> Result<(), ni_fpga::Error> {
     // TODO: Test unsigned FXP @ 98342
     // TODO: Test signed FXP @ 98346
 
-    test_case(
-        "read true bool",
-        session.read::<bool>(98350)?,
-        true,
-    );
-    test_case(
-        "read false bool",
-        session.read::<bool>(98354)?,
-        false,
-    );
+    test_case("read true bool", session.read::<bool>(98350)?, true);
+    test_case("read false bool", session.read::<bool>(98354)?, false);
     test_case(
         "read bool array",
         session.read::<[bool; 8]>(98358)?,
@@ -105,7 +85,7 @@ fn main() -> Result<(), ni_fpga::Error> {
     test_case(
         "read cluster",
         session.read::<TestCluster>(98360)?,
-        TestCluster{ b: false, u: 1337 },
+        TestCluster { b: false, u: 1337 },
     );
     // TODO: Investigate cluster array memory layout in order to fix this test.
     // The expected array may be incorrect here, I don't exactly remember what I used for the
@@ -113,7 +93,10 @@ fn main() -> Result<(), ni_fpga::Error> {
     test_case(
         "read cluster array",
         session.read::<[TestCluster; 2]>(98360)?,
-        [TestCluster{ b: true, u: 255 }, TestCluster{ b: false, u: 1337 }],
+        [
+            TestCluster { b: true, u: 255 },
+            TestCluster { b: false, u: 1337 },
+        ],
     );
 
     Ok(())
