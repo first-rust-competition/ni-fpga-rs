@@ -13,14 +13,14 @@ This interface supports reading and writing the following types, both indviduall
 * u8
 * u16
 * u32
-* ~u64~
+* u64
 * i8
 * i16
 * i32
-* ~i64~
+* i64
 
 ### Clusters
-Clusters are supported via a derive macro. Arrays of Clusters are also supported.
+Clusters are supported via a derive macro. Arrays of Clusters are not guaranteed to be supported.
 ```rust
 #[derive(Cluster)]
 struct PWMConfig {
