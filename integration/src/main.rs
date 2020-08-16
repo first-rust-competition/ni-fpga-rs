@@ -11,7 +11,7 @@ struct TestCluster {
     u: u16,
 }
 
-fn test_case<T: PartialEq + std::fmt::Debug>(test_case_name: &str, expected: T, actual: T) {
+fn test_case<T: PartialEq + std::fmt::Debug>(test_case_name: &str, actual: T, expected: T) {
     eprint!("{}...", test_case_name);
     if expected != actual {
         eprintln!(
@@ -70,7 +70,9 @@ fn main() -> Result<(), ni_fpga::Error> {
         0b1111111111111110111111001111100011110000111000001100000010000000,
     );
 
-    // TODO: Test SGL @ 98336
+    #[allow(clippy::approx_constant)]
+    test_case("read SGL", session.read::<f32>(98336)?, 3.14);
+
     // TODO: Test unsigned FXP @ 98342
     // TODO: Test signed FXP @ 98346
 

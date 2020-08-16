@@ -155,6 +155,30 @@ impl Datatype for i64 {
     }
 }
 
+impl Datatype for f32 {
+    const SIZE_IN_BITS: usize = 32;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        u32::pack(fpga_bits, &data.to_bits())
+    }
+
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        Ok(Self::from_bits(u32::unpack(fpga_bits)?))
+    }
+}
+
+impl Datatype for f64 {
+    const SIZE_IN_BITS: usize = 64;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        u64::pack(fpga_bits, &data.to_bits())
+    }
+
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        Ok(Self::from_bits(u64::unpack(fpga_bits)?))
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -181,7 +205,6 @@ mod tests {
         Ok(())
     }
 
-    // Test against some random constants
     #[test]
     fn test_u8() -> Result<(), Error> {
         round_trip_test(&0b00000001u8)?;
@@ -225,6 +248,17 @@ mod tests {
     #[allow(overflowing_literals)]
     fn test_i64() -> Result<(), Error> {
         round_trip_test(&0b1111111111111110111111001111100011110000111000001100000010000000i64)?;
+        Ok(())
+    }
+
+    #[test]
+    fn test_f32() -> Result<(), Error> {
+        round_trip_test(&3.14f32)?;
+        Ok(())
+    }
+    #[test]
+    fn test_f64() -> Result<(), Error> {
+        round_trip_test(&3.14f64)?;
         Ok(())
     }
 }
