@@ -95,12 +95,14 @@ impl Datatype for u32 {
 impl Datatype for u64 {
     const SIZE_IN_BITS: usize = 64;
 
-    fn pack(_fpga_bits: &mut FpgaBits, _data: &Self) -> Result<(), Error> {
-        unimplemented!();
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        fpga_bits[..32].store_be::<u32>((*data >> 32) as u32);
+        fpga_bits[32..].store_be::<u32>(*data as u32);
+        Ok(())
     }
 
-    fn unpack(_fpga_bits: &FpgaBits) -> Result<Self, Error> {
-        unimplemented!();
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        Ok(((fpga_bits[..32].load_be::<u32>() as u64) << 32) | fpga_bits[32..].load_be::<u32>() as u64)
     }
 }
 
@@ -143,11 +145,103 @@ impl Datatype for i32 {
 impl Datatype for i64 {
     const SIZE_IN_BITS: usize = 64;
 
-    fn pack(_fpga_bits: &mut FpgaBits, _data: &Self) -> Result<(), Error> {
-        unimplemented!();
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        u64::pack(fpga_bits, &(*data as u64))
     }
 
-    fn unpack(_fpga_bits: &FpgaBits) -> Result<Self, Error> {
-        unimplemented!();
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        Ok(u64::unpack(fpga_bits)? as Self)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    fn round_trip_test<T: Datatype + PartialEq + std::fmt::Debug>(
+        data: &T,
+    ) -> Result<(), Error> {
+        let mut bv = BitVec::with_capacity(T::SIZE_IN_BITS);
+        unsafe {
+            bv.set_len(T::SIZE_IN_BITS);
+        }
+        let mut fpga_bits = bv.as_mut_bitslice();
+        T::pack(&mut fpga_bits, data)?;
+        assert_eq!(T::unpack(&fpga_bits)?, *data);
+        Ok(())
+    }
+
+    #[test]
+    fn test_bool() -> Result<(), Error>{
+        round_trip_test(&true)?;
+        Ok(())
+    }
+
+    #[test]
+    fn test_bool_array() -> Result<(), Error>{
+        round_trip_test(&[true, false])?;
+        Ok(())
+    }
+
+    // Test against some random constants
+    #[test]
+    fn test_u8() -> Result<(), Error>{
+        round_trip_test(
+            &0b00000001u8,
+        )?;
+        Ok(())
+    }
+    #[test]
+    fn test_u16() -> Result<(), Error>{
+        round_trip_test(
+            &0b0000001100000001u16,
+        )?;
+        Ok(())
+    }
+    #[test]
+    fn test_u32() -> Result<(), Error>{
+        round_trip_test(
+            &0b00001111000001110000001100000001u32,
+        )?;
+        Ok(())
+    }
+    #[test]
+    fn test_u64() -> Result<(), Error>{
+        round_trip_test(
+            &0b1111111101111111001111110001111100001111000001110000001100000001u64,
+        )?;
+        Ok(())
+    }
+
+    #[test]
+    #[allow(overflowing_literals)]
+    fn test_i8() -> Result<(), Error>{
+        round_trip_test(
+            &0b10000000i8,
+        )?;
+        Ok(())
+    }
+    #[test]
+    #[allow(overflowing_literals)]
+    fn test_i16() -> Result<(), Error>{
+        round_trip_test(
+            &0b1100000010000000i16,
+        )?;
+        Ok(())
+    }
+    #[test]
+    #[allow(overflowing_literals)]
+    fn test_i32() -> Result<(), Error>{
+        round_trip_test(
+            &0b11110000111000001100000010000000i32,
+        )?;
+        Ok(())
+    }
+    #[test]
+    #[allow(overflowing_literals)]
+    fn test_i64() -> Result<(), Error>{
+        round_trip_test(
+            &0b1111111111111110111111001111100011110000111000001100000010000000i64,
+        )?;
+        Ok(())
     }
 }
