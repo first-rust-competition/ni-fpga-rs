@@ -1,7 +1,7 @@
 use std::io::Write;
 
 use colored::*;
-use ni_fpga::fxp::unsigned::UnsignedFXP;
+use ni_fpga::fxp::{SignedFXP, UnsignedFXP};
 use ni_fpga::Session;
 use ni_fpga_macros::Cluster;
 use tempfile::NamedTempFile;
@@ -79,7 +79,11 @@ fn main() -> Result<(), ni_fpga::Error> {
         session.read::<UnsignedFXP<4, 3>>(98342)?,
         UnsignedFXP::from_float(4.5)?,
     );
-    // TODO: Test signed FXP @ 98346
+    test_case(
+        "read unsigned FXP",
+        session.read::<SignedFXP<4, 3>>(98346)?,
+        SignedFXP::from_float(-1.5)?,
+    );
 
     test_case("read true bool", session.read::<bool>(98350)?, true);
     test_case("read false bool", session.read::<bool>(98354)?, false);
