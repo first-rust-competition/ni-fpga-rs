@@ -49,7 +49,13 @@ enum SPIDebugState {
 ```
 
 ### Fixed-point numeric types
-FXP types are currently unsupported.
+Signed and unsigned FXP types are implemented in the `fxp` module. The types both take two generic parameters: word length and integer length. Word length is the actual number of bits used by the type. Integer length is such that the maximum value of the type is 2<sup>integer length</sup> - 1 (half if it is signed) and the resolution of the type is 2<sup>integer length - word length</sup>. For example, if an unsigned FXP has a word length of 8 and an integer length of 7, then its maximum value is 127 and its resolution is 0.5.
+```rust
+assert_eq!(
+    SignedFXP::<8, 7>::from_float(-1.5)? + SignedFXP::<8, 7>::from_float(4.0)?,
+    SignedFXP::<8, 7>::from_float(2.5)?,
+);
+```
 
 ## Locating register offsets
 Register offset can be found by introspecting `/boot/user.lvbitx` on a roboRIO. This file is also present in [first-rust-competition/cross-images](https://github.com/first-rust-competition/cross-images) images.
