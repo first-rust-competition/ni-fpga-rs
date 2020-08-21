@@ -1,6 +1,7 @@
 use std::io::Write;
 
 use colored::*;
+use ni_fpga::fxp::{SignedFXP, UnsignedFXP};
 use ni_fpga::Session;
 use ni_fpga_macros::Cluster;
 use tempfile::NamedTempFile;
@@ -73,8 +74,16 @@ fn main() -> Result<(), ni_fpga::Error> {
     #[allow(clippy::approx_constant)]
     test_case("read SGL", session.read::<f32>(98336)?, 3.14);
 
-    // TODO: Test unsigned FXP @ 98342
-    // TODO: Test signed FXP @ 98346
+    test_case(
+        "read unsigned FXP",
+        session.read::<UnsignedFXP<4, 3>>(98342)?,
+        UnsignedFXP::from_float(4.5)?,
+    );
+    test_case(
+        "read unsigned FXP",
+        session.read::<SignedFXP<4, 3>>(98346)?,
+        SignedFXP::from_float(-1.5)?,
+    );
 
     test_case("read true bool", session.read::<bool>(98350)?, true);
     test_case("read false bool", session.read::<bool>(98354)?, false);
