@@ -109,6 +109,5 @@ fn main() -> Result<(), ni_fpga::Error> {
 ## Contributing
 Contributions are welcome and appreciated. Look at [open issues](https://github.com/first-rust-competition/ni-fpga-rs/issues) to find tasks to work on. We especially need help with:
 * Creating an automated testing strategy
-* Handling fixed-point numeric types
 * Improving documentation
 * Adding support for IRQs and FIFOs (see [NI API reference](http://zone.ni.com/reference/en-XX/help/372928G-01/TOC2.htm))
