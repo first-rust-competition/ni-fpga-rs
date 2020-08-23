@@ -115,11 +115,27 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool>
         }
     }
 
-    fn abs(self) -> Self {
+    pub fn abs(self) -> Self {
         if !SIGNED || self.0 & Self::SIGN_MASK == 0 {
             self
         } else {
             Self((self.0 ^ Self::WORD_MASK) + 1)
+        }
+    }
+
+    pub fn max_value() -> Self {
+        if !SIGNED {
+            Self(Self::WORD_MASK)
+        } else {
+            Self(Self::WORD_MASK ^ Self::SIGN_MASK)
+        }
+    }
+
+    pub fn min_value() -> Self {
+        if !SIGNED {
+            Self(0)
+        } else {
+            Self(Self::SIGN_MASK)
         }
     }
 }
