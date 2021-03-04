@@ -1,6 +1,5 @@
-use crate::Datatype;
-use crate::Error;
-use crate::FpgaBits;
+use crate::datatype::{Datatype, FpgaBits};
+use crate::errors::Error;
 
 pub struct FXP<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool>(u64);
 

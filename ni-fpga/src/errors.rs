@@ -1,6 +1,6 @@
 use thiserror::Error;
 
-use crate::Status;
+use crate::status::Status;
 
 #[derive(Debug, Error, PartialEq)]
 pub enum Error {

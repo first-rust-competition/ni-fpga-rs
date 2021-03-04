@@ -1,3 +1,4 @@
+#![feature(const_evaluatable_checked)]
 #![feature(const_generics)]
 #![feature(maybe_uninit_uninit_array)]
 
@@ -9,6 +10,7 @@ pub mod fxp;
 mod session;
 mod status;
 
+// Keep these for backwards compatibility, but don't use them internally
 pub use datatype::{Datatype, FpgaBits};
 pub use errors::Error;
 pub type Offset = ffi::Offset;
