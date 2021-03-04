@@ -1,6 +1,6 @@
 use bitvec::prelude::*;
 
-use crate::Error;
+use crate::errors::Error;
 
 #[cfg(target_endian = "little")]
 pub type FpgaBits = BitSlice<Msb0, u8>;

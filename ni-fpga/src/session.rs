@@ -1,12 +1,10 @@
 use std::ffi::CString;
 
-use bitvec::prelude::*;
-
+use crate::datatype::{Datatype, FpgaBits};
+use crate::errors::Error;
 use crate::ffi;
-use crate::Datatype;
-use crate::Error;
-use crate::Offset;
-use crate::Status;
+use crate::ffi::Offset;
+use crate::status::Status;
 
 pub struct Session {
     pub handle: ffi::Session,
@@ -32,49 +30,48 @@ impl Session {
             _ => Err(Error::FPGA(status)),
         }
     }
-    pub fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error> {
-        // Ideally we would declare an array of `[u8; (T::SIZE_IN_BITS - 1) / 8 + 1`,
-        // read from the FPGA, and take a BitSlice from it. However, this declaration
-        // is not allowed: https://github.com/rust-lang/rust/issues/68436.
-        // When this issue is fixed, we should use the described approach.
-        let mut bv = BitVec::with_capacity(((T::SIZE_IN_BITS - 1) / 8 + 1) * 8);
-        unsafe {
-            bv.set_len(((T::SIZE_IN_BITS - 1) / 8 + 1) * 8);
-        }
-        let fpga_bits = bv.as_mut_bitslice();
+    pub fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>
+    where
+        [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
+    {
+        // We don't care about initializing these buffers, but it would be nice to clean up eventaully
+        // TODO: replace with Default::default() when a suitable const-generic default exists
+        let mut buffer = unsafe {
+            std::mem::MaybeUninit::<[u8; (T::SIZE_IN_BITS - 1) / 8 + 1]>::uninit().assume_init()
+        };
         let status = Status::from(unsafe {
             ffi::ReadArrayU8(
                 self.handle,
                 offset,
-                fpga_bits.as_mut_slice().as_mut_ptr(),
+                buffer.as_mut_ptr(),
                 (T::SIZE_IN_BITS - 1) / 8 + 1,
             )
         });
         match status {
             Status::Success => Ok(Datatype::unpack(
-                &fpga_bits[((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],
+                &FpgaBits::from_slice(&buffer)
+                    [((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],
             )?),
             _ => Err(Error::FPGA(status)),
         }
     }
-    pub fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error> {
-        // Same as above - it would be better to declare an uninit fixed size array,
-        // take a mutable BitSlice from it, pack into it, then write the array to the
-        // FPGA.
-        let mut bv = BitVec::with_capacity(((T::SIZE_IN_BITS - 1) / 8 + 1) * 8);
-        unsafe {
-            bv.set_len(((T::SIZE_IN_BITS - 1) / 8 + 1) * 8);
-        }
-        let fpga_bits = bv.as_mut_bitslice();
+    pub fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>
+    where
+        [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
+    {
+        let mut buffer = unsafe {
+            std::mem::MaybeUninit::<[u8; (T::SIZE_IN_BITS - 1) / 8 + 1]>::uninit().assume_init()
+        };
         Datatype::pack(
-            &mut fpga_bits[((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],
+            &mut FpgaBits::from_slice_mut(&mut buffer)
+                [((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],
             data,
         )?;
         let status = Status::from(unsafe {
             ffi::WriteArrayU8(
                 self.handle,
                 offset,
-                fpga_bits.as_slice().as_ptr(),
+                buffer.as_ptr(),
                 (T::SIZE_IN_BITS - 1) / 8 + 1,
             )
         });
