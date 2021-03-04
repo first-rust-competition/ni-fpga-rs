@@ -17,14 +17,14 @@ jobs:
       working-directory: ./ni-fpga-sys
       env:
         CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_ACCESS_TOKEN }}
-      run: git diff --quiet HEAD^ ./Cargo.toml || (cargo publish && sleep 15)
+      run: git diff --quiet HEAD^ ./Cargo.toml || (cargo publish +nightly && sleep 15)
     - name: Publish ni-fpga
       working-directory: ./ni-fpga
       env:
         CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_ACCESS_TOKEN }}
-      run: git diff --quiet HEAD^ ./Cargo.toml || cargo publish
+      run: git diff --quiet HEAD^ ./Cargo.toml || cargo publish +nightly
     - name: Publish ni-fpga-macros
       working-directory: ./ni-fpga-macros
       env:
         CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_ACCESS_TOKEN }}
-      run: git diff --quiet HEAD^ ./Cargo.toml || cargo publish
+      run: git diff --quiet HEAD^ ./Cargo.toml || cargo publish +nightly
