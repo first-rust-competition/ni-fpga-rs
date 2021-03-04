@@ -131,8 +131,8 @@ impl From<ffi::Status> for Status {
     }
 }
 
-impl Into<ffi::Status> for Status {
-    fn into(self) -> ffi::Status {
-        self.0
+impl From<Status> for ffi::Status {
+    fn from(status: Status) -> Self {
+        status.0
     }
 }
