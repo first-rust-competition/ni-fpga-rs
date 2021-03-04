@@ -4,6 +4,7 @@ use crate::status::Status;
 
 #[derive(Debug, Error, PartialEq)]
 pub enum Error {
+    #[allow(clippy::upper_case_acronyms)]
     #[error("an FPGA operation failed: {0}")]
     FPGA(Status),
     #[error("the FPGA returned an invalid enum discriminant: {0}")]

@@ -1,6 +1,7 @@
 use crate::datatype::{Datatype, FpgaBits};
 use crate::errors::Error;
 
+#[allow(clippy::upper_case_acronyms)]
 pub struct FXP<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool>(u64);
 
 pub type SignedFXP<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8> =
