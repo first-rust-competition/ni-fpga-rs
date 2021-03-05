@@ -27,4 +27,4 @@ jobs:
         CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_ACCESS_TOKEN }}
       with:
         command: workspaces
-        args: publish --yes --from-git
+        args: publish --yes --from-git --skip-published

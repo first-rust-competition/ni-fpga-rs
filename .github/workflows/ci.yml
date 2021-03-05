@@ -34,7 +34,7 @@ jobs:
       uses: actions-rs/cargo@v1
       with:
         use-cross: true
-        command: build
+        command: test
         args: --verbose --target=arm-unknown-linux-gnueabi
     - name: cargo fmt
       uses: actions-rs/cargo@v1
