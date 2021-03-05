@@ -11,20 +11,20 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Install latest nightly
+      uses: actions-rs/toolchain@v1
       with:
-        fetch-depth: 2
-    - name: Publish ni-fpga-sys
-      working-directory: ./ni-fpga-sys
+        toolchain: nightly
+        default: true
+    - name: cargo install cargo-workspaces
+      uses: actions-rs/cargo@v1
+      with:
+        command: install
+        args: cargo-workspaces
+    - name: Publish
+      uses: actions-rs/cargo@v1
       env:
         CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_ACCESS_TOKEN }}
-      run: git diff --quiet HEAD^ ./Cargo.toml || (cargo publish +nightly && sleep 15)
-    - name: Publish ni-fpga
-      working-directory: ./ni-fpga
-      env:
-        CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_ACCESS_TOKEN }}
-      run: git diff --quiet HEAD^ ./Cargo.toml || cargo publish +nightly
-    - name: Publish ni-fpga-macros
-      working-directory: ./ni-fpga-macros
-      env:
-        CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_ACCESS_TOKEN }}
-      run: git diff --quiet HEAD^ ./Cargo.toml || cargo publish +nightly
+      with:
+        command: workspaces
+        args: publish --yes --from-git
