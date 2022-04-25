@@ -3,6 +3,7 @@ name = "ni-fpga"
 version = "1.4.1"
 authors = ["Connor Worley <connorbworley@gmail.com>"]
 edition = "2018"
+license = "MIT"
 license-file = "LICENSE.md"
 description = "Safe Rust interface to NI FPGAs with FXP support."
 readme = "README.md"
