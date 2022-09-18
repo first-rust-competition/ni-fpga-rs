@@ -1,4 +1,3 @@
-#![feature(const_evaluatable_checked)]
 #![feature(generic_const_exprs)]
 #![feature(maybe_uninit_uninit_array)]
 
