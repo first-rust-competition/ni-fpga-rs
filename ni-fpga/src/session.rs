@@ -34,11 +34,7 @@ impl Session {
     where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
     {
-        // We don't care about initializing these buffers, but it would be nice to clean up eventaully
-        // TODO: replace with Default::default() when a suitable const-generic default exists
-        let mut buffer = unsafe {
-            std::mem::MaybeUninit::<[u8; (T::SIZE_IN_BITS - 1) / 8 + 1]>::uninit().assume_init()
-        };
+        let mut buffer = [0u8; (T::SIZE_IN_BITS - 1) / 8 + 1];
         let status = Status::from(unsafe {
             ffi::ReadArrayU8(
                 self.handle,
@@ -59,9 +55,7 @@ impl Session {
     where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
     {
-        let mut buffer = unsafe {
-            std::mem::MaybeUninit::<[u8; (T::SIZE_IN_BITS - 1) / 8 + 1]>::uninit().assume_init()
-        };
+        let mut buffer = [0u8; (T::SIZE_IN_BITS - 1) / 8 + 1];
         Datatype::pack(
             &mut FpgaBits::from_slice_mut(&mut buffer)
                 [((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],

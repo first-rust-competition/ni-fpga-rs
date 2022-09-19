@@ -315,9 +315,9 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> Dataty
 
     fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
         if WORD_LENGTH > 32 {
-            u64::pack(fpga_bits, &(*data).0)
+            u64::pack(fpga_bits, &(data.0))
         } else {
-            u32::pack(fpga_bits, &((*data).0 as u32))
+            u32::pack(fpga_bits, &(data.0 as u32))
         }
     }
 
