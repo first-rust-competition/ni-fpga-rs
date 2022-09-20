@@ -3,9 +3,9 @@ use bitvec::prelude::*;
 use crate::errors::Error;
 
 #[cfg(target_endian = "little")]
-pub type FpgaBits = BitSlice<Msb0, u8>;
+pub type FpgaBits = BitSlice<u8, Msb0>;
 #[cfg(target_endian = "big")]
-pub type FpgaBits = BitSlice<Lsb0, u8>;
+pub type FpgaBits = BitSlice<u8, Lsb0>;
 
 pub trait Datatype: Sized {
     const SIZE_IN_BITS: usize;
@@ -20,7 +20,7 @@ impl<T: Datatype, const N: usize> Datatype for [T; N] {
 
     fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
         data.iter()
-            .zip(fpga_bits.chunks_mut(T::SIZE_IN_BITS))
+            .zip(unsafe { fpga_bits.chunks_mut(T::SIZE_IN_BITS).remove_alias() })
             .try_for_each(|(src, bits)| Datatype::pack(bits, src))
     }
 
