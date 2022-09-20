@@ -20,7 +20,7 @@ jobs:
       uses: actions-rs/cargo@v1
       with:
         command: install
-        args: cargo-workspaces --version 0.2.17
+        args: cargo-workspaces --version 0.2.35
     - name: Publish
       uses: actions-rs/cargo@v1
       env:
