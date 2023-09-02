@@ -35,7 +35,7 @@ macro_rules! type_wrapper {
                 .to_result()
         }
 
-        pub fn $write_fun_name(&mut self, indicator: Offset, value: $type) -> Result<(), Error> {
+        pub fn $write_fun_name(&self, indicator: Offset, value: $type) -> Result<(), Error> {
             self.api
                 .base
                 .$write_ffi_name(self.session, indicator, value)
@@ -54,7 +54,7 @@ macro_rules! type_wrapper {
         }
 
         pub fn $writearr_fun_name(
-            &mut self,
+            &self,
             indicator: Offset,
             value: &[$type],
         ) -> Result<(), Error> {
