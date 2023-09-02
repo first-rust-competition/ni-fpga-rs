@@ -46,19 +46,33 @@ pub type Offset = u32;
 pub type Session = u32;
 pub type Status = i32;
 
-use std::{ffi::c_char, fmt};
+use std::{
+    ffi::{c_char, c_void},
+    fmt,
+};
 
 use dlopen::{
     utils::platform_file_name,
-    wrapper::{Container, WrapperApi},
+    wrapper::{Container, WrapperApi, WrapperMultiApi},
 };
 
-use dlopen_derive::WrapperApi;
+use dlopen_derive::{WrapperApi, WrapperMultiApi};
 
 pub type NiFpgaApiContainer = Container<NiFpgaApi>;
 
 #[derive(WrapperApi)]
-pub struct NiFpgaApi {
+pub struct NiFpgaHmbApi {
+    NiFpgaDll_OpenHmb: extern "C" fn(
+        session: Session,
+        memory_name: *const c_char,
+        memory_size: *mut usize,
+        virual_address: *mut *mut c_void,
+    ) -> Status,
+    NiFpgaDll_CloseHmb: extern "C" fn(session: Session, memory_name: *const c_char) -> Status,
+}
+
+#[derive(WrapperApi)]
+pub struct NiFpgaBaseApi {
     NiFpgaDll_Open: extern "C" fn(
         bitfile: *const c_char,
         signature: *const c_char,
@@ -167,6 +181,12 @@ pub struct NiFpgaApi {
         array: *const i64,
         size: usize,
     ) -> Status,
+}
+
+#[derive(WrapperMultiApi)]
+pub struct NiFpgaApi {
+    pub base: NiFpgaBaseApi,
+    pub hmb: Option<NiFpgaHmbApi>,
 }
 
 impl NiFpgaApi {

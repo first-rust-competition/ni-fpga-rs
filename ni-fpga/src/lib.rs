@@ -6,6 +6,7 @@ extern crate ni_fpga_sys as ffi;
 mod datatype;
 mod errors;
 pub mod fxp;
+pub mod hmb;
 mod nifpga;
 mod session;
 mod status;

@@ -1,8 +1,11 @@
-use std::ffi::CString;
+use std::{
+    ffi::{c_void, CString},
+    ptr,
+};
 
 use ni_fpga_sys::{NiFpgaApi, NiFpgaApiContainer, Offset, Session};
 
-use crate::Error;
+use crate::{hmb::Hmb, Error, Status};
 
 trait StatusHelper {
     fn to_result(self) -> Result<(), Error>;
@@ -27,12 +30,14 @@ macro_rules! type_wrapper {
         $readarr_fun_name:ident, $readarr_ffi_name:ident, $writearr_fun_name:ident, $writearr_ffi_name:ident) => {
         pub fn $read_fun_name(&self, indicator: Offset, value: &mut $type) -> Result<(), Error> {
             self.api
+                .base
                 .$read_ffi_name(self.session, indicator, value as *mut $type)
                 .to_result()
         }
 
-        pub fn $write_fun_name(&self, indicator: Offset, value: $type) -> Result<(), Error> {
+        pub fn $write_fun_name(&mut self, indicator: Offset, value: $type) -> Result<(), Error> {
             self.api
+                .base
                 .$write_ffi_name(self.session, indicator, value)
                 .to_result()
         }
@@ -43,12 +48,18 @@ macro_rules! type_wrapper {
             value: &mut [$type],
         ) -> Result<(), Error> {
             self.api
+                .base
                 .$readarr_ffi_name(self.session, indicator, value.as_mut_ptr(), value.len())
                 .to_result()
         }
 
-        pub fn $writearr_fun_name(&self, indicator: Offset, value: &[$type]) -> Result<(), Error> {
+        pub fn $writearr_fun_name(
+            &mut self,
+            indicator: Offset,
+            value: &[$type],
+        ) -> Result<(), Error> {
             self.api
+                .base
                 .$writearr_ffi_name(self.session, indicator, value.as_ptr(), value.len())
                 .to_result()
         }
@@ -156,6 +167,34 @@ impl NiFpga {
         NiFpgaDll_WriteArrayI64
     );
 
+    pub fn open_hmb(&self, memory_name: &CString) -> Result<Hmb, Error> {
+        match &self.api.hmb {
+            Some(hmb) => {
+                let mut memory_size: usize = 0;
+                let mut virtual_address: *mut c_void = ptr::null_mut();
+                match hmb
+                    .NiFpgaDll_OpenHmb(
+                        self.session,
+                        memory_name.as_ptr(),
+                        &mut memory_size,
+                        &mut virtual_address,
+                    )
+                    .to_result()
+                {
+                    Ok(_) => Ok(Hmb::new(
+                        hmb,
+                        self.session,
+                        memory_name.clone(),
+                        memory_size,
+                        virtual_address,
+                    )),
+                    Err(err) => Err(err),
+                }
+            }
+            None => Err(Error::FPGA(Status::ResourceNotInitialized)),
+        }
+    }
+
     pub fn open(
         bitfile: &CString,
         signature: &CString,
@@ -167,14 +206,15 @@ impl NiFpga {
             Err(err) => return Err(Error::DlOpen(err)),
         };
 
-        let mut session: u32 = 0;
+        let mut session: Session = 0;
         match api
+            .base
             .NiFpgaDll_Open(
                 bitfile.as_ptr(),
                 signature.as_ptr(),
                 resource.as_ptr(),
                 attribute,
-                &mut session as *mut Session,
+                &mut session,
             )
             .to_result()
         {
@@ -185,6 +225,7 @@ impl NiFpga {
 
     pub fn close(self, attribute: u32) -> Result<(), Error> {
         self.api
+            .base
             .NiFpgaDll_Close(self.session, attribute)
             .to_result()
     }
@@ -194,6 +235,6 @@ impl Drop for NiFpga {
     fn drop(&mut self) {
         // TODO figure out what to do here with attribute
         // and the return value
-        self.api.NiFpgaDll_Close(self.session, 0);
+        self.api.base.NiFpgaDll_Close(self.session, 0);
     }
 }

@@ -32,7 +32,7 @@ impl Session {
             Err(err) => Err(err),
         }
     }
-    pub fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>
+    pub fn write<T: Datatype>(&mut self, offset: Offset, data: &T) -> Result<(), Error>
     where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
     {
