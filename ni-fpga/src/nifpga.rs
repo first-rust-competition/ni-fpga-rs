@@ -23,6 +23,7 @@ impl StatusHelper for ffi::Status {
 pub struct NiFpga {
     session: Session,
     api: NiFpgaApiContainer,
+    owns_session: bool,
 }
 
 macro_rules! type_wrapper {
@@ -53,11 +54,7 @@ macro_rules! type_wrapper {
                 .to_result()
         }
 
-        pub fn $writearr_fun_name(
-            &self,
-            indicator: Offset,
-            value: &[$type],
-        ) -> Result<(), Error> {
+        pub fn $writearr_fun_name(&self, indicator: Offset, value: &[$type]) -> Result<(), Error> {
             self.api
                 .base
                 .$writearr_ffi_name(self.session, indicator, value.as_ptr(), value.len())
@@ -195,6 +192,19 @@ impl NiFpga {
         }
     }
 
+    pub fn from_session(session: Session) -> Result<Self, Error> {
+        let api = match NiFpgaApi::load() {
+            Ok(api) => api,
+            Err(err) => return Err(Error::DlOpen(err)),
+        };
+
+        Ok(Self {
+            session,
+            api,
+            owns_session: false,
+        })
+    }
+
     pub fn open(
         bitfile: &CString,
         signature: &CString,
@@ -218,16 +228,24 @@ impl NiFpga {
             )
             .to_result()
         {
-            Ok(_) => Ok(Self { session, api }),
+            Ok(_) => Ok(Self {
+                session,
+                api,
+                owns_session: true,
+            }),
             Err(err) => Err(err),
         }
     }
 
     pub fn close(self, attribute: u32) -> Result<(), Error> {
-        self.api
-            .base
-            .NiFpgaDll_Close(self.session, attribute)
-            .to_result()
+        match self.owns_session {
+            true => self
+                .api
+                .base
+                .NiFpgaDll_Close(self.session, attribute)
+                .to_result(),
+            false => Err(Error::ClosingUnownedSession),
+        }
     }
 }
 
@@ -235,6 +253,8 @@ impl Drop for NiFpga {
     fn drop(&mut self) {
         // TODO figure out what to do here with attribute
         // and the return value
-        self.api.base.NiFpgaDll_Close(self.session, 0);
+        if self.owns_session {
+            self.api.base.NiFpgaDll_Close(self.session, 0);
+        }
     }
 }

@@ -18,4 +18,6 @@ pub enum Error {
     FixedPointPrecision(f64, u8, u8, bool),
     #[error("Library Open Failed: {0}")]
     DlOpen(DlOpenError),
+    #[error("Cannot close an unowned fpga session")]
+    ClosingUnownedSession,
 }
