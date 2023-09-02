@@ -7,7 +7,7 @@ use crate::ffi::Offset;
 use crate::status::Status;
 
 pub struct Session {
-    pub handle: ffi::Session,
+    pub api: crate::ffi::NiFpga,
 }
 
 impl Session {
@@ -16,18 +16,12 @@ impl Session {
         let c_bitfile = CString::new(bitfile).unwrap();
         let c_signature = CString::new(signature).unwrap();
         let c_resource = CString::new(resource).unwrap();
-        let status = Status::from(unsafe {
-            ffi::Open(
-                c_bitfile.as_ptr(),
-                c_signature.as_ptr(),
-                c_resource.as_ptr(),
-                0,
-                &mut handle as *mut ffi::Session,
-            )
-        });
-        match status {
-            Status::Success => Ok(Session { handle }),
-            _ => Err(Error::FPGA(status)),
+        match ffi::NiFpga::open(&c_bitfile, &c_signature, &c_resource, 0) {
+            Ok(api) => Ok(Self { api }),
+            Err(err) => match err {
+                ffi::OpenError::NiFpgaError(fpga) => Err(Error::FPGA(Status::from(fpga))),
+                ffi::OpenError::DlOpenError(_) => Err(Error::DlOpen),
+            },
         }
     }
     pub fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>
@@ -73,11 +67,5 @@ impl Session {
             Status::Success => Ok(()),
             _ => Err(Error::FPGA(status)),
         }
-    }
-}
-
-impl Drop for Session {
-    fn drop(&mut self) {
-        unsafe { ffi::Close(self.handle, 0) };
     }
 }

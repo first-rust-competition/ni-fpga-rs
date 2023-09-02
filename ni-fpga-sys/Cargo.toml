@@ -11,3 +11,6 @@ links = "NiFpga"
 build = "build.rs"
 
 [dependencies]
+dlopen = "0.1.8"
+dlopen_derive = "0.1.4"
+libc = "0.2"
