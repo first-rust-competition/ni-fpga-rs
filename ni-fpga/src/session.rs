@@ -12,7 +12,6 @@ pub struct Session {
 
 impl Session {
     pub fn open(bitfile: &str, signature: &str, resource: &str) -> Result<Self, Error> {
-        let mut handle: ffi::Session = Default::default();
         let c_bitfile = CString::new(bitfile).unwrap();
         let c_signature = CString::new(signature).unwrap();
         let c_resource = CString::new(resource).unwrap();
@@ -20,7 +19,7 @@ impl Session {
             Ok(api) => Ok(Self { api }),
             Err(err) => match err {
                 ffi::OpenError::NiFpgaError(fpga) => Err(Error::FPGA(Status::from(fpga))),
-                ffi::OpenError::DlOpenError(_) => Err(Error::DlOpen),
+                ffi::OpenError::DlOpenError(dlopen) => Err(Error::DlOpen(dlopen)),
             },
         }
     }
@@ -29,20 +28,12 @@ impl Session {
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
     {
         let mut buffer = [0u8; (T::SIZE_IN_BITS - 1) / 8 + 1];
-        let status = Status::from(unsafe {
-            ffi::ReadArrayU8(
-                self.handle,
-                offset,
-                buffer.as_mut_ptr(),
-                (T::SIZE_IN_BITS - 1) / 8 + 1,
-            )
-        });
-        match status {
-            Status::Success => Ok(Datatype::unpack(
+        match self.api.read_u8_array(offset, &mut buffer) {
+            Ok(_) => Ok(Datatype::unpack(
                 &FpgaBits::from_slice(&buffer)
                     [((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],
             )?),
-            _ => Err(Error::FPGA(status)),
+            Err(err) => Err(Error::FPGA(err.into())),
         }
     }
     pub fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>
@@ -55,17 +46,9 @@ impl Session {
                 [((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],
             data,
         )?;
-        let status = Status::from(unsafe {
-            ffi::WriteArrayU8(
-                self.handle,
-                offset,
-                buffer.as_ptr(),
-                (T::SIZE_IN_BITS - 1) / 8 + 1,
-            )
-        });
-        match status {
-            Status::Success => Ok(()),
-            _ => Err(Error::FPGA(status)),
+        match self.api.write_u8_array(offset, &buffer) {
+            Ok(_) => Ok(()),
+            Err(err) => Err(Error::FPGA(err.into())),
         }
     }
 }

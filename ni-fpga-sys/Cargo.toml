@@ -7,7 +7,6 @@ license-file = "LICENSE.md"
 description = "Rust bindings to the NI FPGA C API."
 repository = "https://github.com/first-rust-competition/ni-fpga-rs"
 
-links = "NiFpga"
 build = "build.rs"
 
 [dependencies]
