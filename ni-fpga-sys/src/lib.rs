@@ -1,5 +1,4 @@
-mod ffi;
-use std::{ffi::CString, fmt};
+#![allow(non_snake_case)]
 
 #[derive(Debug)]
 pub struct DlOpenError(dlopen::Error);
@@ -43,208 +42,135 @@ impl PartialEq for DlOpenError {
     }
 }
 
-use dlopen::wrapper::Container;
-use ffi::NiFpgaApi;
-
 pub type Offset = u32;
 pub type Session = u32;
 pub type Status = i32;
 
-trait StatusHelper {
-    fn to_result(self) -> Result<(), Status>;
-}
+use std::{ffi::c_char, fmt};
 
-impl StatusHelper for Status {
-    fn to_result(self) -> Result<(), Status> {
-        match self {
-            0 => Ok(()),
-            _ => Err(self),
-        }
-    }
-}
+use dlopen::wrapper::{Container, WrapperApi};
 
-pub struct NiFpga {
-    session: Session,
-    api: Container<NiFpgaApi>,
-}
+use dlopen_derive::WrapperApi;
 
-pub enum OpenError {
-    NiFpgaError(Status),
-    DlOpenError(DlOpenError),
-}
+pub type NiFpgaApiContainer = Container<NiFpgaApi>;
 
-macro_rules! type_wrapper {
-    ($type:ident, $read_fun_name:ident, $read_ffi_name:ident, $write_fun_name:ident, $write_ffi_name:ident,
-        $readarr_fun_name:ident, $readarr_ffi_name:ident, $writearr_fun_name:ident, $writearr_ffi_name:ident) => {
-        pub fn $read_fun_name(&self, indicator: Offset, value: &mut $type) -> Result<(), Status> {
-            self.api
-                .$read_ffi_name(self.session, indicator, value as *mut $type)
-                .to_result()
-        }
-
-        pub fn $write_fun_name(&self, indicator: Offset, value: $type) -> Result<(), Status> {
-            self.api
-                .$write_ffi_name(self.session, indicator, value)
-                .to_result()
-        }
-
-        pub fn $readarr_fun_name(
-            &self,
-            indicator: Offset,
-            value: &mut [$type],
-        ) -> Result<(), Status> {
-            self.api
-                .$readarr_ffi_name(self.session, indicator, value.as_mut_ptr(), value.len())
-                .to_result()
-        }
-
-        pub fn $writearr_fun_name(&self, indicator: Offset, value: &[$type]) -> Result<(), Status> {
-            self.api
-                .$writearr_ffi_name(self.session, indicator, value.as_ptr(), value.len())
-                .to_result()
-        }
-    };
-}
-
-impl NiFpga {
-    type_wrapper!(
-        bool,
-        read_bool,
-        NiFpgaDll_ReadBool,
-        write_bool,
-        NiFpgaDll_WriteBool,
-        read_bool_array,
-        NiFpgaDll_ReadArrayBool,
-        write_bool_array,
-        NiFpgaDll_WriteArrayBool
-    );
-    type_wrapper!(
-        u8,
-        read_u8,
-        NiFpgaDll_ReadU8,
-        write_u8,
-        NiFpgaDll_WriteU8,
-        read_u8_array,
-        NiFpgaDll_ReadArrayU8,
-        write_u8_array,
-        NiFpgaDll_WriteArrayU8
-    );
-    type_wrapper!(
-        i8,
-        read_i8,
-        NiFpgaDll_ReadI8,
-        write_i8,
-        NiFpgaDll_WriteI8,
-        read_i8_array,
-        NiFpgaDll_ReadArrayI8,
-        write_i8_array,
-        NiFpgaDll_WriteArrayI8
-    );
-    type_wrapper!(
-        u16,
-        read_u16,
-        NiFpgaDll_ReadU16,
-        write_u16,
-        NiFpgaDll_WriteU16,
-        read_u16_array,
-        NiFpgaDll_ReadArrayU16,
-        write_u16_array,
-        NiFpgaDll_WriteArrayU16
-    );
-    type_wrapper!(
-        i16,
-        read_i16,
-        NiFpgaDll_ReadI16,
-        write_i16,
-        NiFpgaDll_WriteI16,
-        read_i16_array,
-        NiFpgaDll_ReadArrayI16,
-        write_i16_array,
-        NiFpgaDll_WriteArrayI16
-    );
-    type_wrapper!(
-        u32,
-        read_u32,
-        NiFpgaDll_ReadU32,
-        write_u32,
-        NiFpgaDll_WriteU32,
-        read_u32_array,
-        NiFpgaDll_ReadArrayU32,
-        write_u32_array,
-        NiFpgaDll_WriteArrayU32
-    );
-    type_wrapper!(
-        i32,
-        read_i32,
-        NiFpgaDll_ReadI32,
-        write_i32,
-        NiFpgaDll_WriteI32,
-        read_i32_array,
-        NiFpgaDll_ReadArrayI32,
-        write_i32_array,
-        NiFpgaDll_WriteArrayI32
-    );
-    type_wrapper!(
-        u64,
-        read_u64,
-        NiFpgaDll_ReadU64,
-        write_u64,
-        NiFpgaDll_WriteU64,
-        read_u64_array,
-        NiFpgaDll_ReadArrayU64,
-        write_u64_array,
-        NiFpgaDll_WriteArrayU64
-    );
-    type_wrapper!(
-        i64,
-        read_i64,
-        NiFpgaDll_ReadI64,
-        write_i64,
-        NiFpgaDll_WriteI64,
-        read_i64_array,
-        NiFpgaDll_ReadArrayI64,
-        write_i64_array,
-        NiFpgaDll_WriteArrayI64
-    );
-
-    pub fn open(
-        bitfile: &CString,
-        signature: &CString,
-        resource: &CString,
+#[derive(WrapperApi)]
+pub struct NiFpgaApi {
+    NiFpgaDll_Open: extern "C" fn(
+        bitfile: *const c_char,
+        signature: *const c_char,
+        resource: *const c_char,
         attribute: u32,
-    ) -> Result<Self, OpenError> {
-        let api: Container<NiFpgaApi> = match unsafe { Container::load("NiFpga") } {
-            Ok(api) => api,
-            Err(err) => return Err(OpenError::DlOpenError(DlOpenError(err))),
-        };
+        session: *mut Session,
+    ) -> Status,
 
-        let mut session: u32 = 0;
-        match api
-            .NiFpgaDll_Open(
-                bitfile.as_ptr(),
-                signature.as_ptr(),
-                resource.as_ptr(),
-                attribute,
-                &mut session as *mut Session,
-            )
-            .to_result()
-        {
-            Ok(_) => Ok(Self { session, api }),
-            Err(err) => Err(OpenError::NiFpgaError(err)),
-        }
-    }
+    NiFpgaDll_Close: extern "C" fn(session: Session, attribute: u32) -> Status,
 
-    pub fn close(self, attribute: u32) -> Result<(), Status> {
-        self.api
-            .NiFpgaDll_Close(self.session, attribute)
-            .to_result()
-    }
+    NiFpgaDll_ReadBool:
+        extern "C" fn(session: Session, indicator: Offset, value: *mut bool) -> Status,
+
+    NiFpgaDll_ReadArrayBool:
+        extern "C" fn(session: Session, indicator: Offset, array: *mut bool, size: usize) -> Status,
+    NiFpgaDll_WriteBool: extern "C" fn(session: Session, indicator: Offset, value: bool) -> Status,
+    NiFpgaDll_WriteArrayBool: extern "C" fn(
+        session: Session,
+        indicator: Offset,
+        array: *const bool,
+        size: usize,
+    ) -> Status,
+
+    NiFpgaDll_ReadU8: extern "C" fn(session: Session, indicator: Offset, value: *mut u8) -> Status,
+    NiFpgaDll_ReadArrayU8:
+        extern "C" fn(session: Session, indicator: Offset, array: *mut u8, size: usize) -> Status,
+    NiFpgaDll_WriteU8: extern "C" fn(session: Session, indicator: Offset, value: u8) -> Status,
+    NiFpgaDll_WriteArrayU8:
+        extern "C" fn(session: Session, indicator: Offset, array: *const u8, size: usize) -> Status,
+
+    NiFpgaDll_ReadU16:
+        extern "C" fn(session: Session, indicator: Offset, value: *mut u16) -> Status,
+    NiFpgaDll_ReadArrayU16:
+        extern "C" fn(session: Session, indicator: Offset, array: *mut u16, size: usize) -> Status,
+    NiFpgaDll_WriteU16: extern "C" fn(session: Session, indicator: Offset, value: u16) -> Status,
+    NiFpgaDll_WriteArrayU16: extern "C" fn(
+        session: Session,
+        indicator: Offset,
+        array: *const u16,
+        size: usize,
+    ) -> Status,
+
+    NiFpgaDll_ReadU32:
+        extern "C" fn(session: Session, indicator: Offset, value: *mut u32) -> Status,
+    NiFpgaDll_ReadArrayU32:
+        extern "C" fn(session: Session, indicator: Offset, array: *mut u32, size: usize) -> Status,
+    NiFpgaDll_WriteU32: extern "C" fn(session: Session, indicator: Offset, value: u32) -> Status,
+    NiFpgaDll_WriteArrayU32: extern "C" fn(
+        session: Session,
+        indicator: Offset,
+        array: *const u32,
+        size: usize,
+    ) -> Status,
+
+    NiFpgaDll_ReadU64:
+        extern "C" fn(session: Session, indicator: Offset, value: *mut u64) -> Status,
+    NiFpgaDll_ReadArrayU64:
+        extern "C" fn(session: Session, indicator: Offset, array: *mut u64, size: usize) -> Status,
+    NiFpgaDll_WriteU64: extern "C" fn(session: Session, indicator: Offset, value: u64) -> Status,
+    NiFpgaDll_WriteArrayU64: extern "C" fn(
+        session: Session,
+        indicator: Offset,
+        array: *const u64,
+        size: usize,
+    ) -> Status,
+
+    NiFpgaDll_ReadI8: extern "C" fn(session: Session, indicator: Offset, value: *mut i8) -> Status,
+    NiFpgaDll_ReadArrayI8:
+        extern "C" fn(session: Session, indicator: Offset, array: *mut i8, size: usize) -> Status,
+    NiFpgaDll_WriteI8: extern "C" fn(session: Session, indicator: Offset, value: i8) -> Status,
+    NiFpgaDll_WriteArrayI8:
+        extern "C" fn(session: Session, indicator: Offset, array: *const i8, size: usize) -> Status,
+
+    NiFpgaDll_ReadI16:
+        extern "C" fn(session: Session, indicator: Offset, value: *mut i16) -> Status,
+    NiFpgaDll_ReadArrayI16:
+        extern "C" fn(session: Session, indicator: Offset, array: *mut i16, size: usize) -> Status,
+    NiFpgaDll_WriteI16: extern "C" fn(session: Session, indicator: Offset, value: i16) -> Status,
+    NiFpgaDll_WriteArrayI16: extern "C" fn(
+        session: Session,
+        indicator: Offset,
+        array: *const i16,
+        size: usize,
+    ) -> Status,
+
+    NiFpgaDll_ReadI32:
+        extern "C" fn(session: Session, indicator: Offset, value: *mut i32) -> Status,
+    NiFpgaDll_ReadArrayI32:
+        extern "C" fn(session: Session, indicator: Offset, array: *mut i32, size: usize) -> Status,
+    NiFpgaDll_WriteI32: extern "C" fn(session: Session, indicator: Offset, value: i32) -> Status,
+    NiFpgaDll_WriteArrayI32: extern "C" fn(
+        session: Session,
+        indicator: Offset,
+        array: *const i32,
+        size: usize,
+    ) -> Status,
+
+    NiFpgaDll_ReadI64:
+        extern "C" fn(session: Session, indicator: Offset, value: *mut i64) -> Status,
+    NiFpgaDll_ReadArrayI64:
+        extern "C" fn(session: Session, indicator: Offset, array: *mut i64, size: usize) -> Status,
+    NiFpgaDll_WriteI64: extern "C" fn(session: Session, indicator: Offset, value: i64) -> Status,
+    NiFpgaDll_WriteArrayI64: extern "C" fn(
+        session: Session,
+        indicator: Offset,
+        array: *const i64,
+        size: usize,
+    ) -> Status,
 }
 
-impl Drop for NiFpga {
-    fn drop(&mut self) {
-        // TODO figure out what to do here with attribute
-        // and the return value
-        self.api.NiFpgaDll_Close(self.session, 0);
+impl NiFpgaApi {
+    pub fn load() -> Result<NiFpgaApiContainer, DlOpenError> {
+        match unsafe { Container::load("NiFpga") } {
+            Ok(api) => Ok(api),
+            Err(err) => Err(DlOpenError(err)),
+        }
     }
 }

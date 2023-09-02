@@ -2,12 +2,11 @@ use std::ffi::CString;
 
 use crate::datatype::{Datatype, FpgaBits};
 use crate::errors::Error;
-use crate::ffi;
 use crate::ffi::Offset;
-use crate::status::Status;
+use crate::nifpga::NiFpga;
 
 pub struct Session {
-    pub api: crate::ffi::NiFpga,
+    pub api: NiFpga,
 }
 
 impl Session {
@@ -15,12 +14,9 @@ impl Session {
         let c_bitfile = CString::new(bitfile).unwrap();
         let c_signature = CString::new(signature).unwrap();
         let c_resource = CString::new(resource).unwrap();
-        match ffi::NiFpga::open(&c_bitfile, &c_signature, &c_resource, 0) {
+        match NiFpga::open(&c_bitfile, &c_signature, &c_resource, 0) {
             Ok(api) => Ok(Self { api }),
-            Err(err) => match err {
-                ffi::OpenError::NiFpgaError(fpga) => Err(Error::FPGA(Status::from(fpga))),
-                ffi::OpenError::DlOpenError(dlopen) => Err(Error::DlOpen(dlopen)),
-            },
+            Err(err) => Err(err),
         }
     }
     pub fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>
@@ -33,7 +29,7 @@ impl Session {
                 &FpgaBits::from_slice(&buffer)
                     [((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],
             )?),
-            Err(err) => Err(Error::FPGA(err.into())),
+            Err(err) => Err(err),
         }
     }
     pub fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>
@@ -48,7 +44,7 @@ impl Session {
         )?;
         match self.api.write_u8_array(offset, &buffer) {
             Ok(_) => Ok(()),
-            Err(err) => Err(Error::FPGA(err.into())),
+            Err(err) => Err(err),
         }
     }
 }
