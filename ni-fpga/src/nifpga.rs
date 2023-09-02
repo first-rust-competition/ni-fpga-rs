@@ -3,7 +3,7 @@ use std::{
     ptr,
 };
 
-use ni_fpga_sys::{NiFpgaApi, NiFpgaApiContainer, Offset, Session};
+use ni_fpga_sys::{CloseAttribute, NiFpgaApi, NiFpgaApiContainer, Offset, OpenAttribute, Session};
 
 use crate::{hmb::Hmb, Error, Status};
 
@@ -23,7 +23,7 @@ impl StatusHelper for ffi::Status {
 pub struct NiFpga {
     session: Session,
     api: NiFpgaApiContainer,
-    owns_session: bool,
+    close_attribute: Option<CloseAttribute>,
 }
 
 macro_rules! type_wrapper {
@@ -201,7 +201,7 @@ impl NiFpga {
         Ok(Self {
             session,
             api,
-            owns_session: false,
+            close_attribute: None,
         })
     }
 
@@ -209,7 +209,8 @@ impl NiFpga {
         bitfile: &CString,
         signature: &CString,
         resource: &CString,
-        attribute: u32,
+        open_attribute: OpenAttribute,
+        close_attribute: CloseAttribute,
     ) -> Result<Self, Error> {
         let api = match NiFpgaApi::load() {
             Ok(api) => api,
@@ -223,7 +224,7 @@ impl NiFpga {
                 bitfile.as_ptr(),
                 signature.as_ptr(),
                 resource.as_ptr(),
-                attribute,
+                open_attribute.bits(),
                 &mut session,
             )
             .to_result()
@@ -231,20 +232,20 @@ impl NiFpga {
             Ok(_) => Ok(Self {
                 session,
                 api,
-                owns_session: true,
+                close_attribute: Some(close_attribute),
             }),
             Err(err) => Err(err),
         }
     }
 
-    pub fn close(self, attribute: u32) -> Result<(), Error> {
-        match self.owns_session {
-            true => self
+    pub fn close(self, attribute: CloseAttribute) -> Result<(), Error> {
+        match self.close_attribute {
+            Some(_) => self
                 .api
                 .base
-                .NiFpgaDll_Close(self.session, attribute)
+                .NiFpgaDll_Close(self.session, attribute.bits())
                 .to_result(),
-            false => Err(Error::ClosingUnownedSession),
+            None => Err(Error::ClosingUnownedSession),
         }
     }
 }
@@ -253,8 +254,8 @@ impl Drop for NiFpga {
     fn drop(&mut self) {
         // TODO figure out what to do here with attribute
         // and the return value
-        if self.owns_session {
-            self.api.base.NiFpgaDll_Close(self.session, 0);
+        if let Some(attr) = self.close_attribute {
+            self.api.base.NiFpgaDll_Close(self.session, attr.bits());
         }
     }
 }

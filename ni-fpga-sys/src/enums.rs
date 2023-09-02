@@ -1,17 +1,19 @@
 bitflags::bitflags! {
     #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-    pub struct OpenAttributes: u32 {
+    pub struct OpenAttribute: u32 {
         const NoRun = 1;
         const BitfilePathIsUTF8 = 2;
         const BitfileContentsNotPath = 1u32 << 30;
         const IgnoreSignatureArgument = 1u32 << 31;
+        const _ = !0;
     }
 }
 
 bitflags::bitflags! {
     #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
-    pub struct CloseAttributes: u32 {
+    pub struct CloseAttribute: u32 {
         const NoResetIfLastSession = 1;
+        const _ = !0;
     }
 }
 
@@ -19,6 +21,7 @@ bitflags::bitflags! {
     #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
     pub struct RunAttribute: u32 {
         const WaitUntilDone = 1;
+        const _ = !0;
     }
 }
 

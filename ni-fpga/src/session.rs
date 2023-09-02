@@ -1,5 +1,7 @@
 use std::ffi::CString;
 
+use ni_fpga_sys::{CloseAttribute, OpenAttribute};
+
 use crate::datatype::{Datatype, FpgaBits};
 use crate::errors::Error;
 use crate::ffi::Offset;
@@ -14,7 +16,13 @@ impl Session {
         let c_bitfile = CString::new(bitfile).unwrap();
         let c_signature = CString::new(signature).unwrap();
         let c_resource = CString::new(resource).unwrap();
-        match NiFpga::open(&c_bitfile, &c_signature, &c_resource, 0) {
+        match NiFpga::open(
+            &c_bitfile,
+            &c_signature,
+            &c_resource,
+            OpenAttribute::empty(),
+            CloseAttribute::empty(),
+        ) {
             Ok(api) => Ok(Self { api }),
             Err(err) => Err(err),
         }
