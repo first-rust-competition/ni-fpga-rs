@@ -48,7 +48,10 @@ pub type Status = i32;
 
 use std::{ffi::c_char, fmt};
 
-use dlopen::wrapper::{Container, WrapperApi};
+use dlopen::{
+    utils::platform_file_name,
+    wrapper::{Container, WrapperApi},
+};
 
 use dlopen_derive::WrapperApi;
 
@@ -168,7 +171,7 @@ pub struct NiFpgaApi {
 
 impl NiFpgaApi {
     pub fn load() -> Result<NiFpgaApiContainer, DlOpenError> {
-        match unsafe { Container::load("NiFpga") } {
+        match unsafe { Container::load(platform_file_name("NiFpga")) } {
             Ok(api) => Ok(api),
             Err(err) => Err(DlOpenError(err)),
         }
