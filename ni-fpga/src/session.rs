@@ -33,6 +33,15 @@ impl Session {
         }
     }
 
+    pub fn from_session(session: ffi::Session) -> Result<Self, Error> {
+        match NiFpga::from_session(session) {
+            Ok(api) => Ok(Self {
+                api: Arc::new(Box::new(api)),
+            }),
+            Err(err) => Err(err),
+        }
+    }
+
     pub fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>
     where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
