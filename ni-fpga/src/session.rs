@@ -9,6 +9,7 @@ use crate::errors::Error;
 use crate::ffi::Offset;
 use crate::hmb::Hmb;
 use crate::nifpga::NiFpga;
+use crate::register::Register;
 
 #[derive(Clone)]
 pub struct ArcStorage {
@@ -85,6 +86,12 @@ impl Session<InPlaceStorage> {
         }
     }
 
+    pub fn open_register<T: Datatype, const N: u32>(&self) -> Register<RefStorage, T, N> {
+        Register::new(Session {
+            api: (&self.api).into(),
+        })
+    }
+
     pub fn open_hmb(&self, memory_name: &str) -> Result<Hmb<RefStorage>, Error> {
         let c_memory_name = CString::new(memory_name).unwrap();
         Hmb::new((&self.api).into(), &c_memory_name)
@@ -119,6 +126,12 @@ impl Session<ArcStorage> {
         }
     }
 
+    pub fn open_register<T: Datatype, const N: u32>(&self) -> Register<ArcStorage, T, N> {
+        Register::new(Self {
+            api: self.api.clone(),
+        })
+    }
+
     pub fn open_hmb(&self, memory_name: &str) -> Result<Hmb<ArcStorage>, Error> {
         let c_memory_name = CString::new(memory_name).unwrap();
         Hmb::new(self.api.clone(), &c_memory_name)
@@ -147,7 +160,7 @@ where
             Err(err) => Err(err),
         }
     }
-    pub fn write<T: Datatype>(&mut self, offset: Offset, data: &T) -> Result<(), Error>
+    pub fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>
     where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
     {

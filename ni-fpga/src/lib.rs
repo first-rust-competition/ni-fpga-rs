@@ -8,6 +8,7 @@ mod errors;
 pub mod fxp;
 pub mod hmb;
 mod nifpga;
+pub mod register;
 mod session;
 mod status;
 
