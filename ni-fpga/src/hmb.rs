@@ -2,32 +2,48 @@ use std::{
     ffi::{c_void, CString},
     mem::size_of,
     ptr,
+    sync::Arc,
 };
 
-use ni_fpga_sys::{NiFpgaHmbApi, Session};
+use crate::{
+    nifpga::{NiFpga, StatusHelper},
+    Error, Status,
+};
 
-pub struct Hmb<'a> {
-    api: &'a NiFpgaHmbApi,
-    session: Session,
+pub struct Hmb {
+    fpga: Arc<Box<NiFpga>>,
     memory_name: CString,
     memory_size: usize,
     virtual_address: *mut c_void,
 }
 
-impl<'a> Hmb<'a> {
-    pub fn new(
-        api: &'a NiFpgaHmbApi,
-        session: Session,
-        memory_name: CString,
-        memory_size: usize,
-        virtual_address: *mut c_void,
-    ) -> Hmb<'a> {
-        Self {
-            api,
-            session,
-            memory_name,
-            memory_size,
-            virtual_address,
+impl Hmb {
+    pub fn new(fpga: Arc<Box<NiFpga>>, memory_name: &CString) -> Result<Hmb, Error> {
+        match &fpga.api.hmb {
+            Some(hmb) => {
+                let mut memory_size: usize = 0;
+                let mut virtual_address: *mut c_void = ptr::null_mut();
+                match hmb
+                    .NiFpgaDll_OpenHmb(
+                        fpga.session,
+                        memory_name.as_ptr(),
+                        &mut memory_size,
+                        &mut virtual_address,
+                    )
+                    .to_result()
+                {
+                    Ok(_) => Ok({
+                        Self {
+                            fpga,
+                            memory_name: memory_name.clone(),
+                            memory_size,
+                            virtual_address,
+                        }
+                    }),
+                    Err(err) => Err(err),
+                }
+            }
+            None => Err(Error::FPGA(Status::ResourceNotInitialized)),
         }
     }
 
@@ -52,10 +68,16 @@ impl<'a> Hmb<'a> {
     }
 }
 
-impl<'a> Drop for Hmb<'a> {
+impl Drop for Hmb {
     fn drop(&mut self) {
+        // Unwrap is safe here, as the only way this can get constructed is
+        // if its possible to unwrap it at construction
         // TODO figure out what to do here with the return value
-        self.api
-            .NiFpgaDll_CloseHmb(self.session, self.memory_name.as_ptr());
+        self.fpga
+            .api
+            .hmb
+            .as_ref()
+            .unwrap()
+            .NiFpgaDll_CloseHmb(self.fpga.session, self.memory_name.as_ptr());
     }
 }

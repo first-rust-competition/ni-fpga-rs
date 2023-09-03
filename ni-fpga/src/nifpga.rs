@@ -1,15 +1,12 @@
-use std::{
-    ffi::{c_void, CString},
-    ptr,
-};
+use std::ffi::CString;
 
 use ni_fpga_sys::{
     Bool, CloseAttribute, NiFpgaApi, NiFpgaApiContainer, Offset, OpenAttribute, Session,
 };
 
-use crate::{hmb::Hmb, Error, Status};
+use crate::Error;
 
-trait StatusHelper {
+pub(crate) trait StatusHelper {
     fn to_result(self) -> Result<(), Error>;
 }
 
@@ -23,8 +20,8 @@ impl StatusHelper for ffi::Status {
 }
 
 pub struct NiFpga {
-    session: Session,
-    api: NiFpgaApiContainer,
+    pub(crate) session: Session,
+    pub(crate) api: NiFpgaApiContainer,
     close_attribute: Option<CloseAttribute>,
 }
 
@@ -216,34 +213,6 @@ impl NiFpga {
         write_f64_array,
         NiFpgaDll_WriteArrayDbl
     );
-
-    pub fn open_hmb(&self, memory_name: &CString) -> Result<Hmb, Error> {
-        match &self.api.hmb {
-            Some(hmb) => {
-                let mut memory_size: usize = 0;
-                let mut virtual_address: *mut c_void = ptr::null_mut();
-                match hmb
-                    .NiFpgaDll_OpenHmb(
-                        self.session,
-                        memory_name.as_ptr(),
-                        &mut memory_size,
-                        &mut virtual_address,
-                    )
-                    .to_result()
-                {
-                    Ok(_) => Ok(Hmb::new(
-                        hmb,
-                        self.session,
-                        memory_name.clone(),
-                        memory_size,
-                        virtual_address,
-                    )),
-                    Err(err) => Err(err),
-                }
-            }
-            None => Err(Error::FPGA(Status::ResourceNotInitialized)),
-        }
-    }
 
     pub fn from_session(session: Session) -> Result<Self, Error> {
         let api = match NiFpgaApi::load() {

@@ -1,14 +1,17 @@
 use std::ffi::CString;
+use std::sync::Arc;
 
 use ni_fpga_sys::{CloseAttribute, OpenAttribute};
 
 use crate::datatype::{Datatype, FpgaBits};
 use crate::errors::Error;
 use crate::ffi::Offset;
+use crate::hmb::Hmb;
 use crate::nifpga::NiFpga;
 
+#[derive(Clone)]
 pub struct Session {
-    pub api: NiFpga,
+    pub api: Arc<Box<NiFpga>>,
 }
 
 impl Session {
@@ -23,10 +26,13 @@ impl Session {
             OpenAttribute::empty(),
             CloseAttribute::empty(),
         ) {
-            Ok(api) => Ok(Self { api }),
+            Ok(api) => Ok(Self {
+                api: Arc::new(Box::new(api)),
+            }),
             Err(err) => Err(err),
         }
     }
+
     pub fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>
     where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
@@ -54,5 +60,10 @@ impl Session {
             Ok(_) => Ok(()),
             Err(err) => Err(err),
         }
+    }
+
+    pub fn open_hmb(&self, memory_name: &str) -> Result<Hmb, Error> {
+        let c_memory_name = CString::new(memory_name).unwrap();
+        Hmb::new(self.api.clone(), &c_memory_name)
     }
 }
