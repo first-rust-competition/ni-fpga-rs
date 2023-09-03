@@ -69,6 +69,14 @@ macro_rules! type_wrapper {
 }
 
 impl NiFpga {
+    pub fn ffi(&self) -> &NiFpgaApiContainer {
+        &self.api
+    }
+
+    pub fn session(&self) -> Session {
+        self.session
+    }
+
     pub fn read_bool(&self, indicator: Offset) -> Result<bool, Error> {
         let mut value: u8 = 0;
         match self
