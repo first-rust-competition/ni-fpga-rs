@@ -7,6 +7,7 @@ use std::{
 
 use crate::{
     nifpga::{NiFpga, StatusHelper},
+    session::SessionAccess,
     Error, Session, Status,
 };
 
@@ -31,7 +32,7 @@ where
     Fpga: Deref,
     Fpga: Deref<Target = NiFpga>,
 {
-    pub(crate) fn new(session: Session<Fpga>, memory_name: &CString) -> Result<Hmb<Fpga>, Error> {
+    pub fn new(session: Session<Fpga>, memory_name: &CString) -> Result<Hmb<Fpga>, Error> {
         let fpga = session.fpga();
         match &fpga.api.hmb {
             Some(hmb) => {
@@ -60,8 +61,19 @@ where
             None => Err(Error::FPGA(Status::ResourceNotInitialized)),
         }
     }
+}
 
-    pub fn read<T>(&self, offset: usize) -> T {
+pub trait HmbAccess {
+    fn read<T>(&self, offset: usize) -> T;
+    fn write<T>(&mut self, offset: usize, value: T);
+}
+
+impl<Fpga> HmbAccess for Hmb<Fpga>
+where
+    Fpga: Deref,
+    Fpga: Deref<Target = NiFpga>,
+{
+    fn read<T>(&self, offset: usize) -> T {
         unsafe {
             assert!(size_of::<T>() + offset <= self.memory_size);
             let base: *const u8 = self.virtual_address.0 as *const u8;
@@ -71,7 +83,7 @@ where
         }
     }
 
-    pub fn write<T>(&mut self, offset: usize, value: T) {
+    fn write<T>(&mut self, offset: usize, value: T) {
         unsafe {
             assert!(size_of::<T>() + offset <= self.memory_size);
             let base: *mut u8 = self.virtual_address.0 as *mut u8;

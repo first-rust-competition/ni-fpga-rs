@@ -119,16 +119,27 @@ impl Session<ArcStorage> {
     }
 }
 
-impl<Fpga> Session<Fpga>
+pub trait SessionAccess {
+    fn fpga(&self) -> &NiFpga;
+
+    fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>
+    where
+        [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized;
+    fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>
+    where
+        [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized;
+}
+
+impl<Fpga> SessionAccess for Session<Fpga>
 where
     Fpga: Deref,
     Fpga: Deref<Target = NiFpga>,
 {
-    pub fn fpga(&self) -> &NiFpga {
+    fn fpga(&self) -> &NiFpga {
         &self.fpga_storage
     }
 
-    pub fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>
+    fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>
     where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
     {
@@ -141,7 +152,7 @@ where
             Err(err) => Err(err),
         }
     }
-    pub fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>
+    fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>
     where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
     {

@@ -1,5 +1,7 @@
 use std::io::Write;
 
+use ni_fpga::SessionAccess;
+
 use colored::*;
 use ni_fpga::fxp::{SignedFXP, UnsignedFXP};
 use ni_fpga::Session;
