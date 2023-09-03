@@ -10,14 +10,16 @@ mod hmb;
 mod nifpga;
 mod register;
 mod session;
-mod session_lifetimes;
+pub mod session_lifetimes;
 mod status;
 
 // Keep these for backwards compatibility, but don't use them internally
 pub use datatype::{Datatype, FpgaBits};
 pub use errors::Error;
 pub type Offset = ffi::Offset;
+pub use hmb::Hmb;
 pub use hmb::HmbAccess;
+pub use register::Register;
 pub use register::RegisterAccess;
 pub use session::Session;
 pub use session::SessionAccess;
