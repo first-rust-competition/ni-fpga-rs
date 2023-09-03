@@ -46,3 +46,33 @@ jobs:
       with:
         command: clippy
         args: -- -D warnings -A incomplete_features
+
+build_stable:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup QEMU/binfmts
+      run:
+        sudo apt-get update &&
+        sudo apt-get install -y binfmt-support qemu qemu-user-static qemu-system-arm &&
+        sudo update-binfmts --enable
+    - name: Install latest stable
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        components: rustfmt, clippy
+        default: true
+    - name: cross build
+      uses: actions-rs/cargo@v1
+      with:
+        use-cross: true
+        command: build
+        args: --verbose --target=arm-unknown-linux-gnueabi --package example-arc
+    - name: cross test
+      uses: actions-rs/cargo@v1
+      with:
+        use-cross: true
+        command: test
+        args: --verbose --target=arm-unknown-linux-gnueabi --package ni-fpga

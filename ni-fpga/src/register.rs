@@ -1,18 +1,18 @@
 use std::{marker::PhantomData, ops::Deref};
 
-use crate::{nifpga::NiFpga, session::SessionAccess, Datatype, Error, Session};
+use crate::{nifpga::NiFpga, Datatype, Offset, Session};
 
-pub struct Register<Fpga, T, const N: u32>
+pub struct Register<Fpga, T, const N: Offset>
 where
     Fpga: Deref,
     Fpga: Deref<Target = NiFpga>,
     T: Datatype,
 {
-    session: Session<Fpga>,
+    pub(crate) session: Session<Fpga>,
     _type: PhantomData<T>,
 }
 
-impl<Fpga, T, const N: u32> Register<Fpga, T, N>
+impl<Fpga, T, const N: Offset> Register<Fpga, T, N>
 where
     Fpga: Deref,
     Fpga: Deref<Target = NiFpga>,
@@ -26,6 +26,9 @@ where
     }
 }
 
+#[cfg(feature = "use_generic_const_exprs")]
+use crate::{session::SessionAccess, Error};
+#[cfg(feature = "use_generic_const_exprs")]
 pub trait RegisterAccess<T>
 where
     T: Datatype,
@@ -39,7 +42,8 @@ where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized;
 }
 
-impl<Fpga, T, const N: u32> RegisterAccess<T> for Register<Fpga, T, N>
+#[cfg(feature = "use_generic_const_exprs")]
+impl<Fpga, T, const N: Offset> RegisterAccess<T> for Register<Fpga, T, N>
 where
     Fpga: Deref,
     Fpga: Deref<Target = NiFpga>,

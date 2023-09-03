@@ -1,6 +1,6 @@
 use std::thread;
 
-use ni_fpga::{RegisterAccess, Session, SessionAccess};
+use ni_fpga::{FixedRegisterAccess, Session};
 use ni_fpga_macros::{Cluster, Enum};
 
 #[derive(Cluster, Debug)]
@@ -36,15 +36,12 @@ fn main() -> Result<(), ni_fpga::Error> {
         "RIO0",
     )?;
 
-    let pwm_config_register = session.open_register::<PWMConfig, 98536>();
+    let voltage_register = session.open_register::<u16, 99174>();
+    let voltage_register_2 = session.open_register::<u16, 99174>();
 
-    let read_pwm_thread = thread::spawn(move || pwm_config_register.read());
+    let read_pwm_thread = thread::spawn(move || voltage_register_2.read_direct());
 
-    println!("Input voltage: {:?}", session.read::<u16>(99174)?);
-    //println!("{:#?}", pwm_config_register.read()?);
-    println!("{:#?}", session.read::<PWMConfig>(98536)?);
-    println!("{:#?}", session.read::<[AnalogTriggerOutput; 8]>(98424)?);
-    println!("{:#?}", session.read::<SPIDebugState>(99314)?);
-    println!("{:#?}", read_pwm_thread.join().unwrap()?);
+    println!("Input voltage: {:?}", voltage_register.read_direct()?);
+    println!("Input voltage: {:?}", read_pwm_thread.join().unwrap()?);
     Ok(())
 }

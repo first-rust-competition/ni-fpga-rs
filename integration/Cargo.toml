@@ -9,6 +9,6 @@ publish = false
 
 [dependencies]
 colored = "2.0.0"
-ni-fpga = { path = "../ni-fpga" }
+ni-fpga = { path = "../ni-fpga", features=["use_generic_const_exprs"] }
 ni-fpga-macros = { path = "../ni-fpga-macros" }
 tempfile = "3.1.0"

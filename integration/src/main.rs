@@ -1,10 +1,8 @@
 use std::io::Write;
 
-use ni_fpga::SessionAccess;
-
 use colored::*;
 use ni_fpga::fxp::{SignedFXP, UnsignedFXP};
-use ni_fpga::Session;
+use ni_fpga::{Session, SessionAccess};
 use ni_fpga_macros::Cluster;
 use tempfile::NamedTempFile;
 

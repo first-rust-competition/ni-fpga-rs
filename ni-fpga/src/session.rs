@@ -5,13 +5,14 @@ use std::sync::Arc;
 
 use ni_fpga_sys::{CloseAttribute, OpenAttribute};
 
-use crate::datatype::{Datatype, FpgaBits};
+use crate::datatype::Datatype;
+use crate::erased_register::ErasedRegister;
 use crate::errors::Error;
-use crate::ffi::Offset;
 use crate::hmb::Hmb;
 use crate::nifpga::NiFpga;
 use crate::register::Register;
 use crate::session_lifetimes::{ArcStorage, InPlaceStorage, StorageClone};
+use crate::Offset;
 
 pub struct Session<FpgaStorage> {
     fpga_storage: FpgaStorage,
@@ -54,7 +55,7 @@ where
         }
     }
 
-    pub fn open_register<T: Datatype, const N: u32>(
+    pub fn open_register<T: Datatype, const N: Offset>(
         &'a self,
     ) -> Register<<FpgaStorage as StorageClone<'a>>::Target, T, N>
     where
@@ -64,6 +65,22 @@ where
         Register::new(Session {
             fpga_storage: self.fpga_storage.storage_clone(),
         })
+    }
+
+    pub fn open_register_offset<T: Datatype>(
+        &'a self,
+        offset: Offset,
+    ) -> ErasedRegister<<FpgaStorage as StorageClone<'a>>::Target, T>
+    where
+        <FpgaStorage as StorageClone<'a>>::Target: Deref,
+        <FpgaStorage as StorageClone<'a>>::Target: Deref<Target = NiFpga>,
+    {
+        ErasedRegister::new(
+            Session {
+                fpga_storage: self.fpga_storage.storage_clone(),
+            },
+            offset,
+        )
     }
 
     pub fn open_hmb(
@@ -119,12 +136,17 @@ impl Session<ArcStorage> {
     }
 }
 
+#[cfg(feature = "use_generic_const_exprs")]
+use crate::FpgaBits;
+
 pub trait SessionAccess {
     fn fpga(&self) -> &NiFpga;
 
+    #[cfg(feature = "use_generic_const_exprs")]
     fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>
     where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized;
+    #[cfg(feature = "use_generic_const_exprs")]
     fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>
     where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized;
@@ -139,6 +161,7 @@ where
         &self.fpga_storage
     }
 
+    #[cfg(feature = "use_generic_const_exprs")]
     fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>
     where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
@@ -152,6 +175,7 @@ where
             Err(err) => Err(err),
         }
     }
+    #[cfg(feature = "use_generic_const_exprs")]
     fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>
     where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,

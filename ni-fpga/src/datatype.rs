@@ -1,3 +1,5 @@
+use std::mem::MaybeUninit;
+
 use bitvec::prelude::*;
 
 use crate::errors::Error;
@@ -25,7 +27,8 @@ impl<T: Datatype, const N: usize> Datatype for [T; N] {
     }
 
     fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
-        let mut data: [std::mem::MaybeUninit<T>; N] = std::mem::MaybeUninit::uninit_array();
+        let mut data: [std::mem::MaybeUninit<T>; N] =
+            unsafe { MaybeUninit::<[MaybeUninit<T>; N]>::uninit().assume_init() };
         data.iter_mut()
             .zip(fpga_bits.chunks(T::SIZE_IN_BITS))
             .try_for_each::<_, Result<(), Error>>(|(dest, bits)| {
