@@ -3,7 +3,6 @@
 extern crate ni_fpga_sys as ffi;
 
 mod datatype;
-mod erased_register;
 mod errors;
 mod fixed_register;
 pub mod fxp;
@@ -21,9 +20,11 @@ pub type Offset = ffi::Offset;
 pub use fixed_register::FixedRegisterAccess;
 pub use hmb::Hmb;
 pub use hmb::HmbAccess;
+pub use register::ConstOffset;
 pub use register::Register;
 #[cfg(feature = "use_generic_const_exprs")]
 pub use register::RegisterAccess;
+pub use register::StoredOffset;
 pub use session::Session;
 pub use session::SessionAccess;
 pub use status::Status;

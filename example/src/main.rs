@@ -34,10 +34,10 @@ fn main() -> Result<(), ni_fpga::Error> {
         "RIO0",
     )?;
 
-    let pwm_config_register = session.open_register::<PWMConfig, 98536>();
+    let pwm_config_register = session.open_const_register::<PWMConfig, 98536>();
 
     println!("Input voltage: {:?}", session.read::<u16>(99174)?);
-    println!("{:#?}", pwm_config_register.read()?);
+    println!("{:#?}", pwm_config_register.read(&session)?);
     println!("{:#?}", session.read::<PWMConfig>(98536)?);
     println!("{:#?}", session.read::<[AnalogTriggerOutput; 8]>(98424)?);
     println!("{:#?}", session.read::<SPIDebugState>(99314)?);

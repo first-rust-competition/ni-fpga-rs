@@ -6,11 +6,10 @@ use std::sync::Arc;
 use ni_fpga_sys::{CloseAttribute, OpenAttribute};
 
 use crate::datatype::Datatype;
-use crate::erased_register::ErasedRegister;
 use crate::errors::Error;
 use crate::hmb::Hmb;
 use crate::nifpga::NiFpga;
-use crate::register::Register;
+use crate::register::{ConstOffset, Register, StoredOffset};
 use crate::session_lifetimes::{ArcStorage, InPlaceStorage, StorageClone};
 use crate::Offset;
 
@@ -55,32 +54,12 @@ where
         }
     }
 
-    pub fn open_register<T: Datatype, const N: Offset>(
-        &'a self,
-    ) -> Register<<FpgaStorage as StorageClone<'a>>::Target, T, N>
-    where
-        <FpgaStorage as StorageClone<'a>>::Target: Deref,
-        <FpgaStorage as StorageClone<'a>>::Target: Deref<Target = NiFpga>,
-    {
-        Register::new(Session {
-            fpga_storage: self.fpga_storage.storage_clone(),
-        })
+    pub fn open_const_register<T: Datatype, const N: Offset>(&self) -> Register<ConstOffset<T, N>> {
+        Register::new_const()
     }
 
-    pub fn open_register_offset<T: Datatype>(
-        &'a self,
-        offset: Offset,
-    ) -> ErasedRegister<<FpgaStorage as StorageClone<'a>>::Target, T>
-    where
-        <FpgaStorage as StorageClone<'a>>::Target: Deref,
-        <FpgaStorage as StorageClone<'a>>::Target: Deref<Target = NiFpga>,
-    {
-        ErasedRegister::new(
-            Session {
-                fpga_storage: self.fpga_storage.storage_clone(),
-            },
-            offset,
-        )
+    pub fn open_register<T: Datatype>(&self, offset: Offset) -> Register<StoredOffset<T>> {
+        Register::new(offset)
     }
 
     pub fn open_hmb(
@@ -98,6 +77,14 @@ where
             },
             &c_memory_name,
         )
+    }
+}
+
+impl Clone for Session<ArcStorage> {
+    fn clone(&self) -> Self {
+        Self {
+            fpga_storage: self.fpga_storage.clone(),
+        }
     }
 }
 
