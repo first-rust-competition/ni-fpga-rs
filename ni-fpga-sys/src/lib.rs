@@ -1,4 +1,5 @@
 #![allow(non_snake_case)]
+#![allow(clippy::too_many_arguments)]
 
 pub type Offset = u32;
 pub type Session = u32;

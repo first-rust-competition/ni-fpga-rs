@@ -1,8 +1,8 @@
 use std::{
     ffi::{c_void, CString},
     mem::size_of,
+    ops::Deref,
     ptr,
-    sync::Arc,
 };
 
 use crate::{
@@ -10,15 +10,28 @@ use crate::{
     Error, Status,
 };
 
-pub struct Hmb {
-    fpga: Arc<Box<NiFpga>>,
+struct VirtualAddressHandle(*mut c_void);
+
+unsafe impl Send for VirtualAddressHandle {}
+unsafe impl Sync for VirtualAddressHandle {}
+
+pub struct Hmb<Fpga>
+where
+    Fpga: Deref,
+    Fpga: Deref<Target = NiFpga>,
+{
+    fpga: Fpga,
     memory_name: CString,
     memory_size: usize,
-    virtual_address: *mut c_void,
+    virtual_address: VirtualAddressHandle,
 }
 
-impl Hmb {
-    pub fn new(fpga: Arc<Box<NiFpga>>, memory_name: &CString) -> Result<Hmb, Error> {
+impl<Fpga> Hmb<Fpga>
+where
+    Fpga: Deref,
+    Fpga: Deref<Target = NiFpga>,
+{
+    pub(crate) fn new(fpga: Fpga, memory_name: &CString) -> Result<Hmb<Fpga>, Error> {
         match &fpga.api.hmb {
             Some(hmb) => {
                 let mut memory_size: usize = 0;
@@ -37,7 +50,7 @@ impl Hmb {
                             fpga,
                             memory_name: memory_name.clone(),
                             memory_size,
-                            virtual_address,
+                            virtual_address: VirtualAddressHandle(virtual_address),
                         }
                     }),
                     Err(err) => Err(err),
@@ -50,7 +63,7 @@ impl Hmb {
     pub fn read<T>(&self, offset: usize) -> T {
         unsafe {
             assert!(size_of::<T>() + offset <= self.memory_size);
-            let base: *const u8 = self.virtual_address as *const u8;
+            let base: *const u8 = self.virtual_address.0 as *const u8;
             let address = base.add(offset);
             let typed_address = address as *const T;
             ptr::read_volatile(typed_address)
@@ -60,7 +73,7 @@ impl Hmb {
     pub fn write<T>(&mut self, offset: usize, value: T) {
         unsafe {
             assert!(size_of::<T>() + offset <= self.memory_size);
-            let base: *mut u8 = self.virtual_address as *mut u8;
+            let base: *mut u8 = self.virtual_address.0 as *mut u8;
             let address = base.add(offset);
             let typed_address = address as *mut T;
             ptr::write_volatile(typed_address, value);
@@ -68,7 +81,11 @@ impl Hmb {
     }
 }
 
-impl Drop for Hmb {
+impl<Fpga> Drop for Hmb<Fpga>
+where
+    Fpga: Deref,
+    Fpga: Deref<Target = NiFpga>,
+{
     fn drop(&mut self) {
         // Unwrap is safe here, as the only way this can get constructed is
         // if its possible to unwrap it at construction
