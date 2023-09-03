@@ -3,7 +3,9 @@ use std::{
     ptr,
 };
 
-use ni_fpga_sys::{CloseAttribute, NiFpgaApi, NiFpgaApiContainer, Offset, OpenAttribute, Session};
+use ni_fpga_sys::{
+    Bool, CloseAttribute, NiFpgaApi, NiFpgaApiContainer, Offset, OpenAttribute, Session,
+};
 
 use crate::{hmb::Hmb, Error, Status};
 
@@ -29,11 +31,17 @@ pub struct NiFpga {
 macro_rules! type_wrapper {
     ($type:ident, $read_fun_name:ident, $read_ffi_name:ident, $write_fun_name:ident, $write_ffi_name:ident,
         $readarr_fun_name:ident, $readarr_ffi_name:ident, $writearr_fun_name:ident, $writearr_ffi_name:ident) => {
-        pub fn $read_fun_name(&self, indicator: Offset, value: &mut $type) -> Result<(), Error> {
-            self.api
+        pub fn $read_fun_name(&self, indicator: Offset) -> Result<$type, Error> {
+            let mut value: $type = Default::default();
+            match self
+                .api
                 .base
-                .$read_ffi_name(self.session, indicator, value as *mut $type)
+                .$read_ffi_name(self.session, indicator, &mut value as *mut $type)
                 .to_result()
+            {
+                Ok(_) => Ok(value),
+                Err(err) => Err(err),
+            }
         }
 
         pub fn $write_fun_name(&self, indicator: Offset, value: $type) -> Result<(), Error> {
@@ -64,17 +72,38 @@ macro_rules! type_wrapper {
 }
 
 impl NiFpga {
-    type_wrapper!(
-        bool,
-        read_bool,
-        NiFpgaDll_ReadBool,
-        write_bool,
-        NiFpgaDll_WriteBool,
-        read_bool_array,
-        NiFpgaDll_ReadArrayBool,
-        write_bool_array,
-        NiFpgaDll_WriteArrayBool
-    );
+    pub fn read_bool(&self, indicator: Offset) -> Result<bool, Error> {
+        let mut value: u8 = 0;
+        match self
+            .api
+            .base
+            .NiFpgaDll_ReadBool(self.session, indicator, &mut value as *mut Bool)
+            .to_result()
+        {
+            Ok(_) => Ok(value != 0),
+            Err(err) => Err(err),
+        }
+    }
+    pub fn write_bool(&self, indicator: Offset, value: bool) -> Result<(), Error> {
+        let value = if value { 1 } else { 0 };
+        self.api
+            .base
+            .NiFpgaDll_WriteBool(self.session, indicator, value)
+            .to_result()
+    }
+    pub fn read_bool_array_fast(&self, indicator: Offset, value: &mut [u8]) -> Result<(), Error> {
+        self.api
+            .base
+            .NiFpgaDll_ReadArrayBool(self.session, indicator, value.as_mut_ptr(), value.len())
+            .to_result()
+    }
+    pub fn write_bool_array_fast(&self, indicator: Offset, value: &[u8]) -> Result<(), Error> {
+        self.api
+            .base
+            .NiFpgaDll_WriteArrayBool(self.session, indicator, value.as_ptr(), value.len())
+            .to_result()
+    }
+
     type_wrapper!(
         u8,
         read_u8,
@@ -162,6 +191,30 @@ impl NiFpga {
         NiFpgaDll_ReadArrayI64,
         write_i64_array,
         NiFpgaDll_WriteArrayI64
+    );
+
+    type_wrapper!(
+        f32,
+        read_f32,
+        NiFpgaDll_ReadSgl,
+        write_f32,
+        NiFpgaDll_WriteSgl,
+        read_f32_array,
+        NiFpgaDll_ReadArraySgl,
+        write_f32_array,
+        NiFpgaDll_WriteArraySgl
+    );
+
+    type_wrapper!(
+        f64,
+        read_f64,
+        NiFpgaDll_ReadDbl,
+        write_f64,
+        NiFpgaDll_WriteDbl,
+        read_f64_array,
+        NiFpgaDll_ReadArrayDbl,
+        write_f64_array,
+        NiFpgaDll_WriteArrayDbl
     );
 
     pub fn open_hmb(&self, memory_name: &CString) -> Result<Hmb, Error> {
