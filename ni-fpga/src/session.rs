@@ -1,4 +1,5 @@
 use std::ffi::CString;
+use std::marker::PhantomData;
 use std::ops::Deref;
 use std::sync::Arc;
 
@@ -10,56 +11,24 @@ use crate::ffi::Offset;
 use crate::hmb::Hmb;
 use crate::nifpga::NiFpga;
 use crate::register::Register;
+use crate::session_lifetimes::{ArcStorage, InPlaceStorage, StorageClone};
 
-#[derive(Clone)]
-pub struct ArcStorage {
-    api: Arc<NiFpga>,
+pub struct Session<FpgaStorage> {
+    fpga_storage: FpgaStorage,
 }
 
-impl Deref for ArcStorage {
-    type Target = NiFpga;
-
-    fn deref(&self) -> &Self::Target {
-        &self.api
-    }
-}
-
-pub struct InPlaceStorage {
-    api: NiFpga,
-}
-
-impl Deref for InPlaceStorage {
-    type Target = NiFpga;
-
-    fn deref(&self) -> &Self::Target {
-        &self.api
-    }
-}
-
-impl<'a> From<&'a InPlaceStorage> for RefStorage<'a> {
-    fn from(value: &'a InPlaceStorage) -> Self {
-        Self { api: &value.api }
-    }
-}
-
-pub struct RefStorage<'a> {
-    api: &'a NiFpga,
-}
-
-impl<'a> Deref for RefStorage<'a> {
-    type Target = NiFpga;
-
-    fn deref(&self) -> &Self::Target {
-        self.api
-    }
-}
-
-pub struct Session<Fpga> {
-    api: Fpga,
-}
-
-impl Session<InPlaceStorage> {
-    pub fn open(bitfile: &str, signature: &str, resource: &str) -> Result<Self, Error> {
+impl<'a, FpgaStorage> Session<FpgaStorage>
+where
+    FpgaStorage: StorageClone<'a>,
+    FpgaStorage: Deref,
+    FpgaStorage: Deref<Target = NiFpga>,
+{
+    fn open_local(
+        bitfile: &str,
+        signature: &str,
+        resource: &str,
+        create_self: impl FnOnce(NiFpga) -> Self,
+    ) -> Result<Self, Error> {
         let c_bitfile = CString::new(bitfile).unwrap();
         let c_signature = CString::new(signature).unwrap();
         let c_resource = CString::new(resource).unwrap();
@@ -70,71 +39,83 @@ impl Session<InPlaceStorage> {
             OpenAttribute::empty(),
             CloseAttribute::empty(),
         ) {
-            Ok(api) => Ok(Self {
-                api: InPlaceStorage { api },
-            }),
+            Ok(api) => Ok(create_self(api)),
             Err(err) => Err(err),
         }
     }
 
-    pub fn from_session(session: ffi::Session) -> Result<Self, Error> {
+    fn from_session_local(
+        session: ffi::Session,
+        create_self: impl FnOnce(NiFpga) -> Self,
+    ) -> Result<Self, Error> {
         match NiFpga::from_session(session) {
-            Ok(api) => Ok(Self {
-                api: InPlaceStorage { api },
-            }),
+            Ok(api) => Ok(create_self(api)),
             Err(err) => Err(err),
         }
     }
 
-    pub fn open_register<T: Datatype, const N: u32>(&self) -> Register<RefStorage, T, N> {
+    pub fn open_register<T: Datatype, const N: u32>(
+        &'a self,
+    ) -> Register<<FpgaStorage as StorageClone<'a>>::Target, T, N>
+    where
+        <FpgaStorage as StorageClone<'a>>::Target: Deref,
+        <FpgaStorage as StorageClone<'a>>::Target: Deref<Target = NiFpga>,
+    {
         Register::new(Session {
-            api: (&self.api).into(),
+            fpga_storage: self.fpga_storage.storage_clone(),
         })
     }
 
-    pub fn open_hmb(&self, memory_name: &str) -> Result<Hmb<RefStorage>, Error> {
+    pub fn open_hmb(
+        &'a self,
+        memory_name: &str,
+    ) -> Result<Hmb<<FpgaStorage as StorageClone<'a>>::Target>, Error>
+    where
+        <FpgaStorage as StorageClone<'a>>::Target: Deref,
+        <FpgaStorage as StorageClone<'a>>::Target: Deref<Target = NiFpga>,
+    {
         let c_memory_name = CString::new(memory_name).unwrap();
-        Hmb::new((&self.api).into(), &c_memory_name)
+        Hmb::new(
+            Session {
+                fpga_storage: self.fpga_storage.storage_clone(),
+            },
+            &c_memory_name,
+        )
+    }
+}
+
+impl Session<InPlaceStorage<'_>> {
+    fn create_self(api: NiFpga) -> Self {
+        Self {
+            fpga_storage: InPlaceStorage {
+                api,
+                _marker: PhantomData,
+            },
+        }
+    }
+
+    pub fn open(bitfile: &str, signature: &str, resource: &str) -> Result<Self, Error> {
+        Self::open_local(bitfile, signature, resource, Self::create_self)
+    }
+
+    pub fn from_session(session: ffi::Session) -> Result<Self, Error> {
+        Self::from_session_local(session, Self::create_self)
     }
 }
 
 impl Session<ArcStorage> {
-    pub fn open_arc(bitfile: &str, signature: &str, resource: &str) -> Result<Self, Error> {
-        let c_bitfile = CString::new(bitfile).unwrap();
-        let c_signature = CString::new(signature).unwrap();
-        let c_resource = CString::new(resource).unwrap();
-        match NiFpga::open(
-            &c_bitfile,
-            &c_signature,
-            &c_resource,
-            OpenAttribute::empty(),
-            CloseAttribute::empty(),
-        ) {
-            Ok(api) => Ok(Self {
-                api: ArcStorage { api: Arc::new(api) },
-            }),
-            Err(err) => Err(err),
+    fn create_self(api: NiFpga) -> Self {
+        Self {
+            fpga_storage: ArcStorage { api: Arc::new(api) },
         }
+    }
+
+    pub fn open_arc(bitfile: &str, signature: &str, resource: &str) -> Result<Self, Error> {
+        Self::open_local(bitfile, signature, resource, Self::create_self)
     }
 
     pub fn from_session_arc(session: ffi::Session) -> Result<Self, Error> {
-        match NiFpga::from_session(session) {
-            Ok(api) => Ok(Self {
-                api: ArcStorage { api: Arc::new(api) },
-            }),
-            Err(err) => Err(err),
-        }
-    }
-
-    pub fn open_register<T: Datatype, const N: u32>(&self) -> Register<ArcStorage, T, N> {
-        Register::new(Self {
-            api: self.api.clone(),
-        })
-    }
-
-    pub fn open_hmb(&self, memory_name: &str) -> Result<Hmb<ArcStorage>, Error> {
-        let c_memory_name = CString::new(memory_name).unwrap();
-        Hmb::new(self.api.clone(), &c_memory_name)
+        Self::from_session_local(session, Self::create_self)
     }
 }
 
@@ -144,7 +125,7 @@ where
     Fpga: Deref<Target = NiFpga>,
 {
     pub fn fpga(&self) -> &NiFpga {
-        &self.api
+        &self.fpga_storage
     }
 
     pub fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>
@@ -152,7 +133,7 @@ where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
     {
         let mut buffer = [0u8; (T::SIZE_IN_BITS - 1) / 8 + 1];
-        match self.api.read_u8_array(offset, &mut buffer) {
+        match self.fpga_storage.read_u8_array(offset, &mut buffer) {
             Ok(_) => Ok(Datatype::unpack(
                 &FpgaBits::from_slice(&buffer)
                     [((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],
@@ -170,7 +151,7 @@ where
                 [((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],
             data,
         )?;
-        match self.api.write_u8_array(offset, &buffer) {
+        match self.fpga_storage.write_u8_array(offset, &buffer) {
             Ok(_) => Ok(()),
             Err(err) => Err(err),
         }

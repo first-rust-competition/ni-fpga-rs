@@ -7,7 +7,7 @@ use std::{
 
 use crate::{
     nifpga::{NiFpga, StatusHelper},
-    Error, Status,
+    Error, Session, Status,
 };
 
 struct VirtualAddressHandle(*mut c_void);
@@ -20,7 +20,7 @@ where
     Fpga: Deref,
     Fpga: Deref<Target = NiFpga>,
 {
-    fpga: Fpga,
+    session: Session<Fpga>,
     memory_name: CString,
     memory_size: usize,
     virtual_address: VirtualAddressHandle,
@@ -31,7 +31,8 @@ where
     Fpga: Deref,
     Fpga: Deref<Target = NiFpga>,
 {
-    pub(crate) fn new(fpga: Fpga, memory_name: &CString) -> Result<Hmb<Fpga>, Error> {
+    pub(crate) fn new(session: Session<Fpga>, memory_name: &CString) -> Result<Hmb<Fpga>, Error> {
+        let fpga = session.fpga();
         match &fpga.api.hmb {
             Some(hmb) => {
                 let mut memory_size: usize = 0;
@@ -47,7 +48,7 @@ where
                 {
                     Ok(_) => Ok({
                         Self {
-                            fpga,
+                            session,
                             memory_name: memory_name.clone(),
                             memory_size,
                             virtual_address: VirtualAddressHandle(virtual_address),
@@ -90,11 +91,12 @@ where
         // Unwrap is safe here, as the only way this can get constructed is
         // if its possible to unwrap it at construction
         // TODO figure out what to do here with the return value
-        self.fpga
+        self.session
+            .fpga()
             .api
             .hmb
             .as_ref()
             .unwrap()
-            .NiFpgaDll_CloseHmb(self.fpga.session, self.memory_name.as_ptr());
+            .NiFpgaDll_CloseHmb(self.session.fpga().session, self.memory_name.as_ptr());
     }
 }

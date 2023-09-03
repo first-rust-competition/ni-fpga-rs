@@ -10,6 +10,7 @@ pub mod hmb;
 mod nifpga;
 pub mod register;
 mod session;
+mod session_lifetimes;
 mod status;
 
 // Keep these for backwards compatibility, but don't use them internally
