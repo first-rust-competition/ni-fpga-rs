@@ -1,4 +1,4 @@
-use ni_fpga::{RegisterAccess, Session, SessionAccess};
+use ni_fpga::Session;
 use ni_fpga_macros::{Cluster, Enum};
 
 #[derive(Cluster, Debug)]
@@ -37,7 +37,10 @@ fn main() -> Result<(), ni_fpga::Error> {
     let pwm_config_register = session.open_const_register::<PWMConfig, 98536>();
 
     println!("Input voltage: {:?}", session.read::<u16>(99174)?);
-    println!("{:#?}", pwm_config_register.read(&session)?);
+    println!(
+        "{:#?}",
+        session.read::<PWMConfig>(pwm_config_register.offset())?
+    );
     println!("{:#?}", session.read::<PWMConfig>(98536)?);
     println!("{:#?}", session.read::<[AnalogTriggerOutput; 8]>(98424)?);
     println!("{:#?}", session.read::<SPIDebugState>(99314)?);

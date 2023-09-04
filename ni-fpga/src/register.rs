@@ -1,6 +1,6 @@
-use std::marker::PhantomData;
+use std::{marker::PhantomData, ops::Deref};
 
-use crate::{Datatype, Offset};
+use crate::{nifpga::NiFpga, Datatype, Error, Offset, Session};
 
 pub trait GetOffset<T: Datatype> {
     fn offset(&self) -> Offset;
@@ -59,11 +59,6 @@ impl<T: Datatype, const N: Offset> From<Register<ConstOffset<T, N>>> for Registe
     }
 }
 
-#[cfg(feature = "use_generic_const_exprs")]
-use crate::{nifpga::NiFpga, session::SessionAccess, Error, Session};
-#[cfg(feature = "use_generic_const_exprs")]
-use std::ops::Deref;
-#[cfg(feature = "use_generic_const_exprs")]
 pub trait RegisterAccess<T>
 where
     T: Datatype,
@@ -71,36 +66,20 @@ where
     fn read<Fpga>(&self, session: &Session<Fpga>) -> Result<T, Error>
     where
         Fpga: Deref,
-        Fpga: Deref<Target = NiFpga>,
-        [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized;
-
-    fn write<Fpga>(&mut self, session: &Session<Fpga>, data: &T) -> Result<(), Error>
+        Fpga: Deref<Target = NiFpga>;
+    fn read_array<Fpga, const LEN: usize>(
+        &self,
+        session: &Session<Fpga>,
+    ) -> Result<[T; LEN], Error>
     where
         Fpga: Deref,
-        Fpga: Deref<Target = NiFpga>,
-        [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized;
-}
-
-#[cfg(feature = "use_generic_const_exprs")]
-impl<T, N: GetOffset<T>> RegisterAccess<T> for Register<N>
-where
-    T: Datatype,
-{
-    fn read<Fpga>(&self, session: &Session<Fpga>) -> Result<T, Error>
+        Fpga: Deref<Target = NiFpga>;
+    fn write<Fpga>(&mut self, session: &Session<Fpga>, value: T) -> Result<(), Error>
     where
         Fpga: Deref,
-        Fpga: Deref<Target = NiFpga>,
-        [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
-    {
-        session.read(self.offset())
-    }
-
-    fn write<Fpga>(&mut self, session: &Session<Fpga>, data: &T) -> Result<(), Error>
+        Fpga: Deref<Target = NiFpga>;
+    fn write_array<Fpga>(&self, session: &Session<Fpga>, value: &[T]) -> Result<(), Error>
     where
         Fpga: Deref,
-        Fpga: Deref<Target = NiFpga>,
-        [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
-    {
-        session.write(self.offset(), data)
-    }
+        Fpga: Deref<Target = NiFpga>;
 }

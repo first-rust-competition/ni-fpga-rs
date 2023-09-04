@@ -1,6 +1,6 @@
 use std::thread;
 
-use ni_fpga::{FixedRegisterAccess, Register, Session, StoredOffset};
+use ni_fpga::{Register, RegisterAccess, Session, StoredOffset};
 use ni_fpga_macros::{Cluster, Enum};
 
 #[derive(Cluster, Debug)]
@@ -44,16 +44,10 @@ fn main() -> Result<(), ni_fpga::Error> {
     let voltage_register_3: Register<StoredOffset<u16>> =
         session.open_const_register::<u16, 99174>().into();
 
-    let read_pwm_thread = thread::spawn(move || voltage_register_2.read_direct(&session_2));
+    let read_pwm_thread = thread::spawn(move || voltage_register_2.read(&session_2));
 
-    println!(
-        "Input voltage: {:?}",
-        voltage_register.read_direct(&session)?
-    );
-    println!(
-        "Input voltage: {:?}",
-        voltage_register_3.read_direct(&session)?
-    );
+    println!("Input voltage: {:?}", voltage_register.read(&session)?);
+    println!("Input voltage: {:?}", voltage_register_3.read(&session)?);
     println!("Input voltage: {:?}", read_pwm_thread.join().unwrap()?);
     Ok(())
 }

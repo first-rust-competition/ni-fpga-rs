@@ -2,7 +2,7 @@ use std::io::Write;
 
 use colored::*;
 use ni_fpga::fxp::{SignedFXP, UnsignedFXP};
-use ni_fpga::{Session, SessionAccess};
+use ni_fpga::Session;
 use ni_fpga_macros::Cluster;
 use tempfile::NamedTempFile;
 

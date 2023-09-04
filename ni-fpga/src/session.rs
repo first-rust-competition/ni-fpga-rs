@@ -123,20 +123,8 @@ impl Session<ArcStorage> {
     }
 }
 
-#[cfg(feature = "use_generic_const_exprs")]
-use crate::FpgaBits;
-
 pub trait SessionAccess {
     fn fpga(&self) -> &NiFpga;
-
-    #[cfg(feature = "use_generic_const_exprs")]
-    fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>
-    where
-        [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized;
-    #[cfg(feature = "use_generic_const_exprs")]
-    fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>
-    where
-        [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized;
 }
 
 impl<Fpga> SessionAccess for Session<Fpga>
@@ -147,29 +135,35 @@ where
     fn fpga(&self) -> &NiFpga {
         &self.fpga_storage
     }
+}
 
-    #[cfg(feature = "use_generic_const_exprs")]
-    fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>
+#[cfg(feature = "use_generic_const_exprs")]
+impl<Fpga> Session<Fpga>
+where
+    Fpga: Deref,
+    Fpga: Deref<Target = NiFpga>,
+{
+    pub fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>
     where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
     {
         let mut buffer = [0u8; (T::SIZE_IN_BITS - 1) / 8 + 1];
         match self.fpga_storage.read_u8_array(offset, &mut buffer) {
             Ok(_) => Ok(Datatype::unpack(
-                &FpgaBits::from_slice(&buffer)
+                &crate::FpgaBits::from_slice(&buffer)
                     [((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],
             )?),
             Err(err) => Err(err),
         }
     }
-    #[cfg(feature = "use_generic_const_exprs")]
-    fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>
+
+    pub fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>
     where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
     {
         let mut buffer = [0u8; (T::SIZE_IN_BITS - 1) / 8 + 1];
         Datatype::pack(
-            &mut FpgaBits::from_slice_mut(&mut buffer)
+            &mut crate::FpgaBits::from_slice_mut(&mut buffer)
                 [((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],
             data,
         )?;

@@ -17,7 +17,6 @@ mod status;
 pub use datatype::{Datatype, FpgaBits};
 pub use errors::Error;
 pub type Offset = ffi::Offset;
-pub use fixed_register::FixedRegisterAccess;
 pub use hmb::Hmb;
 pub use hmb::HmbAccess;
 pub use register::ConstOffset;
