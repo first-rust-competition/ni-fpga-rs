@@ -72,6 +72,35 @@ pub fn derive_enum(item: TokenStream) -> TokenStream {
         64 => quote! {u64},
         _ => unreachable!(),
     });
+    let read_function = syn::Type::Verbatim(match backing_size {
+        8 => quote! {read_u8},
+        16 => quote! {read_u16},
+        32 => quote! {read_u32},
+        64 => quote! {read_u64},
+        _ => unreachable!(),
+    });
+    let read_array_function = syn::Type::Verbatim(match backing_size {
+        8 => quote! {read_u8_array},
+        16 => quote! {read_u16_array},
+        32 => quote! {read_u32_array},
+        64 => quote! {read_u64_array},
+        _ => unreachable!(),
+    });
+    let write_function = syn::Type::Verbatim(match backing_size {
+        8 => quote! {write_u8},
+        16 => quote! {write_u16},
+        32 => quote! {write_u32},
+        64 => quote! {write_u64},
+        _ => unreachable!(),
+    });
+    let write_array_function = syn::Type::Verbatim(match backing_size {
+        8 => quote! {write_u8_array},
+        16 => quote! {write_u16_array},
+        32 => quote! {write_u32_array},
+        64 => quote! {write_u64_array},
+        _ => unreachable!(),
+    });
+
     let discriminants: Vec<_> = (0..input.variants.len())
         .map(|discriminant| {
             syn::LitInt::new(
@@ -107,6 +136,75 @@ pub fn derive_enum(item: TokenStream) -> TokenStream {
                     ),*,
                     unknown => Err(ni_fpga::Error::InvalidEnumDiscriminant(unknown as u64)),
                 }
+            }
+        }
+
+        impl #enum_name {
+            fn from_value_result(value: #backing_type) -> Result<#enum_name, ni_fpga::Error> {
+                match value {
+                    #(
+                    #discriminants_for_unpack => Ok(Self::#variants_for_unpack)
+                    ),*,
+                    _ => Err(ni_fpga::Error::InvalidEnumDiscriminant(value as u64)),
+                }
+            }
+
+            // This is only needed because try_map is not stable
+            fn from_value(value: #backing_type, failed: &mut Option<#backing_type>) -> #enum_name {
+                match value {
+                    #(
+                    #discriminants_for_unpack => Self::#variants_for_unpack
+                    ),*,
+                    _ => {
+                        *failed = Some(value);
+                        Self::default()
+                    },
+                }
+            }
+        }
+
+        impl<N: ni_fpga::GetOffset<#enum_name>> ni_fpga::RegisterAccess<#enum_name> for ni_fpga::Register<N> {
+            fn read<Fpga>(&self, session: &Session<Fpga>) -> Result<#enum_name, ni_fpga::Error>
+            where
+                Fpga: std::ops::Deref,
+                Fpga: std::ops::Deref<Target = ni_fpga::NiFpga>,
+            {
+                #enum_name::from_value_result(ni_fpga::SessionAccess::fpga(session).#read_function(self.offset())?)
+            }
+
+            fn read_array<Fpga, const LEN: usize>(
+                &self,
+                session: &Session<Fpga>,
+            ) -> Result<[#enum_name; LEN], ni_fpga::Error>
+            where
+                Fpga: std::ops::Deref,
+                Fpga: std::ops::Deref<Target = ni_fpga::NiFpga>,
+            {
+                let mut raw_array = [Default::default(); LEN];
+                ni_fpga::SessionAccess::fpga(session).#read_array_function(self.offset(), &mut raw_array)?;
+                let mut failed = None;
+                let ret = raw_array.map(|x| #enum_name::from_value(x, &mut failed));
+                match failed {
+                    Some(unknown) => Err(ni_fpga::Error::InvalidEnumDiscriminant(unknown as u64)),
+                    None => Ok(ret),
+                }
+            }
+
+            fn write<Fpga>(&mut self, session: &Session<Fpga>, value: #enum_name) -> Result<(), ni_fpga::Error>
+            where
+                Fpga: std::ops::Deref,
+                Fpga: std::ops::Deref<Target = ni_fpga::NiFpga>,
+            {
+                ni_fpga::SessionAccess::fpga(session).#write_function(self.offset(), value as #backing_type)
+            }
+
+            fn write_array<Fpga, const LEN: usize>(&self, session: &Session<Fpga>, value: &[#enum_name; LEN]) -> Result<(), ni_fpga::Error>
+            where
+                Fpga: std::ops::Deref,
+                Fpga: std::ops::Deref<Target = ni_fpga::NiFpga>,
+            {
+                let mapped = value.map(|x| x as #backing_type);
+                ni_fpga::SessionAccess::fpga(session).#write_array_function(self.offset(), &mapped)
             }
         }
     };

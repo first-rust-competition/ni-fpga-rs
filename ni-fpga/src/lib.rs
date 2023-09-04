@@ -19,7 +19,9 @@ pub use errors::Error;
 pub type Offset = ffi::Offset;
 pub use hmb::Hmb;
 pub use hmb::HmbAccess;
+pub use nifpga::NiFpga;
 pub use register::ConstOffset;
+pub use register::GetOffset;
 pub use register::Register;
 #[cfg(feature = "use_generic_const_exprs")]
 pub use register::RegisterAccess;

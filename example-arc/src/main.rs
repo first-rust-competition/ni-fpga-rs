@@ -16,8 +16,9 @@ struct AnalogTriggerOutput {
     falling: bool,
 }
 
-#[derive(Enum, Debug)]
+#[derive(Enum, Debug, Copy, Clone, Default)]
 enum SPIDebugState {
+    #[default]
     Idle,
     CheckWindow,
     CheckAvailable,

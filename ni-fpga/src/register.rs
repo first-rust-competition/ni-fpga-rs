@@ -78,7 +78,11 @@ where
     where
         Fpga: Deref,
         Fpga: Deref<Target = NiFpga>;
-    fn write_array<Fpga>(&self, session: &Session<Fpga>, value: &[T]) -> Result<(), Error>
+    fn write_array<Fpga, const LEN: usize>(
+        &self,
+        session: &Session<Fpga>,
+        value: &[T; LEN],
+    ) -> Result<(), Error>
     where
         Fpga: Deref,
         Fpga: Deref<Target = NiFpga>;
