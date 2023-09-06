@@ -1,7 +1,8 @@
 use std::ffi::CString;
 
 use ni_fpga_sys::{
-    Bool, CloseAttribute, NiFpgaApi, NiFpgaApiContainer, Offset, OpenAttribute, Session,
+    Bool, CloseAttribute, DlOpenError, NiFpgaApi, NiFpgaApiContainer, Offset, OpenAttribute,
+    Session,
 };
 
 use crate::Error;
@@ -16,6 +17,12 @@ impl StatusHelper for ffi::Status {
             0 => Ok(()),
             _ => Err(Error::FPGA(self.into())),
         }
+    }
+}
+
+impl From<DlOpenError> for Error {
+    fn from(value: DlOpenError) -> Self {
+        Self::DlOpen(value)
     }
 }
 
@@ -223,10 +230,7 @@ impl NiFpga {
     );
 
     pub fn from_session(session: Session) -> Result<Self, Error> {
-        let api = match NiFpgaApi::load() {
-            Ok(api) => api,
-            Err(err) => return Err(Error::DlOpen(err)),
-        };
+        let api = NiFpgaApi::load()?;
 
         Ok(Self {
             session,
@@ -242,10 +246,7 @@ impl NiFpga {
         open_attribute: OpenAttribute,
         close_attribute: CloseAttribute,
     ) -> Result<Self, Error> {
-        let api = match NiFpgaApi::load() {
-            Ok(api) => api,
-            Err(err) => return Err(Error::DlOpen(err)),
-        };
+        let api = NiFpgaApi::load()?;
 
         let mut session: Session = 0;
         match api
