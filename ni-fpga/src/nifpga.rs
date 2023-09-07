@@ -1,11 +1,10 @@
 use std::ffi::CString;
 
 use ni_fpga_sys::{
-    Bool, CloseAttribute, DlOpenError, NiFpgaApi, NiFpgaApiContainer, Offset, OpenAttribute,
-    Session,
+    Bool, CloseAttribute, NiFpgaApi, NiFpgaApiContainer, Offset, OpenAttribute, Session,
 };
 
-use crate::Error;
+use crate::{Error, Status};
 
 pub(crate) trait StatusHelper {
     fn to_result(self) -> Result<(), Error>;
@@ -20,9 +19,18 @@ impl StatusHelper for ffi::Status {
     }
 }
 
-impl From<DlOpenError> for Error {
-    fn from(value: DlOpenError) -> Self {
-        Self::DlOpen(value)
+impl From<ffi::Error> for Error {
+    fn from(value: ffi::Error) -> Self {
+        match value {
+            // Map the explicit opening errors to what the C API
+            // returns for the same errors.
+            ffi::Error::OpeningLibraryError(_) => Error::FPGA(Status::ResourceNotFound),
+            ffi::Error::SymbolGettingError(_) => Error::FPGA(Status::VersionMismatch),
+            // Map unknowns (Which are impossible to hit)
+            // just as a generic error. All 3 other enum states
+            // for this are impossible with the FPGA library.
+            e => panic!("{}", e),
+        }
     }
 }
 
@@ -37,22 +45,24 @@ macro_rules! type_wrapper {
         $readarr_fun_name:ident, $readarr_ffi_name:ident, $writearr_fun_name:ident, $writearr_ffi_name:ident) => {
         pub fn $read_fun_name(&self, indicator: Offset) -> Result<$type, Error> {
             let mut value: $type = Default::default();
-            match self
-                .api
-                .base
-                .$read_ffi_name(self.session, indicator, &mut value as *mut $type)
-                .to_result()
-            {
+            match unsafe {
+                self.api
+                    .base
+                    .$read_ffi_name(self.session, indicator, &mut value as *mut $type)
+                    .to_result()
+            } {
                 Ok(_) => Ok(value),
                 Err(err) => Err(err),
             }
         }
 
         pub fn $write_fun_name(&self, indicator: Offset, value: $type) -> Result<(), Error> {
-            self.api
-                .base
-                .$write_ffi_name(self.session, indicator, value)
-                .to_result()
+            unsafe {
+                self.api
+                    .base
+                    .$write_ffi_name(self.session, indicator, value)
+                    .to_result()
+            }
         }
 
         pub fn $readarr_fun_name(
@@ -60,17 +70,21 @@ macro_rules! type_wrapper {
             indicator: Offset,
             value: &mut [$type],
         ) -> Result<(), Error> {
-            self.api
-                .base
-                .$readarr_ffi_name(self.session, indicator, value.as_mut_ptr(), value.len())
-                .to_result()
+            unsafe {
+                self.api
+                    .base
+                    .$readarr_ffi_name(self.session, indicator, value.as_mut_ptr(), value.len())
+                    .to_result()
+            }
         }
 
         pub fn $writearr_fun_name(&self, indicator: Offset, value: &[$type]) -> Result<(), Error> {
-            self.api
-                .base
-                .$writearr_ffi_name(self.session, indicator, value.as_ptr(), value.len())
-                .to_result()
+            unsafe {
+                self.api
+                    .base
+                    .$writearr_ffi_name(self.session, indicator, value.as_ptr(), value.len())
+                    .to_result()
+            }
         }
     };
 }
@@ -86,34 +100,40 @@ impl NiFpga {
 
     pub fn read_bool(&self, indicator: Offset) -> Result<bool, Error> {
         let mut value: u8 = 0;
-        match self
-            .api
-            .base
-            .NiFpgaDll_ReadBool(self.session, indicator, &mut value as *mut Bool)
-            .to_result()
-        {
+        match unsafe {
+            self.api
+                .base
+                .NiFpgaDll_ReadBool(self.session, indicator, &mut value as *mut Bool)
+                .to_result()
+        } {
             Ok(_) => Ok(value != 0),
             Err(err) => Err(err),
         }
     }
     pub fn write_bool(&self, indicator: Offset, value: bool) -> Result<(), Error> {
         let value = if value { 1 } else { 0 };
-        self.api
-            .base
-            .NiFpgaDll_WriteBool(self.session, indicator, value)
-            .to_result()
+        unsafe {
+            self.api
+                .base
+                .NiFpgaDll_WriteBool(self.session, indicator, value)
+                .to_result()
+        }
     }
     pub fn read_bool_array_fast(&self, indicator: Offset, value: &mut [u8]) -> Result<(), Error> {
-        self.api
-            .base
-            .NiFpgaDll_ReadArrayBool(self.session, indicator, value.as_mut_ptr(), value.len())
-            .to_result()
+        unsafe {
+            self.api
+                .base
+                .NiFpgaDll_ReadArrayBool(self.session, indicator, value.as_mut_ptr(), value.len())
+                .to_result()
+        }
     }
     pub fn write_bool_array_fast(&self, indicator: Offset, value: &[u8]) -> Result<(), Error> {
-        self.api
-            .base
-            .NiFpgaDll_WriteArrayBool(self.session, indicator, value.as_ptr(), value.len())
-            .to_result()
+        unsafe {
+            self.api
+                .base
+                .NiFpgaDll_WriteArrayBool(self.session, indicator, value.as_ptr(), value.len())
+                .to_result()
+        }
     }
 
     type_wrapper!(
@@ -249,17 +269,17 @@ impl NiFpga {
         let api = NiFpgaApi::load()?;
 
         let mut session: Session = 0;
-        match api
-            .base
-            .NiFpgaDll_Open(
-                bitfile.as_ptr(),
-                signature.as_ptr(),
-                resource.as_ptr(),
-                open_attribute.bits(),
-                &mut session,
-            )
-            .to_result()
-        {
+        match unsafe {
+            api.base
+                .NiFpgaDll_Open(
+                    bitfile.as_ptr(),
+                    signature.as_ptr(),
+                    resource.as_ptr(),
+                    open_attribute.bits(),
+                    &mut session,
+                )
+                .to_result()
+        } {
             Ok(_) => Ok(Self {
                 session,
                 api,
@@ -271,11 +291,12 @@ impl NiFpga {
 
     pub fn close(self, attribute: CloseAttribute) -> Result<(), Error> {
         match self.close_attribute {
-            Some(_) => self
-                .api
-                .base
-                .NiFpgaDll_Close(self.session, attribute.bits())
-                .to_result(),
+            Some(_) => unsafe {
+                self.api
+                    .base
+                    .NiFpgaDll_Close(self.session, attribute.bits())
+                    .to_result()
+            },
             None => Err(Error::ClosingUnownedSession),
         }
     }
@@ -286,7 +307,9 @@ impl Drop for NiFpga {
         // TODO figure out what to do here with attribute
         // and the return value
         if let Some(attr) = self.close_attribute {
-            self.api.base.NiFpgaDll_Close(self.session, attr.bits());
+            unsafe {
+                self.api.base.NiFpgaDll_Close(self.session, attr.bits());
+            }
         }
     }
 }

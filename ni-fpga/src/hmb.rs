@@ -38,15 +38,15 @@ where
             Some(hmb) => {
                 let mut memory_size: usize = 0;
                 let mut virtual_address: *mut c_void = ptr::null_mut();
-                match hmb
-                    .NiFpgaDll_OpenHmb(
+                match unsafe {
+                    hmb.NiFpgaDll_OpenHmb(
                         fpga.session,
                         memory_name.as_ptr(),
                         &mut memory_size,
                         &mut virtual_address,
                     )
                     .to_result()
-                {
+                } {
                     Ok(_) => Ok({
                         Self {
                             session,
@@ -103,12 +103,14 @@ where
         // Unwrap is safe here, as the only way this can get constructed is
         // if its possible to unwrap it at construction
         // TODO figure out what to do here with the return value
-        self.session
-            .fpga()
-            .api
-            .hmb
-            .as_ref()
-            .unwrap()
-            .NiFpgaDll_CloseHmb(self.session.fpga().session, self.memory_name.as_ptr());
+        unsafe {
+            self.session
+                .fpga()
+                .api
+                .hmb
+                .as_ref()
+                .unwrap()
+                .NiFpgaDll_CloseHmb(self.session.fpga().session, self.memory_name.as_ptr());
+        }
     }
 }

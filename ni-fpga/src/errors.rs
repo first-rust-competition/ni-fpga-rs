@@ -1,4 +1,3 @@
-use ni_fpga_sys::DlOpenError;
 use thiserror::Error;
 
 use crate::status::Status;
@@ -16,8 +15,6 @@ pub enum Error {
     FixedPointRawOutOfBounds(u64, u8, u8, bool),
     #[error("{0} cannot be precisely represented as FXP<{1}, {2}, {3}>`")]
     FixedPointPrecision(f64, u8, u8, bool),
-    #[error("Library Open Failed: {0}")]
-    DlOpen(DlOpenError),
     #[error("Cannot close an unowned fpga session")]
     ClosingUnownedSession,
 }
