@@ -148,12 +148,21 @@ where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
     {
         let mut buffer = [0u8; (T::SIZE_IN_BITS - 1) / 8 + 1];
-        match self.fpga_storage.read_u8_array(offset, &mut buffer) {
-            Ok(_) => Ok(Datatype::unpack(
-                &crate::FpgaBits::from_slice(&buffer)
-                    [((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],
-            )?),
-            Err(err) => Err(err),
+        if (T::SIZE_IN_BITS - 1) / 8 + 1 <= 4 {
+            match self.fpga_storage.read_u8_array(offset, &mut buffer) {
+                Ok(_) => Ok(Datatype::unpack(
+                    &crate::FpgaBits::from_slice(&buffer)
+                        [((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],
+                )?),
+                Err(err) => Err(err),
+            }
+        } else {
+            match self.fpga_storage.read_u8_array(offset, &mut buffer) {
+                Ok(_) => Ok(Datatype::unpack(
+                    &crate::FpgaBits::from_slice(&buffer),
+                )?),
+                Err(err) => Err(err),
+            }
         }
     }
 
@@ -162,11 +171,18 @@ where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
     {
         let mut buffer = [0u8; (T::SIZE_IN_BITS - 1) / 8 + 1];
-        Datatype::pack(
-            &mut crate::FpgaBits::from_slice_mut(&mut buffer)
-                [((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],
-            data,
-        )?;
+        if (T::SIZE_IN_BITS - 1) / 8 + 1 <= 4 {
+            Datatype::pack(
+                &mut crate::FpgaBits::from_slice_mut(&mut buffer)
+                    [((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],
+                data,
+            )?;
+        } else {
+            Datatype::pack(
+                &mut crate::FpgaBits::from_slice_mut(&mut buffer),
+                data,
+            )?;
+        }
         match self.fpga_storage.write_u8_array(offset, &buffer) {
             Ok(_) => Ok(()),
             Err(err) => Err(err),
