@@ -24,6 +24,7 @@ impl<T: Datatype, const N: usize> Datatype for [T; N] {
             .try_for_each(|(src, bits)| Datatype::pack(bits, src))
     }
 
+    #[allow(clippy::forget_non_drop)]
     fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
         let mut data: [std::mem::MaybeUninit<T>; N] = std::mem::MaybeUninit::uninit_array();
         data.iter_mut()
