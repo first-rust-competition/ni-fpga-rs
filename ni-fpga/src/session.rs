@@ -138,29 +138,29 @@ where
 }
 
 enum SmallBuffer<T, const N: usize> {
-    InPlace([T; N]),
+    InPlace(([T; N], usize)),
     Alloc(Vec<T>),
 }
 
 impl<T: Copy, const N: usize> SmallBuffer<T, N> {
     pub fn new(size: usize, val: T) -> Self {
         if size <= N {
-            Self::InPlace([val; N])
+            Self::InPlace(([val; N], size))
         } else {
-            Self::Alloc(vec![val; N])
+            Self::Alloc(vec![val; size])
         }
     }
 
     pub fn buffer(&self) -> &[T] {
         match self {
-            SmallBuffer::InPlace(b) => &b[0..N],
+            SmallBuffer::InPlace(b) => &b.0[0..b.1],
             SmallBuffer::Alloc(b) => b,
         }
     }
 
     pub fn buffer_mut(&mut self) -> &mut [T] {
         match self {
-            SmallBuffer::InPlace(ref mut b) => &mut b[0..N],
+            SmallBuffer::InPlace(ref mut b) => &mut b.0[0..b.1],
             SmallBuffer::Alloc(ref mut b) => b,
         }
     }
