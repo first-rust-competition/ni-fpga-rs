@@ -1,24 +1,22 @@
-use std::{thread, ffi::CString};
 use std::io::Write;
+use std::{ffi::CString, thread};
 
-use ni_fpga::fxp::{FXP, UnsignedFXP, UnsignedPackedNumber};
-use ni_fpga::{Register, RegisterAccess, Session, StoredOffset, SessionAccess};
+use ni_fpga::fxp::{UnsignedFXP, UnsignedPackedNumber, FXP};
+use ni_fpga::{Register, RegisterAccess, Session, SessionAccess, StoredOffset};
 use ni_fpga_macros::{Cluster, Enum};
 use tempfile::NamedTempFile;
-use ni_fpga::RegisterAccessGeneric;
 
 #[derive(Cluster, Debug)]
 struct DigitalSource {
     channel: UnsignedPackedNumber<4>,
     module: UnsignedPackedNumber<1>,
-    analog_trigger: bool
+    analog_trigger: bool,
 }
 
 #[derive(Cluster, Debug)]
 struct DutyCycleFrequency {
     pub overflow: bool,
     pub frequency: UnsignedPackedNumber<11>,
-
 }
 
 #[derive(Cluster, Debug)]
@@ -58,13 +56,19 @@ fn main() -> Result<(), ni_fpga::Error> {
         "rio://172.22.11.2/RIO0",
     )?;
 
-
     let mut dc_offset: u32 = 0;
     let c = CString::new("DutyCycle0.Frequency").unwrap();
-    let dc0 = unsafe {session.fpga().ffi().api21.as_ref().unwrap().NiFpgaDll_FindRegister(session.fpga().session(), c.as_ptr(), &mut dc_offset) };
+    let dc0 = unsafe {
+        session
+            .fpga()
+            .ffi()
+            .api21
+            .as_ref()
+            .unwrap()
+            .NiFpgaDll_FindRegister(session.fpga().session(), c.as_ptr(), &mut dc_offset)
+    };
 
     println!("{} {}", dc0, dc_offset);
-
 
     let dc = session.open_register::<DutyCycleFrequency>(dc_offset);
     let r = dc.read(&session)?;
@@ -72,10 +76,17 @@ fn main() -> Result<(), ni_fpga::Error> {
     println!("{:?} {}", r, r.frequency);
 
     let c = CString::new("DutyCycle1.Frequency").unwrap();
-    let dc0 = unsafe {session.fpga().ffi().api21.as_ref().unwrap().NiFpgaDll_FindRegister(session.fpga().session(), c.as_ptr(), &mut dc_offset) };
+    let dc0 = unsafe {
+        session
+            .fpga()
+            .ffi()
+            .api21
+            .as_ref()
+            .unwrap()
+            .NiFpgaDll_FindRegister(session.fpga().session(), c.as_ptr(), &mut dc_offset)
+    };
 
     println!("{} {}", dc0, dc_offset);
-
 
     let dc = session.open_register::<DutyCycleFrequency>(dc_offset);
     let r = dc.read(&session)?;

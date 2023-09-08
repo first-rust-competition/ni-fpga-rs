@@ -57,130 +57,56 @@ impl<T, const N: Offset> From<Register<T, ConstOffset<N>>> for Register<T, Store
     }
 }
 
-// pub trait GetOffset {
-
-// }
-
-// impl<T> GetOffset for Register<T, StoredOffset> {
-//     fn offset(&self) -> Offset {
-//         self._offset_type.0
-//     }
-// }
-
-// impl<T, const N: Offset> GetOffset for Register<T, ConstOffset<N>> {
-//     fn offset(&self) -> Offset {
-//         N
-//     }
-// }
-
-pub trait RegisterAccess<T>: RegisterAccessGeneric<T>
-where
-    T: Datatype,
-{
-    #[inline]
-    fn read(&self, session: &impl SessionAccess) -> Result<T, Error> {
-        session.read(self.offset())
-    }
-    #[inline]
-    fn read_array<Fpga, const LEN: usize>(
-        &self,
-        session: &impl SessionAccess,
-    ) -> Result<[T; LEN], Error> {
-        session.read(self.offset())
-    }
-    #[inline]
-    fn write<Fpga>(&mut self, session: &impl SessionAccess, value: T) -> Result<(), Error> {
-        session.write(self.offset(), &value)
-    }
-    #[inline]
-    fn write_array<Fpga, const LEN: usize>(
-        &self,
-        session: &impl SessionAccess,
-        value: &[T; LEN],
-    ) -> Result<(), Error> {
-        session.write(self.offset(), value)
-    }
-}
-
-pub trait RegisterAccessGeneric<T>
+pub trait RegisterAccess<T>
 where
     T: Datatype,
 {
     fn offset(&self) -> Offset;
 
     #[inline]
-    fn read_generic(&self, session: &impl SessionAccess) -> Result<T, Error> {
-        session.read(self.offset())
+    fn read(&self, session: &impl SessionAccess) -> Result<T, Error> {
+        T::read(session, self.offset())
     }
     #[inline]
-    fn read_array_generic<Fpga, const LEN: usize>(
+    fn read_array<const LEN: usize>(
         &self,
         session: &impl SessionAccess,
     ) -> Result<[T; LEN], Error> {
-        session.read(self.offset())
+        T::read_array(session, self.offset())
     }
     #[inline]
-    fn write_generic<Fpga>(&mut self, session: &impl SessionAccess, value: T) -> Result<(), Error> {
-        session.write(self.offset(), &value)
+    fn read_array_inplace(
+        &self,
+        session: &impl SessionAccess,
+        data: &mut [T],
+    ) -> Result<(), Error> {
+        T::read_array_inplace(session, self.offset(), data)
     }
     #[inline]
-    fn write_array_generic<Fpga, const LEN: usize>(
+    fn write(&mut self, session: &impl SessionAccess, value: T) -> Result<(), Error> {
+        T::write(session, self.offset(), value)
+    }
+    #[inline]
+    fn write_ref(&mut self, session: &impl SessionAccess, value: &T) -> Result<(), Error> {
+        T::write_ref(session, self.offset(), value)
+    }
+    #[inline]
+    fn write_array<const LEN: usize>(
         &self,
         session: &impl SessionAccess,
         value: &[T; LEN],
     ) -> Result<(), Error> {
-        session.write(self.offset(), value)
+        T::write_array(session, self.offset(), value)
     }
 }
 
-impl<T, U> RegisterAccessGeneric<T> for Register<T, U>
+impl<T, U> RegisterAccess<T> for Register<T, U>
 where
     T: Datatype,
-    u32: From<U>,
+    Offset: From<U>,
     U: Copy,
 {
     fn offset(&self) -> Offset {
         self._offset_type.into()
     }
 }
-
-pub trait RegisterAccessRef<T>: RegisterAccessGeneric<T>
-where
-    T: Datatype,
-{
-    #[inline]
-    fn write_ref<Fpga>(&mut self, session: &impl SessionAccess, value: &T) -> Result<(), Error> {
-        session.write(self.offset(), value)
-    }
-}
-
-impl<U: Copy> RegisterAccess<u32> for Register<u32, U>
-where
-    Offset: From<U>,
-{
-    #[inline]
-    fn read(&self, session: &impl SessionAccess) -> Result<u32, Error> {
-        session.fpga().read_u32(self.offset())
-    }
-    #[inline]
-    fn read_array<Fpga, const LEN: usize>(
-        &self,
-        session: &impl SessionAccess,
-    ) -> Result<[u32; LEN], Error> {
-        session.read(self.offset())
-    }
-    #[inline]
-    fn write<Fpga>(&mut self, session: &impl SessionAccess, value: u32) -> Result<(), Error> {
-        session.write(self.offset(), &value)
-    }
-    #[inline]
-    fn write_array<Fpga, const LEN: usize>(
-        &self,
-        session: &impl SessionAccess,
-        value: &[u32; LEN],
-    ) -> Result<(), Error> {
-        session.write(self.offset(), value)
-    }
-}
-
-impl<U: Copy> RegisterAccess<u16> for Register<u16, U> where Offset: From<U> {}

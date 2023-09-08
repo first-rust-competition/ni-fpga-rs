@@ -121,7 +121,6 @@ pub trait SessionAccess {
 
     fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>;
 
-
     fn open_const_register<T: Datatype, const N: Offset>(&self) -> Register<T, ConstOffset<N>> {
         Register::new_const()
     }
@@ -168,7 +167,7 @@ where
         &self.fpga_storage
     }
 
-     fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error> {
+    fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error> {
         // Most types are smaller then 4, so preallocate for 4
         let byte_size = (T::SIZE_IN_BITS - 1) / 8 + 1;
         let mut buffer: SmallBuffer<u8, 4> = SmallBuffer::new(byte_size, 0u8);
@@ -187,7 +186,7 @@ where
         }
     }
 
-     fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error> {
+    fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error> {
         // Most types are smaller then 4, so preallocate for 4
         let byte_size = (T::SIZE_IN_BITS - 1) / 8 + 1;
         let mut buffer: SmallBuffer<u8, 4> = SmallBuffer::new(byte_size, 0u8);

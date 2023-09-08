@@ -1,4 +1,3 @@
-use ni_fpga::RegisterAccessGeneric;
 use ni_fpga::{RegisterAccess, SessionAccess};
 use std::io::Write;
 
@@ -37,13 +36,13 @@ fn full_test_case<T: PartialEq + std::fmt::Debug + Datatype + Copy, const N: u32
     let reg: ni_fpga::Register<T, ni_fpga::StoredOffset> = session.open_register::<T>(N);
     test_case(
         &format!("{} ref", test_case_name),
-        reg.read_generic(session)?,
+        reg.read(session)?,
         expected,
     );
     let reg = session.open_const_register::<T, N>();
     test_case(
         &format!("{} const ref", test_case_name),
-        reg.read_generic(session)?,
+        reg.read(session)?,
         expected,
     );
 

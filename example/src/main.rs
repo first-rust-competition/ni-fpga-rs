@@ -1,4 +1,4 @@
-use ni_fpga::{RegisterAccess, Session, SessionAccess, RegisterAccessGeneric};
+use ni_fpga::{RegisterAccess, Session, SessionAccess};
 use ni_fpga_macros::{Cluster, Enum};
 
 #[derive(Cluster, Debug)]

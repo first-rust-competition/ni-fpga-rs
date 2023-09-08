@@ -17,4 +17,6 @@ pub enum Error {
     FixedPointPrecision(f64, u8, u8, bool),
     #[error("Cannot close an unowned fpga session")]
     ClosingUnownedSession,
+    #[error("An invalid datatype was passed.")]
+    InvalidDatatype,
 }

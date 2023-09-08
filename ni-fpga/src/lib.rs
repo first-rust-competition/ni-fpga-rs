@@ -20,7 +20,6 @@ pub use nifpga::NiFpga;
 pub use register::ConstOffset;
 pub use register::Register;
 pub use register::RegisterAccess;
-pub use register::RegisterAccessGeneric;
 pub use register::StoredOffset;
 pub use session::Session;
 pub use session::SessionAccess;

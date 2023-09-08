@@ -2,7 +2,7 @@ use std::mem::MaybeUninit;
 
 use bitvec::prelude::*;
 
-use crate::errors::Error;
+use crate::{errors::Error, Offset, SessionAccess};
 
 #[cfg(target_endian = "little")]
 pub type FpgaBits = BitSlice<Msb0, u8>;
@@ -14,6 +14,47 @@ pub trait Datatype: Sized {
 
     fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error>;
     fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error>;
+
+    #[inline]
+    fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        session.read(offset)
+    }
+
+    #[inline]
+    fn read_array<const LEN: usize>(
+        session: &impl SessionAccess,
+        offset: Offset,
+    ) -> Result<[Self; LEN], Error> {
+        session.read(offset)
+    }
+
+    #[inline]
+    fn read_array_inplace(
+        _session: &impl SessionAccess,
+        _offset: Offset,
+        _data: &mut [Self],
+    ) -> Result<(), Error> {
+        Err(Error::InvalidDatatype)
+    }
+
+    #[inline]
+    fn write(session: &impl SessionAccess, offset: Offset, value: Self) -> Result<(), Error> {
+        session.write(offset, &value)
+    }
+
+    #[inline]
+    fn write_ref(session: &impl SessionAccess, offset: Offset, value: &Self) -> Result<(), Error> {
+        session.write(offset, value)
+    }
+
+    #[inline]
+    fn write_array<const LEN: usize>(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: &[Self; LEN],
+    ) -> Result<(), Error> {
+        session.write(offset, value)
+    }
 }
 
 // Support array versions of any Datatype
@@ -66,6 +107,49 @@ impl Datatype for u8 {
 
     fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
         Ok(fpga_bits.load_be::<Self>())
+    }
+
+    #[inline]
+    fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        session.fpga().read_u8(offset)
+    }
+
+    #[inline]
+    fn read_array<const LEN: usize>(
+        session: &impl SessionAccess,
+        offset: Offset,
+    ) -> Result<[Self; LEN], Error> {
+        let mut buffer = [0u8; LEN];
+        session.fpga().read_u8_array(offset, &mut buffer)?;
+        Ok(buffer)
+    }
+
+    #[inline]
+    fn read_array_inplace(
+        session: &impl SessionAccess,
+        offset: Offset,
+        buffer: &mut [Self],
+    ) -> Result<(), Error> {
+        session.fpga().read_u8_array(offset, buffer)
+    }
+
+    #[inline]
+    fn write(session: &impl SessionAccess, offset: Offset, value: Self) -> Result<(), Error> {
+        session.fpga().write_u8(offset, value)
+    }
+
+    #[inline]
+    fn write_ref(session: &impl SessionAccess, offset: Offset, value: &Self) -> Result<(), Error> {
+        session.fpga().write_u8(offset, *value)
+    }
+
+    #[inline]
+    fn write_array<const LEN: usize>(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: &[Self; LEN],
+    ) -> Result<(), Error> {
+        session.fpga().write_u8_array(offset, value)
     }
 }
 
