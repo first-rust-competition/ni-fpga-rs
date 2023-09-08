@@ -2,96 +2,97 @@ use std::marker::PhantomData;
 
 use crate::{Datatype, Error, Offset, SessionAccess};
 
-pub trait GetOffset<T: Datatype> {
-    fn offset(&self) -> Offset;
-}
+#[derive(Clone, Copy)]
+pub struct ConstOffset<const N: Offset>;
 
-pub struct ConstOffset<T: Datatype, const N: Offset>(PhantomData<T>);
-
-impl<T: Datatype, const N: Offset> GetOffset<T> for ConstOffset<T, N> {
-    fn offset(&self) -> Offset {
+impl<const N: Offset> From<ConstOffset<N>> for Offset {
+    #[inline]
+    fn from(_value: ConstOffset<N>) -> Self {
         N
     }
 }
 
-pub struct StoredOffset<T: Datatype>(Offset, PhantomData<T>);
+#[derive(Clone, Copy)]
+pub struct StoredOffset(Offset);
 
-impl<T: Datatype> GetOffset<T> for StoredOffset<T> {
-    fn offset(&self) -> Offset {
-        self.0
+impl From<StoredOffset> for Offset {
+    #[inline]
+    fn from(value: StoredOffset) -> Self {
+        value.0
     }
 }
 
-pub struct Register<O> {
-    offset_type: O,
+pub struct Register<T, O> {
+    _offset_type: O,
+    _type: PhantomData<T>,
 }
 
-impl<T: Datatype> Register<StoredOffset<T>> {
+impl<T> Register<T, StoredOffset> {
+    #[inline]
     pub fn new(offset: Offset) -> Self {
         Self {
-            offset_type: StoredOffset(offset, PhantomData),
+            _offset_type: StoredOffset(offset),
+            _type: PhantomData,
         }
     }
 }
 
-impl<T: Datatype, const N: Offset> Register<ConstOffset<T, N>> {
+impl<T, const N: Offset> Register<T, ConstOffset<N>> {
+    #[inline]
     pub fn new_const() -> Self {
         Self {
-            offset_type: ConstOffset(PhantomData),
+            _offset_type: ConstOffset,
+            _type: PhantomData,
         }
     }
 }
 
-impl<O> Register<O> {
-    pub fn offset<T: Datatype>(&self) -> Offset
-    where
-        O: GetOffset<T>,
-    {
-        self.offset_type.offset()
-    }
-}
-
-impl<T: Datatype, const N: Offset> From<Register<ConstOffset<T, N>>> for Register<StoredOffset<T>> {
-    fn from(_: Register<ConstOffset<T, N>>) -> Self {
+impl<T, const N: Offset> From<Register<T, ConstOffset<N>>> for Register<T, StoredOffset> {
+    #[inline]
+    fn from(_: Register<T, ConstOffset<N>>) -> Self {
         Self {
-            offset_type: StoredOffset(N, PhantomData),
+            _offset_type: StoredOffset(N),
+            _type: PhantomData,
         }
     }
 }
 
-pub trait RegisterAccess<T>
+// pub trait GetOffset {
+
+// }
+
+// impl<T> GetOffset for Register<T, StoredOffset> {
+//     fn offset(&self) -> Offset {
+//         self._offset_type.0
+//     }
+// }
+
+// impl<T, const N: Offset> GetOffset for Register<T, ConstOffset<N>> {
+//     fn offset(&self) -> Offset {
+//         N
+//     }
+// }
+
+pub trait RegisterAccess<T>: RegisterAccessGeneric<T>
 where
     T: Datatype,
 {
-    fn read(&self, session: &impl SessionAccess) -> Result<T, Error>;
-    fn read_array<Fpga, const LEN: usize>(
-        &self,
-        session: &impl SessionAccess,
-    ) -> Result<[T; LEN], Error>;
-    fn write<Fpga>(&mut self, session: &impl SessionAccess, value: T) -> Result<(), Error>;
-    fn write_array<Fpga, const LEN: usize>(
-        &self,
-        session: &impl SessionAccess,
-        value: &[T; LEN],
-    ) -> Result<(), Error>;
-}
-
-impl<T: Datatype, N: GetOffset<T>> RegisterAccess<T> for Register<N> {
+    #[inline]
     fn read(&self, session: &impl SessionAccess) -> Result<T, Error> {
         session.read(self.offset())
     }
-
+    #[inline]
     fn read_array<Fpga, const LEN: usize>(
         &self,
         session: &impl SessionAccess,
     ) -> Result<[T; LEN], Error> {
         session.read(self.offset())
     }
-
+    #[inline]
     fn write<Fpga>(&mut self, session: &impl SessionAccess, value: T) -> Result<(), Error> {
         session.write(self.offset(), &value)
     }
-
+    #[inline]
     fn write_array<Fpga, const LEN: usize>(
         &self,
         session: &impl SessionAccess,
@@ -101,16 +102,85 @@ impl<T: Datatype, N: GetOffset<T>> RegisterAccess<T> for Register<N> {
     }
 }
 
-pub trait RegisterAccessRef<T>
+pub trait RegisterAccessGeneric<T>
 where
     T: Datatype,
 {
-    fn write_ref<Fpga>(&mut self, session: &impl SessionAccess, value: &T) -> Result<(), Error>;
-}
+    fn offset(&self) -> Offset;
 
-impl<T: Datatype, N: GetOffset<T>> RegisterAccessRef<T> for Register<N> {
-    fn write_ref<Fpga>(&mut self, session: &impl SessionAccess, value: &T) -> Result<(), Error>
-    {
+    #[inline]
+    fn read_generic(&self, session: &impl SessionAccess) -> Result<T, Error> {
+        session.read(self.offset())
+    }
+    #[inline]
+    fn read_array_generic<Fpga, const LEN: usize>(
+        &self,
+        session: &impl SessionAccess,
+    ) -> Result<[T; LEN], Error> {
+        session.read(self.offset())
+    }
+    #[inline]
+    fn write_generic<Fpga>(&mut self, session: &impl SessionAccess, value: T) -> Result<(), Error> {
+        session.write(self.offset(), &value)
+    }
+    #[inline]
+    fn write_array_generic<Fpga, const LEN: usize>(
+        &self,
+        session: &impl SessionAccess,
+        value: &[T; LEN],
+    ) -> Result<(), Error> {
         session.write(self.offset(), value)
     }
 }
+
+impl<T, U> RegisterAccessGeneric<T> for Register<T, U>
+where
+    T: Datatype,
+    u32: From<U>,
+    U: Copy,
+{
+    fn offset(&self) -> Offset {
+        self._offset_type.into()
+    }
+}
+
+pub trait RegisterAccessRef<T>: RegisterAccessGeneric<T>
+where
+    T: Datatype,
+{
+    #[inline]
+    fn write_ref<Fpga>(&mut self, session: &impl SessionAccess, value: &T) -> Result<(), Error> {
+        session.write(self.offset(), value)
+    }
+}
+
+impl<U: Copy> RegisterAccess<u32> for Register<u32, U>
+where
+    Offset: From<U>,
+{
+    #[inline]
+    fn read(&self, session: &impl SessionAccess) -> Result<u32, Error> {
+        session.fpga().read_u32(self.offset())
+    }
+    #[inline]
+    fn read_array<Fpga, const LEN: usize>(
+        &self,
+        session: &impl SessionAccess,
+    ) -> Result<[u32; LEN], Error> {
+        session.read(self.offset())
+    }
+    #[inline]
+    fn write<Fpga>(&mut self, session: &impl SessionAccess, value: u32) -> Result<(), Error> {
+        session.write(self.offset(), &value)
+    }
+    #[inline]
+    fn write_array<Fpga, const LEN: usize>(
+        &self,
+        session: &impl SessionAccess,
+        value: &[u32; LEN],
+    ) -> Result<(), Error> {
+        session.write(self.offset(), value)
+    }
+}
+
+impl<U: Copy> RegisterAccess<u16> for Register<u16, U> where Offset: From<U> {}

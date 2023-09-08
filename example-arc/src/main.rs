@@ -5,6 +5,7 @@ use ni_fpga::fxp::{FXP, UnsignedFXP, UnsignedPackedNumber};
 use ni_fpga::{Register, RegisterAccess, Session, StoredOffset, SessionAccess};
 use ni_fpga_macros::{Cluster, Enum};
 use tempfile::NamedTempFile;
+use ni_fpga::RegisterAccessGeneric;
 
 #[derive(Cluster, Debug)]
 struct DigitalSource {
@@ -91,7 +92,7 @@ fn main() -> Result<(), ni_fpga::Error> {
     let voltage_register = session.open_register::<u16>(99174);
     let voltage_register_2 = session.open_const_register::<u16, 99174>();
 
-    let voltage_register_3: Register<StoredOffset<u16>> =
+    let voltage_register_3: Register<u16, StoredOffset> =
         session.open_const_register::<u16, 99174>().into();
 
     let read_pwm_thread = thread::spawn(move || voltage_register_2.read(&session_2));

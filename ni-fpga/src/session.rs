@@ -122,11 +122,11 @@ pub trait SessionAccess {
     fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>;
 
 
-    fn open_const_register<T: Datatype, const N: Offset>(&self) -> Register<ConstOffset<T, N>> {
+    fn open_const_register<T: Datatype, const N: Offset>(&self) -> Register<T, ConstOffset<N>> {
         Register::new_const()
     }
 
-    fn open_register<T: Datatype>(&self, offset: Offset) -> Register<StoredOffset<T>> {
+    fn open_register<T: Datatype>(&self, offset: Offset) -> Register<T, StoredOffset> {
         Register::new(offset)
     }
 }
