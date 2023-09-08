@@ -5,10 +5,52 @@ use crate::errors::Error;
 #[derive(Clone, Copy)]
 pub struct FXP<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool>(u64);
 
+pub type PackedNumber<const LENGTH: u8, const SIGNED: bool> = FXP<LENGTH, LENGTH, SIGNED>;
+pub type SignedPackedNumber<const LENGTH: u8> = PackedNumber<LENGTH, true>;
+pub type UnsignedPackedNumber<const LENGTH: u8> = PackedNumber<LENGTH, false>;
+
 pub type SignedFXP<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8> =
     FXP<WORD_LENGTH, INTEGER_LENGTH, true>;
 pub type UnsignedFXP<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8> =
     FXP<WORD_LENGTH, INTEGER_LENGTH, false>;
+
+impl<const LENGTH: u8, const SIGNED: bool> FXP<LENGTH, LENGTH, SIGNED> {
+    pub fn from_int(num: i64) -> Result<Self, Error> {
+        if !SIGNED {
+            if num >= (1 << LENGTH) || num < 0 {
+                Err(Error::FixedPointOutOfBounds(
+                    num as f64, LENGTH, LENGTH, SIGNED,
+                ))
+            } else {
+                Ok(Self(num as u64))
+            }
+        } else if num >= (1 << (LENGTH - 1)) || num < -(1 << (LENGTH - 1)) {
+            Err(Error::FixedPointOutOfBounds(
+                num as f64, LENGTH, LENGTH, SIGNED,
+            ))
+        } else {
+            let abs_bits = num.unsigned_abs();
+            if num >= 0 {
+                Ok(Self(abs_bits))
+            } else {
+                Ok(Self((abs_bits ^ Self::WORD_MASK) + 1))
+            }
+        }
+    }
+
+    pub fn to_int(&self) -> i64 {
+        let mut bits = self.0;
+        if SIGNED && self.0 & Self::SIGN_MASK != 0 {
+            bits = (bits ^ Self::WORD_MASK) + 1
+        }
+        let result = bits as i64;
+        if SIGNED && self.0 & Self::SIGN_MASK != 0 {
+            -result
+        } else {
+            result
+        }
+    }
+}
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool>
     FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
@@ -341,6 +383,28 @@ mod tests {
     // For FXPs with resolution less than 1, an underscore will follow the intergral part.
     // For FXPs with resolution greater than 1, (integer length - word length) underscores
     // will follow the integral part. For example, FXP<3, 6>(0b110___) == 0b110000.
+
+    #[test]
+    fn test_from_int() -> Result<(), Error> {
+        for i in 0..=255 {
+            assert_eq!(FXP::<8, 8, false>::from_int(i)?.0, i as u64);
+        }
+        for i in 0..=127 {
+            assert_eq!(FXP::<8, 8, true>::from_int(i)?.0, i as u64);
+        }
+        Ok(())
+    }
+
+    #[test]
+    fn test_to_int() -> Result<(), Error> {
+        for i in 0..=255 {
+            assert_eq!(FXP::<8, 8, false>::from_int(i)?.to_int(), i);
+        }
+        for i in -128..=127 {
+            assert_eq!(FXP::<8, 8, true>::from_int(i)?.to_int(), i);
+        }
+        Ok(())
+    }
 
     #[test]
     fn test_from_raw() -> Result<(), Error> {

@@ -1,15 +1,22 @@
 use std::{thread, ffi::CString};
 use std::io::Write;
 
-use ni_fpga::fxp::{FXP, UnsignedFXP};
+use ni_fpga::fxp::{FXP, UnsignedFXP, UnsignedPackedNumber};
 use ni_fpga::{Register, RegisterAccess, Session, StoredOffset, SessionAccess};
 use ni_fpga_macros::{Cluster, Enum};
 use tempfile::NamedTempFile;
 
 #[derive(Cluster, Debug)]
+struct DigitalSource {
+    channel: UnsignedPackedNumber<4>,
+    module: UnsignedPackedNumber<1>,
+    analog_trigger: bool
+}
+
+#[derive(Cluster, Debug)]
 struct DutyCycleFrequency {
     pub overflow: bool,
-    pub frequency: UnsignedFXP<11, 11>,
+    pub frequency: UnsignedPackedNumber<11>,
 
 }
 
@@ -73,6 +80,11 @@ fn main() -> Result<(), ni_fpga::Error> {
     let r = dc.read(&session)?;
 
     println!("{:?} {}", r, r.frequency);
+
+    let dc0s = session.open_const_register::<DigitalSource, 99398>();
+    let config = dc0s.read(&session);
+
+    println!("{:?}", config);
 
     let session_2 = session.clone();
 
