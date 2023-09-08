@@ -8,6 +8,22 @@ use crate::status::Status;
 
 pub struct Session {
     pub handle: ffi::Session,
+    api: ffi::NiFpgaApiContainer,
+}
+
+impl From<ffi::Error> for Error {
+    fn from(value: ffi::Error) -> Self {
+        match value {
+            // Map the explicit opening errors to what the C API
+            // returns for the same errors.
+            ffi::Error::OpeningLibraryError(_) => Error::FPGA(Status::ResourceNotFound),
+            ffi::Error::SymbolGettingError(_) => Error::FPGA(Status::VersionMismatch),
+            // Map unknowns (Which are impossible to hit)
+            // just as a generic error. All 3 other enum states
+            // for this are impossible with the FPGA library.
+            _ => Error::FPGA(Status::ResourceNotFound),
+        }
+    }
 }
 
 impl Session {
@@ -16,8 +32,10 @@ impl Session {
         let c_bitfile = CString::new(bitfile).unwrap();
         let c_signature = CString::new(signature).unwrap();
         let c_resource = CString::new(resource).unwrap();
+        let api = ffi::NiFpgaApi::load()?;
+
         let status = Status::from(unsafe {
-            ffi::Open(
+            api.base.NiFpgaDll_Open(
                 c_bitfile.as_ptr(),
                 c_signature.as_ptr(),
                 c_resource.as_ptr(),
@@ -26,7 +44,7 @@ impl Session {
             )
         });
         match status {
-            Status::Success => Ok(Session { handle }),
+            Status::Success => Ok(Session { api, handle }),
             _ => Err(Error::FPGA(status)),
         }
     }
@@ -36,7 +54,7 @@ impl Session {
     {
         let mut buffer = [0u8; (T::SIZE_IN_BITS - 1) / 8 + 1];
         let status = Status::from(unsafe {
-            ffi::ReadArrayU8(
+            self.api.base.NiFpgaDll_ReadArrayU8(
                 self.handle,
                 offset,
                 buffer.as_mut_ptr(),
@@ -72,7 +90,7 @@ impl Session {
             data,
         )?;
         let status = Status::from(unsafe {
-            ffi::WriteArrayU8(
+            self.api.base.NiFpgaDll_WriteArrayU8(
                 self.handle,
                 offset,
                 buffer.as_ptr(),
@@ -88,6 +106,6 @@ impl Session {
 
 impl Drop for Session {
     fn drop(&mut self) {
-        unsafe { ffi::Close(self.handle, 0) };
+        unsafe { self.api.base.NiFpgaDll_Close(self.handle, 0) };
     }
 }
