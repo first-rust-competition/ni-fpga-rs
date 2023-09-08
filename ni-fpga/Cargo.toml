@@ -13,6 +13,3 @@ repository = "https://github.com/first-rust-competition/ni-fpga-rs"
 bitvec = "0.17.4"
 ni-fpga-sys = { version = "1.0.1", path = "../ni-fpga-sys" }
 thiserror = "1.0.19"
-
-[features]
-use_generic_const_exprs = []

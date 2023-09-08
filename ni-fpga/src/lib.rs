@@ -1,5 +1,3 @@
-#![cfg_attr(feature = "use_generic_const_exprs", feature(generic_const_exprs))]
-
 extern crate ni_fpga_sys as ffi;
 
 mod datatype;
@@ -23,7 +21,6 @@ pub use nifpga::NiFpga;
 pub use register::ConstOffset;
 pub use register::GetOffset;
 pub use register::Register;
-#[cfg(feature = "use_generic_const_exprs")]
 pub use register::RegisterAccess;
 pub use register::StoredOffset;
 pub use session::Session;
