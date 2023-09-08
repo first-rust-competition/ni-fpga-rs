@@ -1,6 +1,6 @@
-use std::{marker::PhantomData, ops::Deref};
+use std::marker::PhantomData;
 
-use crate::{nifpga::NiFpga, Datatype, Error, Offset, Session};
+use crate::{Datatype, Error, Offset, SessionAccess};
 
 pub trait GetOffset<T: Datatype> {
     fn offset(&self) -> Offset;
@@ -63,27 +63,54 @@ pub trait RegisterAccess<T>
 where
     T: Datatype,
 {
-    fn read<Fpga>(&self, session: &Session<Fpga>) -> Result<T, Error>
-    where
-        Fpga: Deref,
-        Fpga: Deref<Target = NiFpga>;
+    fn read(&self, session: &impl SessionAccess) -> Result<T, Error>;
     fn read_array<Fpga, const LEN: usize>(
         &self,
-        session: &Session<Fpga>,
-    ) -> Result<[T; LEN], Error>
-    where
-        Fpga: Deref,
-        Fpga: Deref<Target = NiFpga>;
-    fn write<Fpga>(&mut self, session: &Session<Fpga>, value: T) -> Result<(), Error>
-    where
-        Fpga: Deref,
-        Fpga: Deref<Target = NiFpga>;
+        session: &impl SessionAccess,
+    ) -> Result<[T; LEN], Error>;
+    fn write<Fpga>(&mut self, session: &impl SessionAccess, value: T) -> Result<(), Error>;
     fn write_array<Fpga, const LEN: usize>(
         &self,
-        session: &Session<Fpga>,
+        session: &impl SessionAccess,
         value: &[T; LEN],
-    ) -> Result<(), Error>
-    where
-        Fpga: Deref,
-        Fpga: Deref<Target = NiFpga>;
+    ) -> Result<(), Error>;
+}
+
+impl<T: Datatype, N: GetOffset<T>> RegisterAccess<T> for Register<N> {
+    fn read(&self, session: &impl SessionAccess) -> Result<T, Error> {
+        session.read(self.offset())
+    }
+
+    fn read_array<Fpga, const LEN: usize>(
+        &self,
+        session: &impl SessionAccess,
+    ) -> Result<[T; LEN], Error> {
+        session.read(self.offset())
+    }
+
+    fn write<Fpga>(&mut self, session: &impl SessionAccess, value: T) -> Result<(), Error> {
+        session.write(self.offset(), &value)
+    }
+
+    fn write_array<Fpga, const LEN: usize>(
+        &self,
+        session: &impl SessionAccess,
+        value: &[T; LEN],
+    ) -> Result<(), Error> {
+        session.write(self.offset(), value)
+    }
+}
+
+pub trait RegisterAccessRef<T>
+where
+    T: Datatype,
+{
+    fn write_ref<Fpga>(&mut self, session: &impl SessionAccess, value: &T) -> Result<(), Error>;
+}
+
+impl<T: Datatype, N: GetOffset<T>> RegisterAccessRef<T> for Register<N> {
+    fn write_ref<Fpga>(&mut self, session: &impl SessionAccess, value: &T) -> Result<(), Error>
+    {
+        session.write(self.offset(), value)
+    }
 }

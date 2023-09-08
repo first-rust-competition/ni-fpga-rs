@@ -19,7 +19,6 @@ pub use hmb::Hmb;
 pub use hmb::HmbAccess;
 pub use nifpga::NiFpga;
 pub use register::ConstOffset;
-pub use register::GetOffset;
 pub use register::Register;
 pub use register::RegisterAccess;
 pub use register::StoredOffset;

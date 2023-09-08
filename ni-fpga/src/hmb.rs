@@ -18,7 +18,6 @@ unsafe impl Sync for VirtualAddressHandle {}
 
 pub struct Hmb<Fpga>
 where
-    Fpga: Deref,
     Fpga: Deref<Target = NiFpga>,
 {
     session: Session<Fpga>,
@@ -29,7 +28,6 @@ where
 
 impl<Fpga> Hmb<Fpga>
 where
-    Fpga: Deref,
     Fpga: Deref<Target = NiFpga>,
 {
     pub fn new(session: Session<Fpga>, memory_name: &CString) -> Result<Hmb<Fpga>, Error> {
@@ -70,7 +68,6 @@ pub trait HmbAccess {
 
 impl<Fpga> HmbAccess for Hmb<Fpga>
 where
-    Fpga: Deref,
     Fpga: Deref<Target = NiFpga>,
 {
     fn read<T>(&self, offset: usize) -> T {
@@ -96,7 +93,6 @@ where
 
 impl<Fpga> Drop for Hmb<Fpga>
 where
-    Fpga: Deref,
     Fpga: Deref<Target = NiFpga>,
 {
     fn drop(&mut self) {

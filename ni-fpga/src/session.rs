@@ -20,7 +20,6 @@ pub struct Session<FpgaStorage> {
 impl<'a, FpgaStorage> Session<FpgaStorage>
 where
     FpgaStorage: StorageClone<'a>,
-    FpgaStorage: Deref,
     FpgaStorage: Deref<Target = NiFpga>,
 {
     fn open_local(
@@ -52,14 +51,6 @@ where
             Ok(api) => Ok(create_self(api)),
             Err(err) => Err(err),
         }
-    }
-
-    pub fn open_const_register<T: Datatype, const N: Offset>(&self) -> Register<ConstOffset<T, N>> {
-        Register::new_const()
-    }
-
-    pub fn open_register<T: Datatype>(&self, offset: Offset) -> Register<StoredOffset<T>> {
-        Register::new(offset)
     }
 
     pub fn open_hmb(
@@ -125,15 +116,18 @@ impl Session<ArcStorage> {
 
 pub trait SessionAccess {
     fn fpga(&self) -> &NiFpga;
-}
 
-impl<Fpga> SessionAccess for Session<Fpga>
-where
-    Fpga: Deref,
-    Fpga: Deref<Target = NiFpga>,
-{
-    fn fpga(&self) -> &NiFpga {
-        &self.fpga_storage
+    fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>;
+
+    fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>;
+
+
+    fn open_const_register<T: Datatype, const N: Offset>(&self) -> Register<ConstOffset<T, N>> {
+        Register::new_const()
+    }
+
+    fn open_register<T: Datatype>(&self, offset: Offset) -> Register<StoredOffset<T>> {
+        Register::new(offset)
     }
 }
 
@@ -166,12 +160,15 @@ impl<T: Copy, const N: usize> SmallBuffer<T, N> {
     }
 }
 
-impl<Fpga> Session<Fpga>
+impl<Fpga> SessionAccess for Session<Fpga>
 where
-    Fpga: Deref,
     Fpga: Deref<Target = NiFpga>,
 {
-    pub fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error> {
+    fn fpga(&self) -> &NiFpga {
+        &self.fpga_storage
+    }
+
+     fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error> {
         // Most types are smaller then 4, so preallocate for 4
         let byte_size = (T::SIZE_IN_BITS - 1) / 8 + 1;
         let mut buffer: SmallBuffer<u8, 4> = SmallBuffer::new(byte_size, 0u8);
@@ -190,7 +187,7 @@ where
         }
     }
 
-    pub fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error> {
+     fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error> {
         // Most types are smaller then 4, so preallocate for 4
         let byte_size = (T::SIZE_IN_BITS - 1) / 8 + 1;
         let mut buffer: SmallBuffer<u8, 4> = SmallBuffer::new(byte_size, 0u8);

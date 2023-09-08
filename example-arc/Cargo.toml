@@ -10,3 +10,4 @@ publish = false
 [dependencies]
 ni-fpga = { path = "../ni-fpga" }
 ni-fpga-macros = { path = "../ni-fpga-macros" }
+tempfile = "3.1.0"
