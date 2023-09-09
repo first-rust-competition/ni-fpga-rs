@@ -110,30 +110,6 @@ pub fn derive_enum(item: TokenStream) -> TokenStream {
                 }
             }
         }
-
-        impl #enum_name {
-            fn from_value_result(value: #backing_type) -> Result<#enum_name, ni_fpga::Error> {
-                match value {
-                    #(
-                    #discriminants_for_unpack => Ok(Self::#variants_for_unpack)
-                    ),*,
-                    _ => Err(ni_fpga::Error::InvalidEnumDiscriminant(value as u64)),
-                }
-            }
-
-            // This is only needed because try_map is not stable
-            fn from_value(value: #backing_type, failed: &mut Option<#backing_type>) -> #enum_name {
-                match value {
-                    #(
-                    #discriminants_for_unpack => Self::#variants_for_unpack
-                    ),*,
-                    _ => {
-                        *failed = Some(value);
-                        Self::default()
-                    },
-                }
-            }
-        }
     };
 
     output.into()
