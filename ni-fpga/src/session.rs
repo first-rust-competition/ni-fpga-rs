@@ -288,14 +288,7 @@ impl<T: Copy, const N: usize> SmallBuffer<T, N> {
         }
     }
 
-    pub fn buffer(&self) -> &[T] {
-        match self {
-            SmallBuffer::InPlace(b) => &b.0[0..b.1],
-            SmallBuffer::Alloc(b) => b,
-        }
-    }
-
-    pub fn buffer_mut(&mut self) -> &mut [T] {
+    pub fn buffer(&mut self) -> &mut [T] {
         match self {
             SmallBuffer::InPlace(ref mut b) => &mut b.0[0..b.1],
             SmallBuffer::Alloc(ref mut b) => b,
@@ -315,17 +308,18 @@ where
         // Most types are smaller then 4, so preallocate for 4
         let byte_size = (T::SIZE_IN_BITS - 1) / 8 + 1;
         let mut buffer: SmallBuffer<u8, 4> = SmallBuffer::new(byte_size, 0u8);
-        // Values larger then a single element (32 bit) are left justified, not right
-        let slice_start = if byte_size <= 4 {
-            byte_size * 8 - T::SIZE_IN_BITS
-        } else {
-            0
-        };
+        match self.fpga_storage.read_u8_array(offset, buffer.buffer()) {
+            Ok(_) => {
+                // Values larger then a single element (32 bit) are left justified, not right
+                let bit_slice = crate::datatype::FpgaBitsRaw::from_slice_mut(buffer.buffer());
+                let bit_slice = if byte_size <= 4 {
+                    bit_slice.split_at_mut(byte_size * 8 - T::SIZE_IN_BITS).1
+                } else {
+                    bit_slice.split_at_mut(T::SIZE_IN_BITS).0
+                };
 
-        match self.fpga_storage.read_u8_array(offset, buffer.buffer_mut()) {
-            Ok(_) => Ok(DatatypePacker::unpack(
-                &crate::FpgaBits::from_slice(buffer.buffer())[slice_start..],
-            )?),
+                Ok(DatatypePacker::unpack(bit_slice)?)
+            }
             Err(err) => Err(err),
         }
     }
@@ -334,17 +328,16 @@ where
         // Most types are smaller then 4, so preallocate for 4
         let byte_size = (T::SIZE_IN_BITS - 1) / 8 + 1;
         let mut buffer: SmallBuffer<u8, 4> = SmallBuffer::new(byte_size, 0u8);
+
         // Values larger then a single element (32 bit) are left justified, not right
-        let slice_start = if byte_size <= 4 {
-            byte_size * 8 - T::SIZE_IN_BITS
+        let bit_slice = crate::datatype::FpgaBitsRaw::from_slice_mut(buffer.buffer());
+        let bit_slice = if byte_size <= 4 {
+            bit_slice.split_at_mut(byte_size * 8 - T::SIZE_IN_BITS).1
         } else {
-            0
+            bit_slice.split_at_mut(T::SIZE_IN_BITS).0
         };
 
-        DatatypePacker::pack(
-            &mut crate::FpgaBits::from_slice_mut(buffer.buffer_mut())[slice_start..],
-            data,
-        )?;
+        DatatypePacker::pack(bit_slice, data)?;
 
         self.fpga_storage.write_u8_array(offset, buffer.buffer())
     }

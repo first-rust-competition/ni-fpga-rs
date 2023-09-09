@@ -1,13 +1,17 @@
 use std::{borrow::Borrow, mem::MaybeUninit};
 
-use bitvec::prelude::*;
+use bitvec::{access::BitSafeU8, prelude::*};
 
 use crate::{errors::Error, Offset, SessionAccess};
 
 #[cfg(target_endian = "little")]
-pub type FpgaBits = BitSlice<Msb0, u8>;
+pub type FpgaBits = BitSlice<BitSafeU8, Msb0>;
+#[cfg(target_endian = "little")]
+pub type FpgaBitsRaw = BitSlice<u8, Msb0>;
 #[cfg(target_endian = "big")]
-pub type FpgaBits = BitSlice<Lsb0, u8>;
+pub type FpgaBits = BitSlice<BitSafeU8a, Lsb0>;
+#[cfg(target_endian = "big")]
+pub type FpgaBitsRaw = BitSlice<u8, Lsb0>;
 
 pub trait DatatypePacker: Sized {
     const SIZE_IN_BITS: usize;
@@ -32,13 +36,19 @@ pub trait Datatype: DatatypePacker {
     }
 }
 
-// Support array versions of any Datatype
-impl<T: Datatype, const N: usize> DatatypePacker for [T; N] {
+pub trait DerivedDatatype {}
+impl<T, const N: usize> Datatype for [T; N] where T: DerivedDatatype + Datatype + std::fmt::Debug {}
+
+// Support array versions of derived datatypes
+impl<T, const N: usize> DatatypePacker for [T; N]
+where
+    T: DerivedDatatype + Datatype,
+{
     const SIZE_IN_BITS: usize = T::SIZE_IN_BITS * N;
 
     fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
         data.iter()
-            .zip(fpga_bits.chunks_mut(T::SIZE_IN_BITS))
+            .zip(unsafe { fpga_bits.chunks_mut(T::SIZE_IN_BITS).remove_alias() })
             .try_for_each(|(src, bits)| DatatypePacker::pack(bits, src))
     }
 
@@ -71,6 +81,258 @@ impl Datatype for i64 {}
 impl Datatype for f32 {}
 impl Datatype for f64 {}
 
+impl<const N: usize> DatatypePacker for [bool; N] {
+    const SIZE_IN_BITS: usize = <bool as DatatypePacker>::SIZE_IN_BITS * N;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        data.iter()
+            .zip(unsafe {
+                fpga_bits
+                    .chunks_mut(<bool as DatatypePacker>::SIZE_IN_BITS)
+                    .remove_alias()
+            })
+            .for_each(|(src, bits)| bits.set(0, *src));
+        Ok(())
+    }
+
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        let mut data = [bool::default(); N];
+        data.iter_mut()
+            .zip(fpga_bits.chunks(<bool as DatatypePacker>::SIZE_IN_BITS))
+            .for_each(|(dest, bits)| *dest = bits[0]);
+        Ok(data)
+    }
+}
+impl<const N: usize> DatatypePacker for [u8; N] {
+    const SIZE_IN_BITS: usize = <u8 as DatatypePacker>::SIZE_IN_BITS * N;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        data.iter()
+            .zip(unsafe {
+                fpga_bits
+                    .chunks_mut(<u8 as DatatypePacker>::SIZE_IN_BITS)
+                    .remove_alias()
+            })
+            .for_each(|(src, bits)| bits.store_be(*src));
+        Ok(())
+    }
+
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        let mut data = [u8::default(); N];
+        data.iter_mut()
+            .zip(fpga_bits.chunks(<u8 as DatatypePacker>::SIZE_IN_BITS))
+            .for_each(|(dest, bits)| *dest = bits.load_be());
+        Ok(data)
+    }
+}
+
+impl<const N: usize> DatatypePacker for [u16; N] {
+    const SIZE_IN_BITS: usize = <u16 as DatatypePacker>::SIZE_IN_BITS * N;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        data.iter()
+            .zip(unsafe {
+                fpga_bits
+                    .chunks_mut(<u16 as DatatypePacker>::SIZE_IN_BITS)
+                    .remove_alias()
+            })
+            .for_each(|(src, bits)| bits.store_be(*src));
+        Ok(())
+    }
+
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        let mut data = [u16::default(); N];
+        data.iter_mut()
+            .zip(fpga_bits.chunks(<u16 as DatatypePacker>::SIZE_IN_BITS))
+            .for_each(|(dest, bits)| *dest = bits.load_be());
+        Ok(data)
+    }
+}
+
+impl<const N: usize> DatatypePacker for [u32; N] {
+    const SIZE_IN_BITS: usize = <u32 as DatatypePacker>::SIZE_IN_BITS * N;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        data.iter()
+            .zip(unsafe {
+                fpga_bits
+                    .chunks_mut(<u32 as DatatypePacker>::SIZE_IN_BITS)
+                    .remove_alias()
+            })
+            .for_each(|(src, bits)| bits.store_be(*src));
+        Ok(())
+    }
+
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        let mut data = [u32::default(); N];
+        data.iter_mut()
+            .zip(fpga_bits.chunks(<u32 as DatatypePacker>::SIZE_IN_BITS))
+            .for_each(|(dest, bits)| *dest = bits.load_be());
+        Ok(data)
+    }
+}
+
+impl<const N: usize> DatatypePacker for [u64; N] {
+    const SIZE_IN_BITS: usize = <u64 as DatatypePacker>::SIZE_IN_BITS * N;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        data.iter()
+            .zip(unsafe {
+                fpga_bits
+                    .chunks_mut(<u64 as DatatypePacker>::SIZE_IN_BITS)
+                    .remove_alias()
+            })
+            .for_each(|(src, bits)| bits.store_be(*src));
+        Ok(())
+    }
+
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        let mut data = [u64::default(); N];
+        data.iter_mut()
+            .zip(fpga_bits.chunks(<u64 as DatatypePacker>::SIZE_IN_BITS))
+            .for_each(|(dest, bits)| *dest = bits.load_be());
+        Ok(data)
+    }
+}
+
+impl<const N: usize> DatatypePacker for [i8; N] {
+    const SIZE_IN_BITS: usize = <i8 as DatatypePacker>::SIZE_IN_BITS * N;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        data.iter()
+            .zip(unsafe {
+                fpga_bits
+                    .chunks_mut(<i8 as DatatypePacker>::SIZE_IN_BITS)
+                    .remove_alias()
+            })
+            .for_each(|(src, bits)| bits.store_be(*src));
+        Ok(())
+    }
+
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        let mut data = [i8::default(); N];
+        data.iter_mut()
+            .zip(fpga_bits.chunks(<i8 as DatatypePacker>::SIZE_IN_BITS))
+            .for_each(|(dest, bits)| *dest = bits.load_be());
+        Ok(data)
+    }
+}
+
+impl<const N: usize> DatatypePacker for [i16; N] {
+    const SIZE_IN_BITS: usize = <i16 as DatatypePacker>::SIZE_IN_BITS * N;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        data.iter()
+            .zip(unsafe {
+                fpga_bits
+                    .chunks_mut(<i16 as DatatypePacker>::SIZE_IN_BITS)
+                    .remove_alias()
+            })
+            .for_each(|(src, bits)| bits.store_be(*src));
+        Ok(())
+    }
+
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        let mut data = [i16::default(); N];
+        data.iter_mut()
+            .zip(fpga_bits.chunks(<i16 as DatatypePacker>::SIZE_IN_BITS))
+            .for_each(|(dest, bits)| *dest = bits.load_be());
+        Ok(data)
+    }
+}
+
+impl<const N: usize> DatatypePacker for [i32; N] {
+    const SIZE_IN_BITS: usize = <i32 as DatatypePacker>::SIZE_IN_BITS * N;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        data.iter()
+            .zip(unsafe {
+                fpga_bits
+                    .chunks_mut(<i32 as DatatypePacker>::SIZE_IN_BITS)
+                    .remove_alias()
+            })
+            .for_each(|(src, bits)| bits.store_be(*src));
+        Ok(())
+    }
+
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        let mut data = [i32::default(); N];
+        data.iter_mut()
+            .zip(fpga_bits.chunks(<i32 as DatatypePacker>::SIZE_IN_BITS))
+            .for_each(|(dest, bits)| *dest = bits.load_be());
+        Ok(data)
+    }
+}
+
+impl<const N: usize> DatatypePacker for [i64; N] {
+    const SIZE_IN_BITS: usize = <i64 as DatatypePacker>::SIZE_IN_BITS * N;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        data.iter()
+            .zip(unsafe {
+                fpga_bits
+                    .chunks_mut(<i64 as DatatypePacker>::SIZE_IN_BITS)
+                    .remove_alias()
+            })
+            .for_each(|(src, bits)| bits.store_be(*src));
+        Ok(())
+    }
+
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        let mut data = [i64::default(); N];
+        data.iter_mut()
+            .zip(fpga_bits.chunks(<i64 as DatatypePacker>::SIZE_IN_BITS))
+            .for_each(|(dest, bits)| *dest = bits.load_be());
+        Ok(data)
+    }
+}
+
+impl<const N: usize> DatatypePacker for [f32; N] {
+    const SIZE_IN_BITS: usize = <f32 as DatatypePacker>::SIZE_IN_BITS * N;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        data.iter()
+            .zip(unsafe {
+                fpga_bits
+                    .chunks_mut(<f32 as DatatypePacker>::SIZE_IN_BITS)
+                    .remove_alias()
+            })
+            .for_each(|(src, bits)| bits.store_be(src.to_bits()));
+        Ok(())
+    }
+
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        let mut data = [f32::default(); N];
+        data.iter_mut()
+            .zip(fpga_bits.chunks(<f32 as DatatypePacker>::SIZE_IN_BITS))
+            .for_each(|(dest, bits)| *dest = f32::from_bits(bits.load_be()));
+        Ok(data)
+    }
+}
+
+impl<const N: usize> DatatypePacker for [f64; N] {
+    const SIZE_IN_BITS: usize = <f64 as DatatypePacker>::SIZE_IN_BITS * N;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        data.iter()
+            .zip(unsafe {
+                fpga_bits
+                    .chunks_mut(<f64 as DatatypePacker>::SIZE_IN_BITS)
+                    .remove_alias()
+            })
+            .for_each(|(src, bits)| bits.store_be(src.to_bits()));
+        Ok(())
+    }
+
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        let mut data = [f64::default(); N];
+        data.iter_mut()
+            .zip(fpga_bits.chunks(<f64 as DatatypePacker>::SIZE_IN_BITS))
+            .for_each(|(dest, bits)| *dest = f64::from_bits(bits.load_be()));
+        Ok(data)
+    }
+}
+
 impl<const N: usize> Datatype for [bool; N] {}
 impl<const N: usize> Datatype for [u8; N] {}
 impl<const N: usize> Datatype for [u16; N] {}
@@ -82,9 +344,6 @@ impl<const N: usize> Datatype for [i32; N] {}
 impl<const N: usize> Datatype for [i64; N] {}
 impl<const N: usize> Datatype for [f32; N] {}
 impl<const N: usize> Datatype for [f64; N] {}
-
-pub trait DerivedDatatype {}
-impl<T, const N: usize> Datatype for [T; N] where T: DerivedDatatype + Datatype {}
 
 impl DatatypePacker for bool {
     const SIZE_IN_BITS: usize = 1;

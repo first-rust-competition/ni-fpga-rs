@@ -1,6 +1,8 @@
 use crate::datatype::{Datatype, DatatypePacker, FpgaBits};
 use crate::errors::Error;
 
+use bitvec::prelude::*;
+
 #[allow(clippy::upper_case_acronyms)]
 #[derive(Clone, Copy)]
 pub struct FXP<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool>(u64);
@@ -378,6 +380,44 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> Dataty
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> Datatype
     for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
 {
+}
+
+impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool, const N: usize>
+    DatatypePacker for [FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>; N]
+{
+    const SIZE_IN_BITS: usize =
+        <FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED> as DatatypePacker>::SIZE_IN_BITS * N;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        data.iter()
+            .zip(unsafe {
+                fpga_bits
+                    .chunks_mut(<bool as DatatypePacker>::SIZE_IN_BITS)
+                    .remove_alias()
+            })
+            .for_each(|(src, bits)| {
+                if WORD_LENGTH > 32 {
+                    bits.store_be(src.0)
+                } else {
+                    bits.store_be(src.0 as u32)
+                }
+            });
+        Ok(())
+    }
+
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        let mut data = [FXP(0); N];
+        data.iter_mut()
+            .zip(fpga_bits.chunks(<bool as DatatypePacker>::SIZE_IN_BITS))
+            .for_each(|(dest, bits)| {
+                if WORD_LENGTH > 32 {
+                    dest.0 = bits.load_be();
+                } else {
+                    dest.0 = bits.load_be::<u32>() as u64
+                }
+            });
+        Ok(data)
+    }
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool, const N: usize> Datatype

@@ -1,4 +1,5 @@
-use ni_fpga::{RegisterAccess, SessionAccess, SessionBuilder};
+use bitvec::vec::BitVec;
+use ni_fpga::{Error, RegisterAccess, SessionAccess, SessionBuilder};
 
 use colored::*;
 use ni_fpga::fxp::{SignedFXP, UnsignedFXP};
@@ -44,6 +45,18 @@ fn full_test_case<T: PartialEq + std::fmt::Debug + Datatype + Copy, const N: u32
         expected,
     );
 
+    round_trip_test(&expected)?;
+
+    Ok(())
+}
+
+fn round_trip_test<T: Datatype + PartialEq + std::fmt::Debug>(data: &T) -> Result<(), Error> {
+    let mut bv = BitVec::with_capacity(T::SIZE_IN_BITS);
+    unsafe { bv.set_len(T::SIZE_IN_BITS) }
+
+    let fpga_bits = bv.as_mut_bitslice();
+    T::pack(fpga_bits, data)?;
+    assert_eq!(T::unpack(fpga_bits)?, *data);
     Ok(())
 }
 

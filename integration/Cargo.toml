@@ -11,3 +11,4 @@ publish = false
 colored = "2.0.0"
 ni-fpga = { path = "../ni-fpga" }
 ni-fpga-macros = { path = "../ni-fpga-macros" }
+bitvec = "1.0.1"
