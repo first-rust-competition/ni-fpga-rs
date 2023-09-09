@@ -1,7 +1,7 @@
 use std::{ffi::CString, thread};
 
 use ni_fpga::fxp::UnsignedPackedNumber;
-use ni_fpga::{Register, RegisterAccess, SessionAccess, SessionBuilder, StoredOffset};
+use ni_fpga::{Register, RegisterReadAccess, SessionAccess, SessionBuilder, StoredOffset, ReadOnly};
 use ni_fpga_macros::{Cluster, Enum};
 
 #[derive(Cluster, Debug)]
@@ -66,7 +66,7 @@ fn main() -> Result<(), ni_fpga::Error> {
 
     println!("{} {}", dc0, dc_offset);
 
-    let dc = session.open_register::<DutyCycleFrequency>(dc_offset);
+    let dc = session.open_readonly_register::<DutyCycleFrequency>(dc_offset);
     let r = dc.read(&session)?;
 
     println!("{:?} {}", r, r.frequency);
@@ -84,23 +84,23 @@ fn main() -> Result<(), ni_fpga::Error> {
 
     println!("{} {}", dc0, dc_offset);
 
-    let dc = session.open_register::<DutyCycleFrequency>(dc_offset);
+    let dc = session.open_readonly_register::<DutyCycleFrequency>(dc_offset);
     let r = dc.read(&session)?;
 
     println!("{:?} {}", r, r.frequency);
 
-    let dc0s = session.open_const_register::<DigitalSource, 99398>();
+    let dc0s = session.open_readonly_const_register::<DigitalSource, 99398>();
     let config = dc0s.read(&session);
 
     println!("{:?}", config);
 
     let session_2 = session.clone();
 
-    let voltage_register = session.open_register::<u16>(99174);
-    let voltage_register_2 = session.open_const_register::<u16, 99174>();
+    let voltage_register = session.open_readonly_register::<u16>(99174);
+    let voltage_register_2 = session.open_readonly_const_register::<u16, 99174>();
 
-    let voltage_register_3: Register<u16, StoredOffset> =
-        session.open_const_register::<u16, 99174>().into();
+    let voltage_register_3: Register<u16, ReadOnly, StoredOffset> =
+        session.open_readonly_const_register::<u16, 99174>().into();
 
     let read_pwm_thread = thread::spawn(move || voltage_register_2.read(&session_2));
 

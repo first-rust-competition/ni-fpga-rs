@@ -2,6 +2,10 @@ use std::{borrow::Borrow, marker::PhantomData};
 
 use crate::{Datatype, Error, Offset, SessionAccess};
 
+pub struct ReadOnly;
+pub struct WriteOnly;
+pub struct ReadWrite;
+
 #[derive(Clone, Copy)]
 pub struct ConstOffset<const N: Offset>;
 
@@ -22,37 +26,41 @@ impl From<StoredOffset> for Offset {
     }
 }
 
-pub struct Register<T, O> {
+pub struct Register<T, P, O> {
     _offset_type: O,
     _type: PhantomData<T>,
+    _perms: PhantomData<P>,
 }
 
-impl<T> Register<T, StoredOffset> {
+impl<T, P> Register<T, P, StoredOffset> {
     #[inline]
     pub fn new(offset: Offset) -> Self {
         Self {
             _offset_type: StoredOffset(offset),
             _type: PhantomData,
+            _perms: PhantomData,
         }
     }
 }
 
-impl<T, const N: Offset> Register<T, ConstOffset<N>> {
+impl<T, P, const N: Offset> Register<T, P, ConstOffset<N>> {
     #[inline]
     pub fn new_const() -> Self {
         Self {
             _offset_type: ConstOffset,
             _type: PhantomData,
+            _perms: PhantomData,
         }
     }
 }
 
-impl<T, const N: Offset> From<Register<T, ConstOffset<N>>> for Register<T, StoredOffset> {
+impl<T, P, const N: Offset> From<Register<T, P, ConstOffset<N>>> for Register<T, P, StoredOffset> {
     #[inline]
-    fn from(_: Register<T, ConstOffset<N>>) -> Self {
+    fn from(_: Register<T, P, ConstOffset<N>>) -> Self {
         Self {
             _offset_type: StoredOffset(N),
             _type: PhantomData,
+            _perms: PhantomData,
         }
     }
 }
@@ -85,7 +93,7 @@ where
     }
 }
 
-impl<T, U> RegisterReadAccess<T> for Register<T, U>
+impl<T, U> RegisterReadAccess<T> for Register<T, ReadOnly, U>
 where
     T: Datatype,
     Offset: From<U>,
@@ -97,7 +105,31 @@ where
     }
 }
 
-impl<T, U> RegisterWriteAccess<T> for Register<T, U>
+impl<T, U> RegisterWriteAccess<T> for Register<T, WriteOnly, U>
+where
+    T: Datatype,
+    Offset: From<U>,
+    U: Copy,
+{
+    #[inline]
+    fn offset_write(&self) -> Offset {
+        self._offset_type.into()
+    }
+}
+
+impl<T, U> RegisterReadAccess<T> for Register<T, ReadWrite, U>
+where
+    T: Datatype,
+    Offset: From<U>,
+    U: Copy,
+{
+    #[inline]
+    fn offset_read(&self) -> Offset {
+        self._offset_type.into()
+    }
+}
+
+impl<T, U> RegisterWriteAccess<T> for Register<T, ReadWrite, U>
 where
     T: Datatype,
     Offset: From<U>,

@@ -32,13 +32,13 @@ fn full_test_case<T: PartialEq + std::fmt::Debug + Datatype + Copy, const N: u32
     expected: T,
 ) -> Result<(), ni_fpga::Error> {
     test_case(test_case_name, session.read::<T>(N)?, expected);
-    let reg: ni_fpga::Register<T, ni_fpga::StoredOffset> = session.open_register::<T>(N);
+    let reg = session.open_readonly_register::<T>(N);
     test_case(
         &format!("{} ref", test_case_name),
         reg.read(session)?,
         expected,
     );
-    let reg = session.open_const_register::<T, N>();
+    let reg = session.open_readonly_const_register::<T, N>();
     test_case(
         &format!("{} const ref", test_case_name),
         reg.read(session)?,

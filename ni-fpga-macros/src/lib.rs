@@ -137,7 +137,7 @@ pub fn derive_enum(item: TokenStream) -> TokenStream {
                 Self::from_backing(ni_fpga::Datatype::read(session, offset)?)
             }
 
-            fn write(session: &impl ni_fpga::SessionAccess, offset: ni_fpga::Offset, value: impl std::borrow::Borrow<Self>) -> Result<(), ni_fpga::Error> {
+            unsafe fn write(session: &impl ni_fpga::SessionAccess, offset: ni_fpga::Offset, value: impl std::borrow::Borrow<Self>) -> Result<(), ni_fpga::Error> {
                 <#backing_type as ni_fpga::Datatype>::write(session, offset, value.borrow().into_backing())
             }
         }

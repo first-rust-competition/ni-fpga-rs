@@ -9,7 +9,7 @@ use crate::datatype::Datatype;
 use crate::errors::Error;
 use crate::hmb::Hmb;
 use crate::nifpga::NiFpga;
-use crate::register::{ConstOffset, Register, StoredOffset};
+use crate::register::{ConstOffset, Register, StoredOffset, ReadOnly};
 use crate::session_lifetimes::{ArcStorage, InPlaceStorage, StorageClone};
 use crate::Offset;
 
@@ -265,11 +265,19 @@ pub trait SessionAccess {
 
     unsafe fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>;
 
-    fn open_const_register<T: Datatype, const N: Offset>(&self) -> Register<T, ConstOffset<N>> {
+    fn open_const_register<T: Datatype, P, const N: Offset>(&self) -> Register<T, P, ConstOffset<N>> {
         Register::new_const()
     }
 
-    fn open_register<T: Datatype>(&self, offset: Offset) -> Register<T, StoredOffset> {
+    fn open_register<T: Datatype, P>(&self, offset: Offset) -> Register<T, P, StoredOffset> {
+        Register::new(offset)
+    }
+
+    fn open_readonly_const_register<T: Datatype, const N: Offset>(&self) -> Register<T, ReadOnly, ConstOffset<N>> {
+        Register::new_const()
+    }
+
+    fn open_readonly_register<T: Datatype>(&self, offset: Offset) -> Register<T, ReadOnly, StoredOffset> {
         Register::new(offset)
     }
 }

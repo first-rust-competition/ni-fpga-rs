@@ -27,3 +27,7 @@ pub use session::Session;
 pub use session::SessionAccess;
 pub use session::SessionBuilder;
 pub use status::Status;
+
+pub use register::ReadOnly;
+pub use register::ReadWrite;
+pub use register::WriteOnly;
