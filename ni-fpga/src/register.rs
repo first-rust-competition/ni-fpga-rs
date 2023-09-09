@@ -57,30 +57,54 @@ impl<T, const N: Offset> From<Register<T, ConstOffset<N>>> for Register<T, Store
     }
 }
 
-pub trait RegisterAccess<T>
+pub trait RegisterReadAccess<T>
 where
     T: Datatype,
 {
-    fn offset(&self) -> Offset;
+    fn offset_read(&self) -> Offset;
 
     #[inline(never)]
     fn read(&self, session: &impl SessionAccess) -> Result<T, Error> {
-        T::read(session, self.offset())
-    }
-    #[inline]
-    fn write(&mut self, session: &impl SessionAccess, value: impl Borrow<T>) -> Result<(), Error> {
-        T::write(session, self.offset(), value)
+        T::read(session, self.offset_read())
     }
 }
 
-impl<T, U> RegisterAccess<T> for Register<T, U>
+pub trait RegisterWriteAccess<T>
+where
+    T: Datatype,
+{
+    fn offset_write(&self) -> Offset;
+
+    #[inline]
+    unsafe fn write(
+        &mut self,
+        session: &impl SessionAccess,
+        value: impl Borrow<T>,
+    ) -> Result<(), Error> {
+        T::write(session, self.offset_write(), value)
+    }
+}
+
+impl<T, U> RegisterReadAccess<T> for Register<T, U>
 where
     T: Datatype,
     Offset: From<U>,
     U: Copy,
 {
     #[inline]
-    fn offset(&self) -> Offset {
+    fn offset_read(&self) -> Offset {
+        self._offset_type.into()
+    }
+}
+
+impl<T, U> RegisterWriteAccess<T> for Register<T, U>
+where
+    T: Datatype,
+    Offset: From<U>,
+    U: Copy,
+{
+    #[inline]
+    fn offset_write(&self) -> Offset {
         self._offset_type.into()
     }
 }

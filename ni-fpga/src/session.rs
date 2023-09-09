@@ -5,7 +5,7 @@ use std::sync::Arc;
 
 use ni_fpga_sys::{CloseAttribute, OpenAttribute};
 
-use crate::datatype::{Datatype, DatatypePacker};
+use crate::datatype::Datatype;
 use crate::errors::Error;
 use crate::hmb::Hmb;
 use crate::nifpga::NiFpga;
@@ -263,7 +263,7 @@ pub trait SessionAccess {
 
     fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>;
 
-    fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>;
+    unsafe fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>;
 
     fn open_const_register<T: Datatype, const N: Offset>(&self) -> Register<T, ConstOffset<N>> {
         Register::new_const()
@@ -271,28 +271,6 @@ pub trait SessionAccess {
 
     fn open_register<T: Datatype>(&self, offset: Offset) -> Register<T, StoredOffset> {
         Register::new(offset)
-    }
-}
-
-enum SmallBuffer<T, const N: usize> {
-    InPlace(([T; N], usize)),
-    Alloc(Vec<T>),
-}
-
-impl<T: Copy, const N: usize> SmallBuffer<T, N> {
-    pub fn new(size: usize, val: T) -> Self {
-        if size <= N {
-            Self::InPlace(([val; N], size))
-        } else {
-            Self::Alloc(vec![val; size])
-        }
-    }
-
-    pub fn buffer(&mut self) -> &mut [T] {
-        match self {
-            SmallBuffer::InPlace(ref mut b) => &mut b.0[0..b.1],
-            SmallBuffer::Alloc(ref mut b) => b,
-        }
     }
 }
 
@@ -305,40 +283,10 @@ where
     }
 
     fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error> {
-        // Most types are smaller then 4, so preallocate for 4
-        let byte_size = (T::SIZE_IN_BITS - 1) / 8 + 1;
-        let mut buffer: SmallBuffer<u8, 4> = SmallBuffer::new(byte_size, 0u8);
-        match self.fpga_storage.read_u8_array(offset, buffer.buffer()) {
-            Ok(_) => {
-                // Values larger then a single element (32 bit) are left justified, not right
-                let bit_slice = crate::datatype::FpgaBitsRaw::from_slice_mut(buffer.buffer());
-                let bit_slice = if byte_size <= 4 {
-                    bit_slice.split_at_mut(byte_size * 8 - T::SIZE_IN_BITS).1
-                } else {
-                    bit_slice.split_at_mut(T::SIZE_IN_BITS).0
-                };
-
-                Ok(DatatypePacker::unpack(bit_slice)?)
-            }
-            Err(err) => Err(err),
-        }
+        T::read(self, offset)
     }
 
-    fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error> {
-        // Most types are smaller then 4, so preallocate for 4
-        let byte_size = (T::SIZE_IN_BITS - 1) / 8 + 1;
-        let mut buffer: SmallBuffer<u8, 4> = SmallBuffer::new(byte_size, 0u8);
-
-        // Values larger then a single element (32 bit) are left justified, not right
-        let bit_slice = crate::datatype::FpgaBitsRaw::from_slice_mut(buffer.buffer());
-        let bit_slice = if byte_size <= 4 {
-            bit_slice.split_at_mut(byte_size * 8 - T::SIZE_IN_BITS).1
-        } else {
-            bit_slice.split_at_mut(T::SIZE_IN_BITS).0
-        };
-
-        DatatypePacker::pack(bit_slice, data)?;
-
-        self.fpga_storage.write_u8_array(offset, buffer.buffer())
+    unsafe fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error> {
+        T::write(self, offset, data)
     }
 }

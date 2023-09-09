@@ -1,5 +1,5 @@
 use bitvec::vec::BitVec;
-use ni_fpga::{Error, RegisterAccess, SessionAccess, SessionBuilder};
+use ni_fpga::{Error, RegisterReadAccess, SessionAccess, SessionBuilder};
 
 use colored::*;
 use ni_fpga::fxp::{SignedFXP, UnsignedFXP};
