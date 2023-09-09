@@ -11,9 +11,10 @@ pub mod session_lifetimes;
 mod status;
 
 // Keep these for backwards compatibility, but don't use them internally
-pub use datatype::{Datatype, FpgaBits};
+pub use datatype::{Datatype, DatatypePacker, FpgaBits};
 pub use errors::Error;
 pub type Offset = ffi::Offset;
+pub use datatype::DerivedDatatype;
 pub use hmb::Hmb;
 pub use hmb::HmbAccess;
 pub use nifpga::NiFpga;

@@ -5,7 +5,7 @@ use std::sync::Arc;
 
 use ni_fpga_sys::{CloseAttribute, OpenAttribute};
 
-use crate::datatype::Datatype;
+use crate::datatype::{Datatype, DatatypePacker};
 use crate::errors::Error;
 use crate::hmb::Hmb;
 use crate::nifpga::NiFpga;
@@ -323,7 +323,7 @@ where
         };
 
         match self.fpga_storage.read_u8_array(offset, buffer.buffer_mut()) {
-            Ok(_) => Ok(Datatype::unpack(
+            Ok(_) => Ok(DatatypePacker::unpack(
                 &crate::FpgaBits::from_slice(buffer.buffer())[slice_start..],
             )?),
             Err(err) => Err(err),
@@ -341,7 +341,7 @@ where
             0
         };
 
-        Datatype::pack(
+        DatatypePacker::pack(
             &mut crate::FpgaBits::from_slice_mut(buffer.buffer_mut())[slice_start..],
             data,
         )?;

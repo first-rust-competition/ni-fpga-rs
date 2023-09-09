@@ -1,4 +1,4 @@
-use crate::datatype::{Datatype, FpgaBits};
+use crate::datatype::{Datatype, DatatypePacker, FpgaBits};
 use crate::errors::Error;
 
 #[allow(clippy::upper_case_acronyms)]
@@ -351,7 +351,7 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::f
     }
 }
 
-impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> Datatype
+impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> DatatypePacker
     for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
 {
     const SIZE_IN_BITS: usize = WORD_LENGTH as usize;
@@ -373,6 +373,16 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> Dataty
             }
         }))
     }
+}
+
+impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> Datatype
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+{
+}
+
+impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool, const N: usize> Datatype
+    for [FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>; N]
+{
 }
 
 #[cfg(test)]

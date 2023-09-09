@@ -1,4 +1,4 @@
-use std::marker::PhantomData;
+use std::{borrow::Borrow, marker::PhantomData};
 
 use crate::{Datatype, Error, Offset, SessionAccess};
 
@@ -63,40 +63,13 @@ where
 {
     fn offset(&self) -> Offset;
 
-    #[inline]
+    #[inline(never)]
     fn read(&self, session: &impl SessionAccess) -> Result<T, Error> {
         T::read(session, self.offset())
     }
     #[inline]
-    fn read_array<const LEN: usize>(
-        &self,
-        session: &impl SessionAccess,
-    ) -> Result<[T; LEN], Error> {
-        T::read_array(session, self.offset())
-    }
-    #[inline]
-    fn read_array_inplace(
-        &self,
-        session: &impl SessionAccess,
-        data: &mut [T],
-    ) -> Result<(), Error> {
-        T::read_array_inplace(session, self.offset(), data)
-    }
-    #[inline]
-    fn write(&mut self, session: &impl SessionAccess, value: T) -> Result<(), Error> {
+    fn write(&mut self, session: &impl SessionAccess, value: impl Borrow<T>) -> Result<(), Error> {
         T::write(session, self.offset(), value)
-    }
-    #[inline]
-    fn write_ref(&mut self, session: &impl SessionAccess, value: &T) -> Result<(), Error> {
-        T::write_ref(session, self.offset(), value)
-    }
-    #[inline]
-    fn write_array<const LEN: usize>(
-        &self,
-        session: &impl SessionAccess,
-        value: &[T; LEN],
-    ) -> Result<(), Error> {
-        T::write_array(session, self.offset(), value)
     }
 }
 
@@ -106,6 +79,7 @@ where
     Offset: From<U>,
     U: Copy,
 {
+    #[inline]
     fn offset(&self) -> Offset {
         self._offset_type.into()
     }

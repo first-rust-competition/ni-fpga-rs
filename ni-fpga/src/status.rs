@@ -126,12 +126,14 @@ impl fmt::Debug for Status {
 }
 
 impl From<ffi::Status> for Status {
+    #[inline]
     fn from(status: ffi::Status) -> Self {
         Status(status)
     }
 }
 
 impl From<Status> for ffi::Status {
+    #[inline]
     fn from(status: Status) -> Self {
         status.0
     }

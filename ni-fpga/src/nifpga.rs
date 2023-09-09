@@ -11,6 +11,7 @@ pub(crate) trait StatusHelper {
 }
 
 impl StatusHelper for ffi::Status {
+    #[inline]
     fn to_result(self) -> Result<(), Error> {
         match self {
             0 => Ok(()),
@@ -43,6 +44,7 @@ pub struct NiFpga {
 macro_rules! type_wrapper {
     ($type:ident, $read_fun_name:ident, $read_ffi_name:ident, $write_fun_name:ident, $write_ffi_name:ident,
         $readarr_fun_name:ident, $readarr_ffi_name:ident, $writearr_fun_name:ident, $writearr_ffi_name:ident) => {
+        #[inline]
         pub fn $read_fun_name(&self, indicator: Offset) -> Result<$type, Error> {
             let mut value: $type = Default::default();
             match unsafe {
@@ -56,6 +58,7 @@ macro_rules! type_wrapper {
             }
         }
 
+        #[inline]
         pub fn $write_fun_name(&self, indicator: Offset, value: $type) -> Result<(), Error> {
             unsafe {
                 self.api
@@ -65,6 +68,7 @@ macro_rules! type_wrapper {
             }
         }
 
+        #[inline]
         pub fn $readarr_fun_name(
             &self,
             indicator: Offset,
@@ -78,6 +82,7 @@ macro_rules! type_wrapper {
             }
         }
 
+        #[inline]
         pub fn $writearr_fun_name(&self, indicator: Offset, value: &[$type]) -> Result<(), Error> {
             unsafe {
                 self.api
@@ -90,14 +95,17 @@ macro_rules! type_wrapper {
 }
 
 impl NiFpga {
+    #[inline]
     pub fn ffi(&self) -> &NiFpgaApiContainer {
         &self.api
     }
 
+    #[inline]
     pub fn session(&self) -> Session {
         self.session
     }
 
+    #[inline]
     pub fn read_bool(&self, indicator: Offset) -> Result<bool, Error> {
         let mut value: u8 = 0;
         match unsafe {
@@ -110,6 +118,7 @@ impl NiFpga {
             Err(err) => Err(err),
         }
     }
+    #[inline]
     pub fn write_bool(&self, indicator: Offset, value: bool) -> Result<(), Error> {
         let value = if value { 1 } else { 0 };
         unsafe {
@@ -119,6 +128,7 @@ impl NiFpga {
                 .to_result()
         }
     }
+    #[inline]
     pub fn read_bool_array_fast(&self, indicator: Offset, value: &mut [u8]) -> Result<(), Error> {
         unsafe {
             self.api
@@ -127,6 +137,7 @@ impl NiFpga {
                 .to_result()
         }
     }
+    #[inline]
     pub fn write_bool_array_fast(&self, indicator: Offset, value: &[u8]) -> Result<(), Error> {
         unsafe {
             self.api

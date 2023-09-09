@@ -16,6 +16,7 @@ pub struct ArcStorage {
 impl Deref for ArcStorage {
     type Target = NiFpga;
 
+    #[inline]
     fn deref(&self) -> &Self::Target {
         &self.api
     }
@@ -24,6 +25,7 @@ impl Deref for ArcStorage {
 impl StorageClone<'_> for ArcStorage {
     type Target = ArcStorage;
 
+    #[inline]
     fn storage_clone(&self) -> ArcStorage {
         self.clone()
     }
@@ -37,6 +39,7 @@ pub struct InPlaceStorage<'a> {
 impl<'a> Deref for InPlaceStorage<'a> {
     type Target = NiFpga;
 
+    #[inline]
     fn deref(&self) -> &Self::Target {
         &self.api
     }
@@ -45,12 +48,14 @@ impl<'a> Deref for InPlaceStorage<'a> {
 impl<'a> StorageClone<'a> for InPlaceStorage<'a> {
     type Target = RefStorage<'a>;
 
+    #[inline]
     fn storage_clone(&'a self) -> RefStorage<'a> {
         RefStorage { api: &self.api }
     }
 }
 
 impl<'a> From<&'a InPlaceStorage<'_>> for RefStorage<'a> {
+    #[inline]
     fn from(value: &'a InPlaceStorage) -> Self {
         Self { api: &value.api }
     }
@@ -63,6 +68,7 @@ pub struct RefStorage<'a> {
 impl<'a> Deref for RefStorage<'a> {
     type Target = NiFpga;
 
+    #[inline]
     fn deref(&self) -> &Self::Target {
         self.api
     }
@@ -71,6 +77,7 @@ impl<'a> Deref for RefStorage<'a> {
 impl<'a> StorageClone<'a> for RefStorage<'a> {
     type Target = RefStorage<'a>;
 
+    #[inline]
     fn storage_clone(&self) -> RefStorage<'a> {
         RefStorage { api: self.api }
     }
