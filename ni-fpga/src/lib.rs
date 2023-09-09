@@ -23,5 +23,5 @@ pub use register::RegisterAccess;
 pub use register::StoredOffset;
 pub use session::Session;
 pub use session::SessionAccess;
-pub use status::Status;
 pub use session::SessionBuilder;
+pub use status::Status;

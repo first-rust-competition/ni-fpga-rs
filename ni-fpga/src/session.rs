@@ -51,7 +51,6 @@ where
         memory_name: &str,
     ) -> Result<Hmb<<FpgaStorage as StorageClone<'a>>::Target>, Error>
     where
-        <FpgaStorage as StorageClone<'a>>::Target: Deref,
         <FpgaStorage as StorageClone<'a>>::Target: Deref<Target = NiFpga>,
     {
         let c_memory_name = CString::new(memory_name).unwrap();
@@ -89,11 +88,22 @@ impl Session<InPlaceStorage<'_>> {
         open_attribute: OpenAttribute,
         close_attribute: CloseAttribute,
     ) -> Result<Self, Error> {
-        Self::open_local(bitfile, signature, resource, open_attribute, close_attribute, Self::create_self)
+        Self::open_local(
+            bitfile,
+            signature,
+            resource,
+            open_attribute,
+            close_attribute,
+            Self::create_self,
+        )
     }
 
     pub fn open(bitfile: &str, signature: &str, resource: &str) -> Result<Self, Error> {
-        SessionBuilder::new().bitfile_path(bitfile)?.signature(signature)?.resource(resource)?.build()
+        SessionBuilder::new()
+            .bitfile_path(bitfile)?
+            .signature(signature)?
+            .resource(resource)?
+            .build()
     }
 
     pub fn from_session(session: ffi::Session) -> Result<Self, Error> {
@@ -115,7 +125,14 @@ impl Session<ArcStorage> {
         open_attribute: OpenAttribute,
         close_attribute: CloseAttribute,
     ) -> Result<Self, Error> {
-        Self::open_local(bitfile, signature, resource, open_attribute, close_attribute, Self::create_self)
+        Self::open_local(
+            bitfile,
+            signature,
+            resource,
+            open_attribute,
+            close_attribute,
+            Self::create_self,
+        )
     }
 
     pub fn from_session_arc(session: ffi::Session) -> Result<Self, Error> {
@@ -186,23 +203,14 @@ impl SessionBuilder {
 
     fn build_args(
         self,
-    ) -> Result<
-        (
-            CString,
-            CString,
-            CString,
-            OpenAttribute,
-            CloseAttribute,
-        ),
-        Error,
-    > {
+    ) -> Result<(CString, CString, CString, OpenAttribute, CloseAttribute), Error> {
         let mut open_attr = OpenAttribute::empty();
 
         let bitfile = match self.bitfile_type {
             Some(BitfileType::Contents(s)) => {
                 open_attr |= OpenAttribute::BitfileContentsNotPath;
                 s
-            },
+            }
             Some(BitfileType::Path(s)) => s,
             None => return Err(Error::NoBitfileSpecified),
         };
@@ -239,12 +247,12 @@ impl SessionBuilder {
         Ok((bitfile, signature, resource, open_attr, close_attr))
     }
 
-    pub fn build<'b>(self) -> Result<Session<InPlaceStorage<'b>>, Error> {
+    pub fn build(self) -> Result<Session<InPlaceStorage<'static>>, Error> {
         let (bitfile, signature, resource, open_args, close_args) = self.build_args()?;
         Session::open_inplace(bitfile, signature, resource, open_args, close_args)
     }
 
-    pub fn build_arc<'b>(self) -> Result<Session<ArcStorage>, Error> {
+    pub fn build_arc(self) -> Result<Session<ArcStorage>, Error> {
         let (bitfile, signature, resource, open_args, close_args) = self.build_args()?;
         Session::open_arc(bitfile, signature, resource, open_args, close_args)
     }

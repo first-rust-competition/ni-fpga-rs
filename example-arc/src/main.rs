@@ -1,7 +1,7 @@
 use std::{ffi::CString, thread};
 
 use ni_fpga::fxp::UnsignedPackedNumber;
-use ni_fpga::{Register, RegisterAccess, SessionAccess, StoredOffset, SessionBuilder};
+use ni_fpga::{Register, RegisterAccess, SessionAccess, SessionBuilder, StoredOffset};
 use ni_fpga_macros::{Cluster, Enum};
 
 #[derive(Cluster, Debug)]
