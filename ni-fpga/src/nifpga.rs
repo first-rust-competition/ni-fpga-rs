@@ -260,9 +260,9 @@ impl NiFpga {
     }
 
     pub fn open(
-        bitfile: &CString,
-        signature: &CString,
-        resource: &CString,
+        bitfile: CString,
+        signature: CString,
+        resource: CString,
         open_attribute: OpenAttribute,
         close_attribute: CloseAttribute,
     ) -> Result<Self, Error> {

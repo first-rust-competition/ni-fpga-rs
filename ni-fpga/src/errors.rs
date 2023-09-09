@@ -1,8 +1,11 @@
+use std::ffi::NulError;
+
 use thiserror::Error;
 
 use crate::status::Status;
 
 #[derive(Debug, Error, PartialEq)]
+#[non_exhaustive]
 pub enum Error {
     #[allow(clippy::upper_case_acronyms)]
     #[error("an FPGA operation failed: {0}")]
@@ -19,4 +22,18 @@ pub enum Error {
     ClosingUnownedSession,
     #[error("An invalid datatype was passed.")]
     InvalidDatatype,
+    #[error("Null C String {0}")]
+    NullCString(NulError),
+    #[error("No bitfile specified")]
+    NoBitfileSpecified,
+    #[error("No signature specified")]
+    NoSignatureSpecified,
+    #[error("No resource specified")]
+    NoResourceSpecified,
+}
+
+impl From<NulError> for Error {
+    fn from(value: NulError) -> Self {
+        Self::NullCString(value)
+    }
 }

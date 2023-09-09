@@ -1,10 +1,8 @@
-use std::io::Write;
 use std::{ffi::CString, thread};
 
-use ni_fpga::fxp::{UnsignedFXP, UnsignedPackedNumber, FXP};
-use ni_fpga::{Register, RegisterAccess, Session, SessionAccess, StoredOffset};
+use ni_fpga::fxp::UnsignedPackedNumber;
+use ni_fpga::{Register, RegisterAccess, SessionAccess, StoredOffset, SessionBuilder};
 use ni_fpga_macros::{Cluster, Enum};
-use tempfile::NamedTempFile;
 
 #[derive(Cluster, Debug)]
 struct DigitalSource {
@@ -46,15 +44,14 @@ enum SPIDebugState {
     Disable,
 }
 
-fn main() -> Result<(), ni_fpga::Error> {
-    let mut tmp_bitfile = NamedTempFile::new().unwrap();
-    write!(tmp_bitfile, include_str!("roboRIO_FPGA_2023_23.0.0.lvbitx")).unwrap();
+const BITFILE_CONTENTS: &str = include_str!("roboRIO_FPGA_2023_23.0.0.lvbitx");
 
-    let session = Session::open_arc(
-        tmp_bitfile.path().to_str().unwrap(),
-        "2A5927EB7178780081872E6823E32FFC",
-        "rio://172.22.11.2/RIO0",
-    )?;
+fn main() -> Result<(), ni_fpga::Error> {
+    let session = SessionBuilder::new()
+        .bitfile_contents(BITFILE_CONTENTS)?
+        .ignore_signature()
+        .resource("rio://172.22.11.2/RIO0")?
+        .build_arc()?;
 
     let mut dc_offset: u32 = 0;
     let c = CString::new("DutyCycle0.Frequency").unwrap();

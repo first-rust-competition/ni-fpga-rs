@@ -1,11 +1,9 @@
-use ni_fpga::{RegisterAccess, SessionAccess};
-use std::io::Write;
+use ni_fpga::{RegisterAccess, SessionAccess, SessionBuilder};
 
 use colored::*;
 use ni_fpga::fxp::{SignedFXP, UnsignedFXP};
-use ni_fpga::{Datatype, Session};
+use ni_fpga::Datatype;
 use ni_fpga_macros::Cluster;
-use tempfile::NamedTempFile;
 
 #[derive(Cluster, Debug, PartialEq, Clone, Copy)]
 struct TestCluster {
@@ -49,16 +47,15 @@ fn full_test_case<T: PartialEq + std::fmt::Debug + Datatype + Copy, const N: u32
     Ok(())
 }
 
+const BITFILE_CONTENTS: &str = include_str!("integration.lvbitx");
+
 #[allow(overflowing_literals)]
 fn main() -> Result<(), ni_fpga::Error> {
-    let mut tmp_bitfile = NamedTempFile::new().unwrap();
-    write!(tmp_bitfile, include_str!("integration.lvbitx")).unwrap();
-
-    let session = Session::open(
-        tmp_bitfile.path().to_str().unwrap(),
-        "D08F17F77A45A5692FA2342C6B86E0EE",
-        "rio://172.22.11.2/RIO0",
-    )?;
+    let session = SessionBuilder::new()
+        .bitfile_contents(BITFILE_CONTENTS)?
+        .ignore_signature()
+        .resource("rio://172.22.11.2/RIO0")?
+        .build()?;
 
     full_test_case::<u8, 98306>(&session, "read plain U8", 0b00000001)?;
     full_test_case::<u16, 98310>(&session, "read plain U16", 0b0000001100000001)?;

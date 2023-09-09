@@ -1,4 +1,4 @@
-use ni_fpga::{RegisterAccess, Session, SessionAccess};
+use ni_fpga::{Session, SessionAccess};
 use ni_fpga_macros::{Cluster, Enum};
 
 #[derive(Cluster, Debug)]
@@ -14,9 +14,8 @@ struct AnalogTriggerOutput {
     falling: bool,
 }
 
-#[derive(Enum, Debug, Copy, Clone, Default)]
+#[derive(Enum, Debug)]
 enum SPIDebugState {
-    #[default]
     Idle,
     CheckWindow,
     CheckAvailable,
@@ -35,20 +34,9 @@ fn main() -> Result<(), ni_fpga::Error> {
         "RIO0",
     )?;
 
-    let spi_debug_state = session.open_const_register::<SPIDebugState, 99314>();
-
-    let pwm_config_register = session.open_const_register::<PWMConfig, 98536>();
-
-    spi_debug_state.read(&session)?;
-
     println!("Input voltage: {:?}", session.read::<u16>(99174)?);
-    println!(
-        "{:#?}",
-        session.read::<PWMConfig>(pwm_config_register.offset())?
-    );
     println!("{:#?}", session.read::<PWMConfig>(98536)?);
     println!("{:#?}", session.read::<[AnalogTriggerOutput; 8]>(98424)?);
     println!("{:#?}", session.read::<SPIDebugState>(99314)?);
-    println!("{:#?}", spi_debug_state.read(&session));
     Ok(())
 }
