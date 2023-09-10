@@ -263,7 +263,7 @@ pub trait SessionAccess {
 
     fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>;
 
-    unsafe fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>;
+    fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>;
 
     fn open_const_register<T: Datatype, P, const N: Offset>(&self) -> Register<T, P, ConstOffset<N>> {
         Register::new_const()
@@ -294,7 +294,7 @@ where
         T::read(self, offset)
     }
 
-    unsafe fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error> {
+    fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error> {
         T::write(self, offset, data)
     }
 }

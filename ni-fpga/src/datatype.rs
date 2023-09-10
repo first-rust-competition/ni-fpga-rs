@@ -65,7 +65,7 @@ pub trait Datatype: DatatypePacker {
     }
 
     #[inline]
-    unsafe fn write(
+    fn write(
         session: &impl SessionAccess,
         offset: Offset,
         value: impl Borrow<Self>,
