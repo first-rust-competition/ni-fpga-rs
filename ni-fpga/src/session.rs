@@ -1,6 +1,6 @@
 use std::ffi::CString;
 
-use crate::datatype::{Datatype, FpgaBits};
+use crate::datatype::{Datatype, FpgaBitsRaw};
 use crate::errors::Error;
 use crate::ffi;
 use crate::ffi::Offset;
@@ -52,51 +52,52 @@ impl Session {
     where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
     {
+        let byte_size = (T::SIZE_IN_BITS - 1) / 8 + 1;
         let mut buffer = [0u8; (T::SIZE_IN_BITS - 1) / 8 + 1];
-        let status = Status::from(unsafe {
-            self.api.base.NiFpgaDll_ReadArrayU8(
-                self.handle,
-                offset,
-                buffer.as_mut_ptr(),
-                (T::SIZE_IN_BITS - 1) / 8 + 1,
-            )
-        });
-        match status {
-            Status::Success => {
-                let slice_start = if (T::SIZE_IN_BITS - 1) / 8 < 4 {
-                    ((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS
-                } else {
-                    0
-                };
-                Ok(Datatype::unpack(
-                    &FpgaBits::from_slice(&buffer)[slice_start..],
-                )?)
-            }
-            _ => Err(Error::FPGA(status)),
+        let status = unsafe {
+            self.api
+                .base
+                .NiFpgaDll_ReadArrayU8(self.handle, offset, buffer.as_mut_ptr(), buffer.len())
+                .into()
+        };
+        if status != Status::Success {
+            return Err(Error::FPGA(status));
         }
+        // Values larger then a single element (32 bit) are left justified, not right
+        let bit_slice = FpgaBitsRaw::from_slice_mut(&mut buffer);
+        let bit_slice = if byte_size <= 4 {
+            bit_slice.split_at_mut(byte_size * 8 - T::SIZE_IN_BITS).1
+        } else {
+            bit_slice.split_at_mut(T::SIZE_IN_BITS).0
+        };
+
+        Datatype::unpack(bit_slice)
     }
     pub fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>
     where
         [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
     {
+        let byte_size = (T::SIZE_IN_BITS - 1) / 8 + 1;
         let mut buffer = [0u8; (T::SIZE_IN_BITS - 1) / 8 + 1];
-        let slice_start = if (T::SIZE_IN_BITS - 1) / 8 < 4 {
-            ((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS
+        // Values larger then a single element (32 bit) are left justified, not right
+        let bit_slice = FpgaBitsRaw::from_slice_mut(&mut buffer);
+        let bit_slice = if byte_size <= 4 {
+            bit_slice.split_at_mut(byte_size * 8 - T::SIZE_IN_BITS).1
         } else {
-            0
+            bit_slice.split_at_mut(T::SIZE_IN_BITS).0
         };
-        Datatype::pack(
-            &mut FpgaBits::from_slice_mut(&mut buffer)[slice_start..],
-            data,
-        )?;
-        let status = Status::from(unsafe {
-            self.api.base.NiFpgaDll_WriteArrayU8(
-                self.handle,
-                offset,
-                buffer.as_ptr(),
-                (T::SIZE_IN_BITS - 1) / 8 + 1,
-            )
-        });
+        Datatype::pack(bit_slice, data)?;
+        let status = unsafe {
+            self.api
+                .base
+                .NiFpgaDll_WriteArrayU8(
+                    self.handle,
+                    offset,
+                    buffer.as_ptr(),
+                    (T::SIZE_IN_BITS - 1) / 8 + 1,
+                )
+                .into()
+        };
         match status {
             Status::Success => Ok(()),
             _ => Err(Error::FPGA(status)),

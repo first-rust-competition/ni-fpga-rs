@@ -1,6 +1,6 @@
 [package]
 name = "ni-fpga"
-version = "1.4.1"
+version = "1.5.0"
 authors = ["Connor Worley <connorbworley@gmail.com>"]
 edition = "2018"
 license = "MIT"
@@ -10,6 +10,6 @@ readme = "README.md"
 repository = "https://github.com/first-rust-competition/ni-fpga-rs"
 
 [dependencies]
-bitvec = "0.17.4"
-ni-fpga-sys = { version = "1.0.1", path = "../ni-fpga-sys" }
-thiserror = "1.0.19"
+bitvec = "1.0.1"
+ni-fpga-sys = { version = "2.0.0", path = "../ni-fpga-sys" }
+thiserror = "1.0.48"
