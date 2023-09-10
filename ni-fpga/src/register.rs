@@ -6,6 +6,12 @@ pub struct ReadOnly;
 pub struct WriteOnly;
 pub struct ReadWrite;
 
+pub trait RegisterPermission {}
+
+impl RegisterPermission for ReadOnly {}
+impl RegisterPermission for ReadWrite {}
+impl RegisterPermission for WriteOnly {}
+
 #[derive(Clone, Copy)]
 pub struct ConstOffset<const N: Offset>;
 
@@ -26,13 +32,41 @@ impl From<StoredOffset> for Offset {
     }
 }
 
-pub struct Register<T, P, O> {
+pub trait RegisterOffset: Copy + Clone {}
+impl RegisterOffset for StoredOffset {}
+impl<const N: Offset> RegisterOffset for ConstOffset<N> {}
+
+pub struct Register<T, P, O>
+where
+    T: Datatype,
+    P: RegisterPermission,
+    O: RegisterOffset,
+{
     _offset_type: O,
     _type: PhantomData<T>,
     _perms: PhantomData<P>,
 }
 
-impl<T, P> Register<T, P, StoredOffset> {
+impl<T, P, O> Register<T, P, O>
+where
+    T: Datatype,
+    P: RegisterPermission,
+    O: RegisterOffset,
+{
+    pub unsafe fn duplicate(&self) -> Self {
+        Self {
+            _offset_type: self._offset_type,
+            _type: PhantomData,
+            _perms: PhantomData,
+        }
+    }
+}
+
+impl<T, P> Register<T, P, StoredOffset>
+where
+    T: Datatype,
+    P: RegisterPermission,
+{
     #[inline]
     pub const unsafe fn new(offset: Offset) -> Self {
         Self {
@@ -41,9 +75,35 @@ impl<T, P> Register<T, P, StoredOffset> {
             _perms: PhantomData,
         }
     }
+
+    pub const unsafe fn transmute_type<NT>(self) -> Register<NT, P, StoredOffset>
+    where
+        NT: Datatype,
+    {
+        Register {
+            _offset_type: self._offset_type,
+            _type: PhantomData,
+            _perms: PhantomData,
+        }
+    }
+
+    pub const unsafe fn transmute_permissions<NP>(self) -> Register<T, NP, StoredOffset>
+    where
+        NP: RegisterPermission,
+    {
+        Register {
+            _offset_type: self._offset_type,
+            _type: PhantomData,
+            _perms: PhantomData,
+        }
+    }
 }
 
-impl<T, P, const N: Offset> Register<T, P, ConstOffset<N>> {
+impl<T, P, const N: Offset> Register<T, P, ConstOffset<N>>
+where
+    T: Datatype,
+    P: RegisterPermission,
+{
     #[inline]
     pub const unsafe fn new_const() -> Self {
         Self {
@@ -52,9 +112,35 @@ impl<T, P, const N: Offset> Register<T, P, ConstOffset<N>> {
             _perms: PhantomData,
         }
     }
+
+    pub const unsafe fn transmute_type<NT>(self) -> Register<NT, P, ConstOffset<N>>
+    where
+        NT: Datatype,
+    {
+        Register {
+            _offset_type: self._offset_type,
+            _type: PhantomData,
+            _perms: PhantomData,
+        }
+    }
+
+    pub const unsafe fn transmute_permissions<NP>(self) -> Register<T, NP, ConstOffset<N>>
+    where
+        NP: RegisterPermission,
+    {
+        Register {
+            _offset_type: self._offset_type,
+            _type: PhantomData,
+            _perms: PhantomData,
+        }
+    }
 }
 
-impl<T, P, const N: Offset> From<Register<T, P, ConstOffset<N>>> for Register<T, P, StoredOffset> {
+impl<T, P, const N: Offset> From<Register<T, P, ConstOffset<N>>> for Register<T, P, StoredOffset>
+where
+    T: Datatype,
+    P: RegisterPermission,
+{
     #[inline]
     fn from(_: Register<T, P, ConstOffset<N>>) -> Self {
         Self {
@@ -65,7 +151,7 @@ impl<T, P, const N: Offset> From<Register<T, P, ConstOffset<N>>> for Register<T,
     }
 }
 
-pub trait RegisterReadAccess<T>
+pub trait RegisterRead<T>
 where
     T: Datatype,
 {
@@ -78,7 +164,7 @@ where
     }
 }
 
-pub trait RegisterWriteAccess<T>
+pub trait RegisterWrite<T>
 where
     T: Datatype,
 {
@@ -91,9 +177,10 @@ where
     }
 }
 
-impl<T, U> RegisterReadAccess<T> for Register<T, ReadOnly, U>
+impl<T, U> RegisterRead<T> for Register<T, ReadOnly, U>
 where
     T: Datatype,
+    U: RegisterOffset,
     Offset: From<U>,
     U: Copy,
 {
@@ -103,9 +190,10 @@ where
     }
 }
 
-impl<T, U> RegisterWriteAccess<T> for Register<T, WriteOnly, U>
+impl<T, U> RegisterWrite<T> for Register<T, WriteOnly, U>
 where
     T: Datatype,
+    U: RegisterOffset,
     Offset: From<U>,
     U: Copy,
 {
@@ -115,9 +203,10 @@ where
     }
 }
 
-impl<T, U> RegisterReadAccess<T> for Register<T, ReadWrite, U>
+impl<T, U> RegisterRead<T> for Register<T, ReadWrite, U>
 where
     T: Datatype,
+    U: RegisterOffset,
     Offset: From<U>,
     U: Copy,
 {
@@ -127,9 +216,10 @@ where
     }
 }
 
-impl<T, U> RegisterWriteAccess<T> for Register<T, ReadWrite, U>
+impl<T, U> RegisterWrite<T> for Register<T, ReadWrite, U>
 where
     T: Datatype,
+    U: RegisterOffset,
     Offset: From<U>,
     U: Copy,
 {

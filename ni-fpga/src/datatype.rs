@@ -13,7 +13,6 @@ pub type FpgaBits = BitSlice<BitSafeU8a, Lsb0>;
 #[cfg(target_endian = "big")]
 pub type FpgaBitsRaw = BitSlice<u8, Lsb0>;
 
-
 pub trait DatatypePacker: Sized {
     const SIZE_IN_BITS: usize;
 

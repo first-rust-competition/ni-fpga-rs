@@ -1,5 +1,5 @@
 use bitvec::vec::BitVec;
-use ni_fpga::{Error, RegisterReadAccess, SessionAccess};
+use ni_fpga::{Error, RegisterRead, SessionAccess};
 
 use colored::*;
 use ni_fpga::fxp::{SignedFXP, UnsignedFXP};
@@ -25,7 +25,7 @@ fn test_case<T: PartialEq + std::fmt::Debug>(test_case_name: &str, actual: T, ex
 fn full_test_case<T: PartialEq + std::fmt::Debug + Datatype + Copy>(
     session: &impl SessionAccess,
     test_case_name: &str,
-    reg: impl RegisterReadAccess<T>,
+    reg: impl RegisterRead<T>,
     expected: T,
 ) -> Result<(), ni_fpga::Error> {
     test_case(test_case_name, reg.read(session)?, expected);

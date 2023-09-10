@@ -1,6 +1,8 @@
 use std::thread;
 
-use ni_fpga::{ReadOnly, Register, RegisterReadAccess, SessionAccess, StoredOffset};
+use ni_fpga::{
+    ReadOnly, ReadWrite, Register, RegisterRead, RegisterWrite, SessionAccess, StoredOffset,
+};
 
 use crate::registers::FpgaBitfile;
 
@@ -10,8 +12,14 @@ fn main() -> Result<(), ni_fpga::Error> {
     let session = FpgaBitfile::session_builder("rio://172.22.11.2/RIO0")?.build_arc()?;
     let mut regs = FpgaBitfile::take(&session).unwrap();
 
-    let dc0 = regs.DutyCycle0_Frequency.take().unwrap();
+    let dc0 = unsafe {
+        regs.DutyCycle0_Frequency
+            .take()
+            .unwrap()
+            .transmute_permissions::<ReadWrite>()
+    };
     let _r = dc0.read(&session);
+    unsafe { dc0.transmute_type::<u32>() }.write(&session, 42)?;
 
     let dc1_src = regs.DutyCycle1_Source.take().unwrap();
     let _configs = dc1_src.read(&session);
