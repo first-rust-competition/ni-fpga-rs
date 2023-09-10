@@ -1,5 +1,4 @@
 #![feature(generic_const_exprs)]
-#![feature(maybe_uninit_uninit_array)]
 
 extern crate ni_fpga_sys as ffi;
 
