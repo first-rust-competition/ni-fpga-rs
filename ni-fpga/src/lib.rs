@@ -17,6 +17,7 @@ pub use datatype::{Datatype, DatatypePacker, FpgaBits};
 pub use errors::Error;
 pub type Offset = ffi::Offset;
 pub use datatype::DerivedDatatype;
+pub use datatype::StockAccessDatatype;
 pub use hmb::Hmb;
 pub use hmb::HmbAccess;
 pub use nifpga::NiFpga;

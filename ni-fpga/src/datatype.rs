@@ -13,6 +13,7 @@ pub type FpgaBits = BitSlice<BitSafeU8a, Lsb0>;
 #[cfg(target_endian = "big")]
 pub type FpgaBitsRaw = BitSlice<u8, Lsb0>;
 
+
 pub trait DatatypePacker: Sized {
     const SIZE_IN_BITS: usize;
 
@@ -20,7 +21,7 @@ pub trait DatatypePacker: Sized {
     fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error>;
 }
 
-enum SmallBuffer<T, const N: usize> {
+pub(crate) enum SmallBuffer<T, const N: usize> {
     InPlace(([T; N], usize)),
     Alloc(Vec<T>),
 }
@@ -43,7 +44,17 @@ impl<T: Copy, const N: usize> SmallBuffer<T, N> {
 }
 
 pub trait Datatype: DatatypePacker {
-    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error>;
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error>;
+}
+
+pub trait DerivedDatatype {}
+
+pub trait StockAccessDatatype: Datatype {
     unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
         // Most types are smaller then 4, so preallocate for 4
         let byte_size = (Self::SIZE_IN_BITS - 1) / 8 + 1;
@@ -64,7 +75,6 @@ pub trait Datatype: DatatypePacker {
         }
     }
 
-    #[inline]
     unsafe fn write(
         session: &impl SessionAccess,
         offset: Offset,
@@ -88,8 +98,24 @@ pub trait Datatype: DatatypePacker {
     }
 }
 
-pub trait DerivedDatatype {}
-impl<T, const N: usize> Datatype for [T; N] where T: DerivedDatatype + Datatype + std::fmt::Debug {}
+impl<T, const N: usize> StockAccessDatatype for [T; N] where T: DerivedDatatype + Datatype {}
+
+impl<T, const N: usize> Datatype for [T; N]
+where
+    T: DerivedDatatype + Datatype,
+{
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        <Self as StockAccessDatatype>::read(session, offset)
+    }
+
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        <Self as StockAccessDatatype>::write(session, offset, value)
+    }
+}
 
 // Support array versions of derived datatypes
 impl<T, const N: usize> DatatypePacker for [T; N]
@@ -121,17 +147,381 @@ where
     }
 }
 
-impl Datatype for bool {}
-impl Datatype for u8 {}
-impl Datatype for u16 {}
-impl Datatype for u32 {}
-impl Datatype for u64 {}
-impl Datatype for i8 {}
-impl Datatype for i16 {}
-impl Datatype for i32 {}
-impl Datatype for i64 {}
-impl Datatype for f32 {}
-impl Datatype for f64 {}
+impl Datatype for f32 {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        session.fpga().read_f32(offset)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_f32(offset, *value.borrow())
+    }
+}
+
+impl<const N: usize> Datatype for [f32; N] {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        let mut value = [f32::default(); N];
+        session.fpga().read_f32_array(offset, &mut value)?;
+        Ok(value)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_f32_array(offset, value.borrow())
+    }
+}
+
+impl Datatype for f64 {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        session.fpga().read_f64(offset)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_f64(offset, *value.borrow())
+    }
+}
+
+impl<const N: usize> Datatype for [f64; N] {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        let mut value = [f64::default(); N];
+        session.fpga().read_f64_array(offset, &mut value)?;
+        Ok(value)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_f64_array(offset, value.borrow())
+    }
+}
+
+impl Datatype for bool {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        session.fpga().read_bool(offset)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_bool(offset, *value.borrow())
+    }
+}
+
+impl<const N: usize> Datatype for [bool; N] {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        let mut value = [u8::default(); N];
+        session.fpga().read_bool_array_fast(offset, &mut value)?;
+        Ok(value.map(|f| f != 0))
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        let v: &[bool; N] = value.borrow();
+        let mapped = v.map(|f| if f { 1 } else { 0 });
+        session.fpga().write_bool_array_fast(offset, &mapped)
+    }
+}
+
+impl Datatype for i8 {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        session.fpga().read_i8(offset)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_i8(offset, *value.borrow())
+    }
+}
+
+impl<const N: usize> Datatype for [i8; N] {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        let mut value = [i8::default(); N];
+        session.fpga().read_i8_array(offset, &mut value)?;
+        Ok(value)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_i8_array(offset, value.borrow())
+    }
+}
+
+impl Datatype for u8 {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        session.fpga().read_u8(offset)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_u8(offset, *value.borrow())
+    }
+}
+
+impl<const N: usize> Datatype for [u8; N] {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        let mut value = [u8::default(); N];
+        session.fpga().read_u8_array(offset, &mut value)?;
+        Ok(value)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_u8_array(offset, value.borrow())
+    }
+}
+
+impl Datatype for i16 {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        session.fpga().read_i16(offset)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_i16(offset, *value.borrow())
+    }
+}
+
+impl<const N: usize> Datatype for [i16; N] {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        let mut value = [i16::default(); N];
+        session.fpga().read_i16_array(offset, &mut value)?;
+        Ok(value)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_i16_array(offset, value.borrow())
+    }
+}
+
+impl Datatype for u16 {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        session.fpga().read_u16(offset)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_u16(offset, *value.borrow())
+    }
+}
+
+impl<const N: usize> Datatype for [u16; N] {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        let mut value = [u16::default(); N];
+        session.fpga().read_u16_array(offset, &mut value)?;
+        Ok(value)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_u16_array(offset, value.borrow())
+    }
+}
+
+impl Datatype for i32 {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        session.fpga().read_i32(offset)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_i32(offset, *value.borrow())
+    }
+}
+
+impl<const N: usize> Datatype for [i32; N] {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        let mut value = [i32::default(); N];
+        session.fpga().read_i32_array(offset, &mut value)?;
+        Ok(value)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_i32_array(offset, value.borrow())
+    }
+}
+
+impl Datatype for u32 {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        session.fpga().read_u32(offset)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_u32(offset, *value.borrow())
+    }
+}
+
+impl<const N: usize> Datatype for [u32; N] {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        let mut value = [u32::default(); N];
+        session.fpga().read_u32_array(offset, &mut value)?;
+        Ok(value)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_u32_array(offset, value.borrow())
+    }
+}
+
+impl Datatype for i64 {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        session.fpga().read_i64(offset)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_i64(offset, *value.borrow())
+    }
+}
+
+impl<const N: usize> Datatype for [i64; N] {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        let mut value = [i64::default(); N];
+        session.fpga().read_i64_array(offset, &mut value)?;
+        Ok(value)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_i64_array(offset, value.borrow())
+    }
+}
+
+impl Datatype for u64 {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        session.fpga().read_u64(offset)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_u64(offset, *value.borrow())
+    }
+}
+
+impl<const N: usize> Datatype for [u64; N] {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        let mut value = [u64::default(); N];
+        session.fpga().read_u64_array(offset, &mut value)?;
+        Ok(value)
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        session.fpga().write_u64_array(offset, value.borrow())
+    }
+}
 
 impl<const N: usize> DatatypePacker for [bool; N] {
     const SIZE_IN_BITS: usize = <bool as DatatypePacker>::SIZE_IN_BITS * N;
@@ -384,18 +774,6 @@ impl<const N: usize> DatatypePacker for [f64; N] {
         Ok(data)
     }
 }
-
-impl<const N: usize> Datatype for [bool; N] {}
-impl<const N: usize> Datatype for [u8; N] {}
-impl<const N: usize> Datatype for [u16; N] {}
-impl<const N: usize> Datatype for [u32; N] {}
-impl<const N: usize> Datatype for [u64; N] {}
-impl<const N: usize> Datatype for [i8; N] {}
-impl<const N: usize> Datatype for [i16; N] {}
-impl<const N: usize> Datatype for [i32; N] {}
-impl<const N: usize> Datatype for [i64; N] {}
-impl<const N: usize> Datatype for [f32; N] {}
-impl<const N: usize> Datatype for [f64; N] {}
 
 impl DatatypePacker for bool {
     const SIZE_IN_BITS: usize = 1;

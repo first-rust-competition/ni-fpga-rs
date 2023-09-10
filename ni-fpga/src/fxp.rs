@@ -1,5 +1,8 @@
-use crate::datatype::{Datatype, DatatypePacker, FpgaBits};
+use std::borrow::Borrow;
+
+use crate::datatype::{Datatype, DatatypePacker, FpgaBits, SmallBuffer};
 use crate::errors::Error;
+use crate::{Offset, SessionAccess};
 
 use bitvec::prelude::*;
 
@@ -380,6 +383,52 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> Dataty
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> Datatype
     for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
 {
+    unsafe fn read(
+        session: &impl crate::SessionAccess,
+        offset: crate::Offset,
+    ) -> Result<Self, Error> {
+        // Buffer cannot be larger then 8
+        let byte_size = (Self::SIZE_IN_BITS - 1) / 8 + 1;
+        let mut raw_buffer = [0u8; 8];
+        let buffer = &mut raw_buffer[0..byte_size];
+        match session.fpga().read_u8_array(offset, buffer) {
+            Ok(_) => {
+                // Values larger then a single element (32 bit) are left justified, not right
+                let bit_slice = crate::datatype::FpgaBitsRaw::from_slice_mut(buffer);
+                let bit_slice = if byte_size <= 4 {
+                    bit_slice.split_at_mut(byte_size * 8 - Self::SIZE_IN_BITS).1
+                } else {
+                    bit_slice.split_at_mut(Self::SIZE_IN_BITS).0
+                };
+
+                Ok(DatatypePacker::unpack(bit_slice)?)
+            }
+            Err(err) => Err(err),
+        }
+    }
+
+    unsafe fn write(
+        session: &impl crate::SessionAccess,
+        offset: crate::Offset,
+        value: impl std::borrow::Borrow<Self>,
+    ) -> Result<(), Error> {
+        // Buffer cannot be larger then 8
+        let byte_size = (Self::SIZE_IN_BITS - 1) / 8 + 1;
+        let mut raw_buffer = [0u8; 8];
+        let buffer = &mut raw_buffer[0..byte_size];
+
+        // Values larger then a single element (32 bit) are left justified, not right
+        let bit_slice = crate::datatype::FpgaBitsRaw::from_slice_mut(buffer);
+        let bit_slice = if byte_size <= 4 {
+            bit_slice.split_at_mut(byte_size * 8 - Self::SIZE_IN_BITS).1
+        } else {
+            bit_slice.split_at_mut(Self::SIZE_IN_BITS).0
+        };
+
+        DatatypePacker::pack(bit_slice, value.borrow())?;
+
+        session.fpga().write_u8_array(offset, buffer)
+    }
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool, const N: usize>
@@ -423,6 +472,49 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool, const 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool, const N: usize> Datatype
     for [FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>; N]
 {
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        // Most types are smaller then 4, so preallocate for 4
+        let byte_size = (Self::SIZE_IN_BITS - 1) / 8 + 1;
+        let mut buffer: SmallBuffer<u8, 4> = SmallBuffer::new(byte_size, 0u8);
+        match session.fpga().read_u8_array(offset, buffer.buffer()) {
+            Ok(_) => {
+                // Values larger then a single element (32 bit) are left justified, not right
+                let bit_slice = crate::datatype::FpgaBitsRaw::from_slice_mut(buffer.buffer());
+                let bit_slice = if byte_size <= 4 {
+                    bit_slice.split_at_mut(byte_size * 8 - Self::SIZE_IN_BITS).1
+                } else {
+                    bit_slice.split_at_mut(Self::SIZE_IN_BITS).0
+                };
+
+                Ok(DatatypePacker::unpack(bit_slice)?)
+            }
+            Err(err) => Err(err),
+        }
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        // Most types are smaller then 4, so preallocate for 4
+        let byte_size = (Self::SIZE_IN_BITS - 1) / 8 + 1;
+        let mut buffer: SmallBuffer<u8, 4> = SmallBuffer::new(byte_size, 0u8);
+
+        // Values larger then a single element (32 bit) are left justified, not right
+        let bit_slice = crate::datatype::FpgaBitsRaw::from_slice_mut(buffer.buffer());
+        let bit_slice = if byte_size <= 4 {
+            bit_slice.split_at_mut(byte_size * 8 - Self::SIZE_IN_BITS).1
+        } else {
+            bit_slice.split_at_mut(Self::SIZE_IN_BITS).0
+        };
+
+        DatatypePacker::pack(bit_slice, value.borrow())?;
+
+        session.fpga().write_u8_array(offset, buffer.buffer())
+    }
 }
 
 #[cfg(test)]

@@ -51,8 +51,23 @@ pub fn derive_cluster(item: TokenStream) -> TokenStream {
                 )
             }
         }
-        impl ni_fpga::Datatype for #struct_name {}
         impl ni_fpga::DerivedDatatype for #struct_name {}
+        impl ni_fpga::StockAccessDatatype for #struct_name {}
+
+        impl ni_fpga::Datatype for #struct_name
+        {
+            unsafe fn read(session: &impl ni_fpga::SessionAccess, offset: ni_fpga::Offset) -> Result<Self, ni_fpga::Error> {
+                <Self as ni_fpga::StockAccessDatatype>::read(session, offset)
+            }
+
+            unsafe fn write(
+                session: &impl ni_fpga::SessionAccess,
+                offset: ni_fpga::Offset,
+                value: impl std::borrow::Borrow<Self>,
+            ) -> Result<(), ni_fpga::Error> {
+                <Self as ni_fpga::StockAccessDatatype>::write(session, offset, value)
+            }
+        }
     };
 
     output.into()
