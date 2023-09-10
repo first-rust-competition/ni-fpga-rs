@@ -11,7 +11,7 @@ use crate::hmb::Hmb;
 use crate::nifpga::NiFpga;
 use crate::register::{ConstOffset, ReadOnly, Register, RegisterPermission, StoredOffset};
 use crate::session_lifetimes::{ArcStorage, InPlaceStorage, StorageClone};
-use crate::Offset;
+use crate::{Offset, Status};
 
 pub struct Session<FpgaStorage> {
     fpga_storage: FpgaStorage,
@@ -302,6 +302,13 @@ where
     }
 
     fn find_offset(&self, name: impl AsRef<str>) -> Result<Offset, Error> {
-        self.fpga_storage.find_offset(CString::new(name.as_ref())?)
+        self.fpga_storage
+            .find_offset(CString::new(name.as_ref())?)
+            .map_err(|e| match e {
+                Error::FPGA(Status::ResourceNotFound) => {
+                    Error::RegisterNotFound(name.as_ref().into())
+                }
+                e => e,
+            })
     }
 }

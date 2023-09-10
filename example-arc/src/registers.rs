@@ -1,6 +1,6 @@
 #![allow(warnings)]
 
-pub mod types {
+mod types {
     use super::types;
     use ni_fpga_macros::{Cluster, Enum};
     #[derive(Cluster, Debug)]
@@ -1885,11 +1885,6 @@ pub struct FpgaBitfile {
         Option<ni_fpga::Register<bool, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub HMB_ReqReadyForInput:
         Option<ni_fpga::Register<bool, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
-    pub ViControl: Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
-    pub DiagramReset: Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
-    pub InterruptEnable: Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
-    pub InterruptMask: Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
-    pub InterruptStatus: Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
 }
 impl FpgaBitfile {
     pub fn take(session: &impl ni_fpga::SessionAccess) -> Result<Self, ni_fpga::Error> {
@@ -1916,861 +1911,848 @@ impl FpgaBitfile {
                 ni_fpga::Register::new(session.find_offset("InterruptForceNumber")?)
             }),
             SysWatchdog_Status: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SysWatchdog_Status")?)
+                ni_fpga::Register::new(session.find_offset("SysWatchdog.Status")?)
             }),
             SysWatchdog_Command: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SysWatchdog_Command")?)
+                ni_fpga::Register::new(session.find_offset("SysWatchdog.Command")?)
             }),
             SysWatchdog_Challenge: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SysWatchdog_Challenge")?)
+                ni_fpga::Register::new(session.find_offset("SysWatchdog.Challenge")?)
             }),
             SysWatchdog_Timer: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SysWatchdog_Timer")?)
+                ni_fpga::Register::new(session.find_offset("SysWatchdog.Timer")?)
             }),
             SysWatchdog_Active: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SysWatchdog_Active")?)
+                ni_fpga::Register::new(session.find_offset("SysWatchdog.Active")?)
             }),
             SysWatchdog_ForcedKills: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SysWatchdog_ForcedKills")?)
+                ni_fpga::Register::new(session.find_offset("SysWatchdog.ForcedKills")?)
             }),
             AI_ReadSelect: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AI_ReadSelect")?)
+                ni_fpga::Register::new(session.find_offset("AI.ReadSelect")?)
             }),
             AI_LatchOutput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AI_LatchOutput")?)
+                ni_fpga::Register::new(session.find_offset("AI.LatchOutput")?)
             }),
-            AI_Output: Some(unsafe { ni_fpga::Register::new(session.find_offset("AI_Output")?) }),
-            AI_Config: Some(unsafe { ni_fpga::Register::new(session.find_offset("AI_Config")?) }),
+            AI_Output: Some(unsafe { ni_fpga::Register::new(session.find_offset("AI.Output")?) }),
+            AI_Config: Some(unsafe { ni_fpga::Register::new(session.find_offset("AI.Config")?) }),
             AI_ScanList: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AI_ScanList")?)
+                ni_fpga::Register::new(session.find_offset("AI.ScanList")?)
             }),
             AI_OversampleBits: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AI_OversampleBits")?)
+                ni_fpga::Register::new(session.find_offset("AI.OversampleBits")?)
             }),
             AI_AverageBits: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AI_AverageBits")?)
+                ni_fpga::Register::new(session.find_offset("AI.AverageBits")?)
             }),
             AI_LoopTiming: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AI_LoopTiming")?)
+                ni_fpga::Register::new(session.find_offset("AI.LoopTiming")?)
             }),
             Accumulator0_Center: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Accumulator0_Center")?)
+                ni_fpga::Register::new(session.find_offset("Accumulator0.Center")?)
             }),
             Accumulator0_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Accumulator0_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Accumulator0.Reset")?)
             }),
             Accumulator0_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Accumulator0_Output")?)
+                ni_fpga::Register::new(session.find_offset("Accumulator0.Output")?)
             }),
             Accumulator0_Deadband: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Accumulator0_Deadband")?)
+                ni_fpga::Register::new(session.find_offset("Accumulator0.Deadband")?)
             }),
             Accumulator1_Center: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Accumulator1_Center")?)
+                ni_fpga::Register::new(session.find_offset("Accumulator1.Center")?)
             }),
             Accumulator1_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Accumulator1_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Accumulator1.Reset")?)
             }),
             Accumulator1_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Accumulator1_Output")?)
+                ni_fpga::Register::new(session.find_offset("Accumulator1.Output")?)
             }),
             Accumulator1_Deadband: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Accumulator1_Deadband")?)
+                ni_fpga::Register::new(session.find_offset("Accumulator1.Deadband")?)
             }),
             AnalogTrigger_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger_Output")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger.Output")?)
             }),
             AnalogTrigger0_SourceSelect: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger0_SourceSelect")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger0.SourceSelect")?)
             }),
             AnalogTrigger0_UpperLimit: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger0_UpperLimit")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger0.UpperLimit")?)
             }),
             AnalogTrigger0_LowerLimit: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger0_LowerLimit")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger0.LowerLimit")?)
             }),
             AnalogTrigger1_SourceSelect: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger1_SourceSelect")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger1.SourceSelect")?)
             }),
             AnalogTrigger1_UpperLimit: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger1_UpperLimit")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger1.UpperLimit")?)
             }),
             AnalogTrigger1_LowerLimit: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger1_LowerLimit")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger1.LowerLimit")?)
             }),
             AnalogTrigger2_SourceSelect: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger2_SourceSelect")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger2.SourceSelect")?)
             }),
             AnalogTrigger2_UpperLimit: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger2_UpperLimit")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger2.UpperLimit")?)
             }),
             AnalogTrigger2_LowerLimit: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger2_LowerLimit")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger2.LowerLimit")?)
             }),
             AnalogTrigger3_SourceSelect: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger3_SourceSelect")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger3.SourceSelect")?)
             }),
             AnalogTrigger3_UpperLimit: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger3_UpperLimit")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger3.UpperLimit")?)
             }),
             AnalogTrigger3_LowerLimit: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger3_LowerLimit")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger3.LowerLimit")?)
             }),
             AnalogTrigger4_SourceSelect: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger4_SourceSelect")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger4.SourceSelect")?)
             }),
             AnalogTrigger4_UpperLimit: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger4_UpperLimit")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger4.UpperLimit")?)
             }),
             AnalogTrigger4_LowerLimit: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger4_LowerLimit")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger4.LowerLimit")?)
             }),
             AnalogTrigger5_SourceSelect: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger5_SourceSelect")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger5.SourceSelect")?)
             }),
             AnalogTrigger6_UpperLimit: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger6_UpperLimit")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger6.UpperLimit")?)
             }),
             AnalogTrigger6_LowerLimit: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger6_LowerLimit")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger6.LowerLimit")?)
             }),
             AnalogTrigger6_SourceSelect: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger6_SourceSelect")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger6.SourceSelect")?)
             }),
             AnalogTrigger5_UpperLimit: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger5_UpperLimit")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger5.UpperLimit")?)
             }),
             AnalogTrigger5_LowerLimit: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger5_LowerLimit")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger5.LowerLimit")?)
             }),
             AnalogTrigger7_SourceSelect: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger7_SourceSelect")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger7.SourceSelect")?)
             }),
             AnalogTrigger7_UpperLimit: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger7_UpperLimit")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger7.UpperLimit")?)
             }),
             AnalogTrigger7_LowerLimit: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("AnalogTrigger7_LowerLimit")?)
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger7.LowerLimit")?)
             }),
             PWM_LoopTiming: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("PWM_LoopTiming")?)
+                ni_fpga::Register::new(session.find_offset("PWM.LoopTiming")?)
             }),
             PWM_CycleStartTimeUpper: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("PWM_CycleStartTimeUpper")?)
+                ni_fpga::Register::new(session.find_offset("PWM.CycleStartTimeUpper")?)
             }),
             PWM_CycleStartTime: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("PWM_CycleStartTime")?)
+                ni_fpga::Register::new(session.find_offset("PWM.CycleStartTime")?)
             }),
-            PWM_Config: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Config")?) }),
+            PWM_Config: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.Config")?) }),
             PWM_PeriodScaleHdr: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("PWM_PeriodScaleHdr")?)
+                ni_fpga::Register::new(session.find_offset("PWM.PeriodScaleHdr")?)
             }),
             PWM_PeriodScaleMXP: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("PWM_PeriodScaleMXP")?)
+                ni_fpga::Register::new(session.find_offset("PWM.PeriodScaleMXP")?)
             }),
             PWM_ZeroLatch: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("PWM_ZeroLatch")?)
+                ni_fpga::Register::new(session.find_offset("PWM.ZeroLatch")?)
             }),
-            PWM_Hdr0: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr0")?) }),
-            PWM_Hdr1: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr1")?) }),
-            PWM_Hdr2: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr2")?) }),
-            PWM_Hdr3: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr3")?) }),
-            PWM_Hdr4: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr4")?) }),
-            PWM_Hdr5: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr5")?) }),
-            PWM_Hdr6: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr6")?) }),
-            PWM_Hdr7: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr7")?) }),
-            PWM_Hdr8: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr8")?) }),
-            PWM_Hdr9: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr9")?) }),
-            PWM_MXP0: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP0")?) }),
-            PWM_MXP1: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP1")?) }),
-            PWM_MXP2: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP2")?) }),
-            PWM_MXP3: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP3")?) }),
-            PWM_MXP4: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP4")?) }),
-            PWM_MXP5: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP5")?) }),
-            PWM_MXP6: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP6")?) }),
-            PWM_MXP7: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP7")?) }),
-            PWM_MXP8: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP8")?) }),
-            PWM_MXP9: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP9")?) }),
+            PWM_Hdr0: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.Hdr0")?) }),
+            PWM_Hdr1: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.Hdr1")?) }),
+            PWM_Hdr2: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.Hdr2")?) }),
+            PWM_Hdr3: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.Hdr3")?) }),
+            PWM_Hdr4: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.Hdr4")?) }),
+            PWM_Hdr5: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.Hdr5")?) }),
+            PWM_Hdr6: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.Hdr6")?) }),
+            PWM_Hdr7: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.Hdr7")?) }),
+            PWM_Hdr8: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.Hdr8")?) }),
+            PWM_Hdr9: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.Hdr9")?) }),
+            PWM_MXP0: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.MXP0")?) }),
+            PWM_MXP1: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.MXP1")?) }),
+            PWM_MXP2: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.MXP2")?) }),
+            PWM_MXP3: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.MXP3")?) }),
+            PWM_MXP4: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.MXP4")?) }),
+            PWM_MXP5: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.MXP5")?) }),
+            PWM_MXP6: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.MXP6")?) }),
+            PWM_MXP7: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.MXP7")?) }),
+            PWM_MXP8: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.MXP8")?) }),
+            PWM_MXP9: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM.MXP9")?) }),
             DIO_OutputEnable: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DIO_OutputEnable")?)
+                ni_fpga::Register::new(session.find_offset("DIO.OutputEnable")?)
             }),
-            DIO_DO: Some(unsafe { ni_fpga::Register::new(session.find_offset("DIO_DO")?) }),
-            DIO_DI: Some(unsafe { ni_fpga::Register::new(session.find_offset("DIO_DI")?) }),
+            DIO_DO: Some(unsafe { ni_fpga::Register::new(session.find_offset("DIO.DO")?) }),
+            DIO_DI: Some(unsafe { ni_fpga::Register::new(session.find_offset("DIO.DI")?) }),
             DIO_FilterSelectHdr: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DIO_FilterSelectHdr")?)
+                ni_fpga::Register::new(session.find_offset("DIO.FilterSelectHdr")?)
             }),
             DIO_FilterPeriodHdr0: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DIO_FilterPeriodHdr0")?)
+                ni_fpga::Register::new(session.find_offset("DIO.FilterPeriodHdr0")?)
             }),
             DIO_FilterPeriodHdr1: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DIO_FilterPeriodHdr1")?)
+                ni_fpga::Register::new(session.find_offset("DIO.FilterPeriodHdr1")?)
             }),
             DIO_FilterPeriodHdr2: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DIO_FilterPeriodHdr2")?)
+                ni_fpga::Register::new(session.find_offset("DIO.FilterPeriodHdr2")?)
             }),
             DIO_FilterSelectMXP: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DIO_FilterSelectMXP")?)
+                ni_fpga::Register::new(session.find_offset("DIO.FilterSelectMXP")?)
             }),
             DIO_FilterPeriodMXP0: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DIO_FilterPeriodMXP0")?)
+                ni_fpga::Register::new(session.find_offset("DIO.FilterPeriodMXP0")?)
             }),
             DIO_FilterPeriodMXP1: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DIO_FilterPeriodMXP1")?)
+                ni_fpga::Register::new(session.find_offset("DIO.FilterPeriodMXP1")?)
             }),
             DIO_FilterPeriodMXP2: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DIO_FilterPeriodMXP2")?)
+                ni_fpga::Register::new(session.find_offset("DIO.FilterPeriodMXP2")?)
             }),
             DIO_EnableMXPSpecialFunction: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DIO_EnableMXPSpecialFunction")?)
+                ni_fpga::Register::new(session.find_offset("DIO.EnableMXPSpecialFunction")?)
             }),
             DIO_PulseLength: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DIO_PulseLength")?)
+                ni_fpga::Register::new(session.find_offset("DIO.PulseLength")?)
             }),
-            DIO_Pulse: Some(unsafe { ni_fpga::Register::new(session.find_offset("DIO_Pulse")?) }),
+            DIO_Pulse: Some(unsafe { ni_fpga::Register::new(session.find_offset("DIO.Pulse")?) }),
             DIO_PWMDutyCycleA: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DIO_PWMDutyCycleA")?)
+                ni_fpga::Register::new(session.find_offset("DIO.PWMDutyCycleA")?)
             }),
             DIO_PWMDutyCycleB: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DIO_PWMDutyCycleB")?)
+                ni_fpga::Register::new(session.find_offset("DIO.PWMDutyCycleB")?)
             }),
             DIO_PWMOutputSelect: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DIO_PWMOutputSelect")?)
+                ni_fpga::Register::new(session.find_offset("DIO.PWMOutputSelect")?)
             }),
             DIO_PWMPeriodPower: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DIO_PWMPeriodPower")?)
+                ni_fpga::Register::new(session.find_offset("DIO.PWMPeriodPower")?)
             }),
             Counter0_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter0_Config")?)
+                ni_fpga::Register::new(session.find_offset("Counter0.Config")?)
             }),
             Counter0_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter0_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Counter0.Reset")?)
             }),
             Counter0_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter0_Output")?)
+                ni_fpga::Register::new(session.find_offset("Counter0.Output")?)
             }),
             Counter0_TimerConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter0_TimerConfig")?)
+                ni_fpga::Register::new(session.find_offset("Counter0.TimerConfig")?)
             }),
             Counter0_TimerOutput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter0_TimerOutput")?)
+                ni_fpga::Register::new(session.find_offset("Counter0.TimerOutput")?)
             }),
             Counter1_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter1_Config")?)
+                ni_fpga::Register::new(session.find_offset("Counter1.Config")?)
             }),
             Counter1_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter1_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Counter1.Reset")?)
             }),
             Counter1_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter1_Output")?)
+                ni_fpga::Register::new(session.find_offset("Counter1.Output")?)
             }),
             Counter1_TimerConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter1_TimerConfig")?)
+                ni_fpga::Register::new(session.find_offset("Counter1.TimerConfig")?)
             }),
             Counter1_TimerOutput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter1_TimerOutput")?)
+                ni_fpga::Register::new(session.find_offset("Counter1.TimerOutput")?)
             }),
             Counter2_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter2_Config")?)
+                ni_fpga::Register::new(session.find_offset("Counter2.Config")?)
             }),
             Counter2_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter2_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Counter2.Reset")?)
             }),
             Counter2_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter2_Output")?)
+                ni_fpga::Register::new(session.find_offset("Counter2.Output")?)
             }),
             Counter2_TimerConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter2_TimerConfig")?)
+                ni_fpga::Register::new(session.find_offset("Counter2.TimerConfig")?)
             }),
             Counter2_TimerOutput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter2_TimerOutput")?)
+                ni_fpga::Register::new(session.find_offset("Counter2.TimerOutput")?)
             }),
             Counter3_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter3_Config")?)
+                ni_fpga::Register::new(session.find_offset("Counter3.Config")?)
             }),
             Counter3_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter3_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Counter3.Reset")?)
             }),
             Counter3_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter3_Output")?)
+                ni_fpga::Register::new(session.find_offset("Counter3.Output")?)
             }),
             Counter3_TimerConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter3_TimerConfig")?)
+                ni_fpga::Register::new(session.find_offset("Counter3.TimerConfig")?)
             }),
             Counter3_TimerOutput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter3_TimerOutput")?)
+                ni_fpga::Register::new(session.find_offset("Counter3.TimerOutput")?)
             }),
             Counter4_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter4_Config")?)
+                ni_fpga::Register::new(session.find_offset("Counter4.Config")?)
             }),
             Counter4_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter4_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Counter4.Reset")?)
             }),
             Counter4_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter4_Output")?)
+                ni_fpga::Register::new(session.find_offset("Counter4.Output")?)
             }),
             Counter4_TimerConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter4_TimerConfig")?)
+                ni_fpga::Register::new(session.find_offset("Counter4.TimerConfig")?)
             }),
             Counter4_TimerOutput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter4_TimerOutput")?)
+                ni_fpga::Register::new(session.find_offset("Counter4.TimerOutput")?)
             }),
             Counter5_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter5_Config")?)
+                ni_fpga::Register::new(session.find_offset("Counter5.Config")?)
             }),
             Counter5_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter5_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Counter5.Reset")?)
             }),
             Counter5_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter5_Output")?)
+                ni_fpga::Register::new(session.find_offset("Counter5.Output")?)
             }),
             Counter5_TimerConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter5_TimerConfig")?)
+                ni_fpga::Register::new(session.find_offset("Counter5.TimerConfig")?)
             }),
             Counter5_TimerOutput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter5_TimerOutput")?)
+                ni_fpga::Register::new(session.find_offset("Counter5.TimerOutput")?)
             }),
             Counter6_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter6_Config")?)
+                ni_fpga::Register::new(session.find_offset("Counter6.Config")?)
             }),
             Counter6_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter6_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Counter6.Reset")?)
             }),
             Counter6_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter6_Output")?)
+                ni_fpga::Register::new(session.find_offset("Counter6.Output")?)
             }),
             Counter6_TimerConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter6_TimerConfig")?)
+                ni_fpga::Register::new(session.find_offset("Counter6.TimerConfig")?)
             }),
             Counter6_TimerOutput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter6_TimerOutput")?)
+                ni_fpga::Register::new(session.find_offset("Counter6.TimerOutput")?)
             }),
             Counter7_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter7_Config")?)
+                ni_fpga::Register::new(session.find_offset("Counter7.Config")?)
             }),
             Counter7_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter7_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Counter7.Reset")?)
             }),
             Counter7_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter7_Output")?)
+                ni_fpga::Register::new(session.find_offset("Counter7.Output")?)
             }),
             Counter7_TimerConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter7_TimerConfig")?)
+                ni_fpga::Register::new(session.find_offset("Counter7.TimerConfig")?)
             }),
             Counter7_TimerOutput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Counter7_TimerOutput")?)
+                ni_fpga::Register::new(session.find_offset("Counter7.TimerOutput")?)
             }),
             Encoder0_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder0_Config")?)
+                ni_fpga::Register::new(session.find_offset("Encoder0.Config")?)
             }),
             Encoder0_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder0_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Encoder0.Reset")?)
             }),
             Encoder0_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder0_Output")?)
+                ni_fpga::Register::new(session.find_offset("Encoder0.Output")?)
             }),
             Encoder0_TimerConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder0_TimerConfig")?)
+                ni_fpga::Register::new(session.find_offset("Encoder0.TimerConfig")?)
             }),
             Encoder0_TimerOutput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder0_TimerOutput")?)
+                ni_fpga::Register::new(session.find_offset("Encoder0.TimerOutput")?)
             }),
             Encoder1_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder1_Config")?)
+                ni_fpga::Register::new(session.find_offset("Encoder1.Config")?)
             }),
             Encoder1_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder1_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Encoder1.Reset")?)
             }),
             Encoder1_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder1_Output")?)
+                ni_fpga::Register::new(session.find_offset("Encoder1.Output")?)
             }),
             Encoder1_TimerConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder1_TimerConfig")?)
+                ni_fpga::Register::new(session.find_offset("Encoder1.TimerConfig")?)
             }),
             Encoder1_TimerOutput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder1_TimerOutput")?)
+                ni_fpga::Register::new(session.find_offset("Encoder1.TimerOutput")?)
             }),
             Encoder2_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder2_Config")?)
+                ni_fpga::Register::new(session.find_offset("Encoder2.Config")?)
             }),
             Encoder2_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder2_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Encoder2.Reset")?)
             }),
             Encoder2_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder2_Output")?)
+                ni_fpga::Register::new(session.find_offset("Encoder2.Output")?)
             }),
             Encoder2_TimerConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder2_TimerConfig")?)
+                ni_fpga::Register::new(session.find_offset("Encoder2.TimerConfig")?)
             }),
             Encoder2_TimerOutput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder2_TimerOutput")?)
+                ni_fpga::Register::new(session.find_offset("Encoder2.TimerOutput")?)
             }),
             Encoder3_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder3_Config")?)
+                ni_fpga::Register::new(session.find_offset("Encoder3.Config")?)
             }),
             Encoder3_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder3_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Encoder3.Reset")?)
             }),
             Encoder3_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder3_Output")?)
+                ni_fpga::Register::new(session.find_offset("Encoder3.Output")?)
             }),
             Encoder3_TimerConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder3_TimerConfig")?)
+                ni_fpga::Register::new(session.find_offset("Encoder3.TimerConfig")?)
             }),
             Encoder3_TimerOutput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder3_TimerOutput")?)
+                ni_fpga::Register::new(session.find_offset("Encoder3.TimerOutput")?)
             }),
             Encoder4_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder4_Config")?)
+                ni_fpga::Register::new(session.find_offset("Encoder4.Config")?)
             }),
             Encoder4_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder4_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Encoder4.Reset")?)
             }),
             Encoder4_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder4_Output")?)
+                ni_fpga::Register::new(session.find_offset("Encoder4.Output")?)
             }),
             Encoder4_TimerConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder4_TimerConfig")?)
+                ni_fpga::Register::new(session.find_offset("Encoder4.TimerConfig")?)
             }),
             Encoder4_TimerOutput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder4_TimerOutput")?)
+                ni_fpga::Register::new(session.find_offset("Encoder4.TimerOutput")?)
             }),
             Encoder5_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder5_Config")?)
+                ni_fpga::Register::new(session.find_offset("Encoder5.Config")?)
             }),
             Encoder5_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder5_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Encoder5.Reset")?)
             }),
             Encoder5_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder5_Output")?)
+                ni_fpga::Register::new(session.find_offset("Encoder5.Output")?)
             }),
             Encoder5_TimerConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder5_TimerConfig")?)
+                ni_fpga::Register::new(session.find_offset("Encoder5.TimerConfig")?)
             }),
             Encoder5_TimerOutput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder5_TimerOutput")?)
+                ni_fpga::Register::new(session.find_offset("Encoder5.TimerOutput")?)
             }),
             Encoder6_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder6_Config")?)
+                ni_fpga::Register::new(session.find_offset("Encoder6.Config")?)
             }),
             Encoder6_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder6_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Encoder6.Reset")?)
             }),
             Encoder6_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder6_Output")?)
+                ni_fpga::Register::new(session.find_offset("Encoder6.Output")?)
             }),
             Encoder6_TimerConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder6_TimerConfig")?)
+                ni_fpga::Register::new(session.find_offset("Encoder6.TimerConfig")?)
             }),
             Encoder6_TimerOutput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder6_TimerOutput")?)
+                ni_fpga::Register::new(session.find_offset("Encoder6.TimerOutput")?)
             }),
             Encoder7_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder7_Config")?)
+                ni_fpga::Register::new(session.find_offset("Encoder7.Config")?)
             }),
             Encoder7_Reset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder7_Reset")?)
+                ni_fpga::Register::new(session.find_offset("Encoder7.Reset")?)
             }),
             Encoder7_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder7_Output")?)
+                ni_fpga::Register::new(session.find_offset("Encoder7.Output")?)
             }),
             Encoder7_TimerConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder7_TimerConfig")?)
+                ni_fpga::Register::new(session.find_offset("Encoder7.TimerConfig")?)
             }),
             Encoder7_TimerOutput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Encoder7_TimerOutput")?)
+                ni_fpga::Register::new(session.find_offset("Encoder7.TimerOutput")?)
             }),
             Interrupt0_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt0_Config")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt0.Config")?)
             }),
             Interrupt0_RisingTimeStamp: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt0_RisingTimeStamp")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt0.RisingTimeStamp")?)
             }),
             Interrupt0_FallingTimeStamp: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt0_FallingTimeStamp")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt0.FallingTimeStamp")?)
             }),
             Interrupt1_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt1_Config")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt1.Config")?)
             }),
             Interrupt1_RisingTimeStamp: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt1_RisingTimeStamp")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt1.RisingTimeStamp")?)
             }),
             Interrupt1_FallingTimeStamp: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt1_FallingTimeStamp")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt1.FallingTimeStamp")?)
             }),
             Interrupt2_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt2_Config")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt2.Config")?)
             }),
             Interrupt2_RisingTimeStamp: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt2_RisingTimeStamp")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt2.RisingTimeStamp")?)
             }),
             Interrupt2_FallingTimeStamp: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt2_FallingTimeStamp")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt2.FallingTimeStamp")?)
             }),
             Interrupt3_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt3_Config")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt3.Config")?)
             }),
             Interrupt3_RisingTimeStamp: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt3_RisingTimeStamp")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt3.RisingTimeStamp")?)
             }),
             Interrupt3_FallingTimeStamp: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt3_FallingTimeStamp")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt3.FallingTimeStamp")?)
             }),
             Interrupt4_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt4_Config")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt4.Config")?)
             }),
             Interrupt4_RisingTimeStamp: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt4_RisingTimeStamp")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt4.RisingTimeStamp")?)
             }),
             Interrupt4_FallingTimeStamp: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt4_FallingTimeStamp")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt4.FallingTimeStamp")?)
             }),
             Interrupt5_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt5_Config")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt5.Config")?)
             }),
             Interrupt5_RisingTimeStamp: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt5_RisingTimeStamp")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt5.RisingTimeStamp")?)
             }),
             Interrupt5_FallingTimeStamp: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt5_FallingTimeStamp")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt5.FallingTimeStamp")?)
             }),
             Interrupt6_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt6_Config")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt6.Config")?)
             }),
             Interrupt6_RisingTimeStamp: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt6_RisingTimeStamp")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt6.RisingTimeStamp")?)
             }),
             Interrupt6_FallingTimeStamp: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt6_FallingTimeStamp")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt6.FallingTimeStamp")?)
             }),
             Interrupt7_Config: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt7_Config")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt7.Config")?)
             }),
             Interrupt7_RisingTimeStamp: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt7_RisingTimeStamp")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt7.RisingTimeStamp")?)
             }),
             Interrupt7_FallingTimeStamp: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Interrupt7_FallingTimeStamp")?)
+                ni_fpga::Register::new(session.find_offset("Interrupt7.FallingTimeStamp")?)
             }),
-            DMA_Rate: Some(unsafe { ni_fpga::Register::new(session.find_offset("DMA_Rate")?) }),
-            DMA_Config: Some(unsafe { ni_fpga::Register::new(session.find_offset("DMA_Config")?) }),
+            DMA_Rate: Some(unsafe { ni_fpga::Register::new(session.find_offset("DMA.Rate")?) }),
+            DMA_Config: Some(unsafe { ni_fpga::Register::new(session.find_offset("DMA.Config")?) }),
             DMA_ExternalTriggers0: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DMA_ExternalTriggers0")?)
+                ni_fpga::Register::new(session.find_offset("DMA.ExternalTriggers0")?)
             }),
             DMA_ExternalTriggers1: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DMA_ExternalTriggers1")?)
+                ni_fpga::Register::new(session.find_offset("DMA.ExternalTriggers1")?)
             }),
             Alarm_TriggerTime: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Alarm_TriggerTime")?)
+                ni_fpga::Register::new(session.find_offset("Alarm.TriggerTime")?)
             }),
             Alarm_Enable: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Alarm_Enable")?)
+                ni_fpga::Register::new(session.find_offset("Alarm.Enable")?)
             }),
             Relay_Value: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Relay_Value")?)
+                ni_fpga::Register::new(session.find_offset("Relay.Value")?)
             }),
             Power_Status: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Power_Status")?)
+                ni_fpga::Register::new(session.find_offset("Power.Status")?)
             }),
             Power_Disable: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Power_Disable")?)
+                ni_fpga::Register::new(session.find_offset("Power.Disable")?)
             }),
             Power_UserVoltage6V: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Power_UserVoltage6V")?)
+                ni_fpga::Register::new(session.find_offset("Power.UserVoltage6V")?)
             }),
             Power_UserCurrent6V: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Power_UserCurrent6V")?)
+                ni_fpga::Register::new(session.find_offset("Power.UserCurrent6V")?)
             }),
             Power_UserVoltage5V: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Power_UserVoltage5V")?)
+                ni_fpga::Register::new(session.find_offset("Power.UserVoltage5V")?)
             }),
             Power_UserCurrent5V: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Power_UserCurrent5V")?)
+                ni_fpga::Register::new(session.find_offset("Power.UserCurrent5V")?)
             }),
             Power_UserVoltage3V3: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Power_UserVoltage3V3")?)
+                ni_fpga::Register::new(session.find_offset("Power.UserVoltage3V3")?)
             }),
             Power_UserCurrent3V3: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Power_UserCurrent3V3")?)
+                ni_fpga::Register::new(session.find_offset("Power.UserCurrent3V3")?)
             }),
             Power_VinVoltage: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Power_VinVoltage")?)
+                ni_fpga::Register::new(session.find_offset("Power.VinVoltage")?)
             }),
             Power_VinCurrent: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Power_VinCurrent")?)
+                ni_fpga::Register::new(session.find_offset("Power.VinCurrent")?)
             }),
             Power_OnChipTemperature: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Power_OnChipTemperature")?)
+                ni_fpga::Register::new(session.find_offset("Power.OnChipTemperature")?)
             }),
             Power_MXP_DIOVoltage: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Power_MXP_DIOVoltage")?)
+                ni_fpga::Register::new(session.find_offset("Power.MXP_DIOVoltage")?)
             }),
             Power_IntegratedIO: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Power_IntegratedIO")?)
+                ni_fpga::Register::new(session.find_offset("Power.IntegratedIO")?)
             }),
             Power_AOVoltage: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Power_AOVoltage")?)
+                ni_fpga::Register::new(session.find_offset("Power.AOVoltage")?)
             }),
             Power_FaultCounts: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Power_FaultCounts")?)
+                ni_fpga::Register::new(session.find_offset("Power.FaultCounts")?)
             }),
             Power_ResetFaultCounts: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Power_ResetFaultCounts")?)
+                ni_fpga::Register::new(session.find_offset("Power.ResetFaultCounts")?)
             }),
             Power_BrownoutVoltage250mV: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("Power_BrownoutVoltage250mV")?)
+                ni_fpga::Register::new(session.find_offset("Power.BrownoutVoltage250mV")?)
             }),
             BIST_Enable: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("BIST_Enable")?)
+                ni_fpga::Register::new(session.find_offset("BIST.Enable")?)
             }),
             BIST_DO0SquareEnable: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("BIST_DO0SquareEnable")?)
+                ni_fpga::Register::new(session.find_offset("BIST.DO0SquareEnable")?)
             }),
             BIST_DO0SquareTicks: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("BIST_DO0SquareTicks")?)
+                ni_fpga::Register::new(session.find_offset("BIST.DO0SquareTicks")?)
             }),
-            BIST_DO0: Some(unsafe { ni_fpga::Register::new(session.find_offset("BIST_DO0")?) }),
+            BIST_DO0: Some(unsafe { ni_fpga::Register::new(session.find_offset("BIST.DO0")?) }),
             BIST_DO1SquareEnable: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("BIST_DO1SquareEnable")?)
+                ni_fpga::Register::new(session.find_offset("BIST.DO1SquareEnable")?)
             }),
             BIST_DO1SquareTicks: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("BIST_DO1SquareTicks")?)
+                ni_fpga::Register::new(session.find_offset("BIST.DO1SquareTicks")?)
             }),
-            BIST_DO1: Some(unsafe { ni_fpga::Register::new(session.find_offset("BIST_DO1")?) }),
-            AO_MXP0: Some(unsafe { ni_fpga::Register::new(session.find_offset("AO_MXP0")?) }),
-            AO_MXP1: Some(unsafe { ni_fpga::Register::new(session.find_offset("AO_MXP1")?) }),
+            BIST_DO1: Some(unsafe { ni_fpga::Register::new(session.find_offset("BIST.DO1")?) }),
+            AO_MXP0: Some(unsafe { ni_fpga::Register::new(session.find_offset("AO.MXP0")?) }),
+            AO_MXP1: Some(unsafe { ni_fpga::Register::new(session.find_offset("AO.MXP1")?) }),
             SPI_ChipSelectActiveHigh: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_ChipSelectActiveHigh")?)
+                ni_fpga::Register::new(session.find_offset("SPI.ChipSelectActiveHigh")?)
             }),
             SPI_EnableDIO: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_EnableDIO")?)
+                ni_fpga::Register::new(session.find_offset("SPI.EnableDIO")?)
             }),
             SPI_AutoSPI1Select: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_AutoSPI1Select")?)
+                ni_fpga::Register::new(session.find_offset("SPI.AutoSPI1Select")?)
             }),
             SPI_AutoByteCount: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_AutoByteCount")?)
+                ni_fpga::Register::new(session.find_offset("SPI.AutoByteCount")?)
             }),
             SPI_AutoForceOne: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_AutoForceOne")?)
+                ni_fpga::Register::new(session.find_offset("SPI.AutoForceOne")?)
             }),
             SPI_AutoRate: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_AutoRate")?)
+                ni_fpga::Register::new(session.find_offset("SPI.AutoRate")?)
             }),
             SPI_AutoTriggerConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_AutoTriggerConfig")?)
+                ni_fpga::Register::new(session.find_offset("SPI.AutoTriggerConfig")?)
             }),
             SPI_AutoChipSelect: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_AutoChipSelect")?)
+                ni_fpga::Register::new(session.find_offset("SPI.AutoChipSelect")?)
             }),
             SPI_AutoTx0: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_AutoTx0")?)
+                ni_fpga::Register::new(session.find_offset("SPI.AutoTx0")?)
             }),
             SPI_AutoTx1: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_AutoTx1")?)
+                ni_fpga::Register::new(session.find_offset("SPI.AutoTx1")?)
             }),
             SPI_AutoTx2: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_AutoTx2")?)
+                ni_fpga::Register::new(session.find_offset("SPI.AutoTx2")?)
             }),
             SPI_AutoTx3: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_AutoTx3")?)
+                ni_fpga::Register::new(session.find_offset("SPI.AutoTx3")?)
             }),
             SPI_AutoTx4: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_AutoTx4")?)
+                ni_fpga::Register::new(session.find_offset("SPI.AutoTx4")?)
             }),
             SPI_AutoTx5: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_AutoTx5")?)
+                ni_fpga::Register::new(session.find_offset("SPI.AutoTx5")?)
             }),
             SPI_TransferSkippedFullCount: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_TransferSkippedFullCount")?)
+                ni_fpga::Register::new(session.find_offset("SPI.TransferSkippedFullCount")?)
             }),
             SPI_StallConfig: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_StallConfig")?)
+                ni_fpga::Register::new(session.find_offset("SPI.StallConfig")?)
             }),
             SPI_DebugState: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_DebugState")?)
+                ni_fpga::Register::new(session.find_offset("SPI.DebugState")?)
             }),
             SPI_DebugSubstate: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_DebugSubstate")?)
+                ni_fpga::Register::new(session.find_offset("SPI.DebugSubstate")?)
             }),
             SPI_DebugRevision: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_DebugRevision")?)
+                ni_fpga::Register::new(session.find_offset("SPI.DebugRevision")?)
             }),
             SPI_DebugEnabled: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_DebugEnabled")?)
+                ni_fpga::Register::new(session.find_offset("SPI.DebugEnabled")?)
             }),
             SPI_DebugIntStat: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_DebugIntStat")?)
+                ni_fpga::Register::new(session.find_offset("SPI.DebugIntStat")?)
             }),
             SPI_DebugIntStatReadCount: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("SPI_DebugIntStatReadCount")?)
+                ni_fpga::Register::new(session.find_offset("SPI.DebugIntStatReadCount")?)
             }),
-            Accel_ADDR: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel_ADDR")?) }),
-            Accel_CNTR: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel_CNTR")?) }),
-            Accel_DATO: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel_DATO")?) }),
-            Accel_DATI: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel_DATI")?) }),
-            Accel_CNTL: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel_CNTL")?) }),
-            Accel_STAT: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel_STAT")?) }),
-            Accel_CNFG: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel_CNFG")?) }),
-            Accel_GO: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel_GO")?) }),
-            HMB_Config: Some(unsafe { ni_fpga::Register::new(session.find_offset("HMB_Config")?) }),
+            Accel_ADDR: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel.ADDR")?) }),
+            Accel_CNTR: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel.CNTR")?) }),
+            Accel_DATO: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel.DATO")?) }),
+            Accel_DATI: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel.DATI")?) }),
+            Accel_CNTL: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel.CNTL")?) }),
+            Accel_STAT: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel.STAT")?) }),
+            Accel_CNFG: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel.CNFG")?) }),
+            Accel_GO: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel.GO")?) }),
+            HMB_Config: Some(unsafe { ni_fpga::Register::new(session.find_offset("HMB.Config")?) }),
             HMB_ForceOnce: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("HMB_ForceOnce")?)
+                ni_fpga::Register::new(session.find_offset("HMB.ForceOnce")?)
             }),
             DutyCycle0_Source: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle0_Source")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle0.Source")?)
             }),
             DutyCycle0_Frequency: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle0_Frequency")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle0.Frequency")?)
             }),
             DutyCycle0_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle0_Output")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle0.Output")?)
             }),
             DutyCycle0_HighTicks: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle0_HighTicks")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle0.HighTicks")?)
             }),
             DutyCycle1_Source: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle1_Source")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle1.Source")?)
             }),
             DutyCycle1_Frequency: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle1_Frequency")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle1.Frequency")?)
             }),
             DutyCycle1_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle1_Output")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle1.Output")?)
             }),
             DutyCycle1_HighTicks: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle1_HighTicks")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle1.HighTicks")?)
             }),
             DutyCycle2_Source: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle2_Source")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle2.Source")?)
             }),
             DutyCycle2_Frequency: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle2_Frequency")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle2.Frequency")?)
             }),
             DutyCycle2_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle2_Output")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle2.Output")?)
             }),
             DutyCycle2_HighTicks: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle2_HighTicks")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle2.HighTicks")?)
             }),
             DutyCycle3_Source: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle3_Source")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle3.Source")?)
             }),
             DutyCycle3_Frequency: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle3_Frequency")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle3.Frequency")?)
             }),
             DutyCycle3_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle3_Output")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle3.Output")?)
             }),
             DutyCycle3_HighTicks: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle3_HighTicks")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle3.HighTicks")?)
             }),
             DutyCycle4_Source: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle4_Source")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle4.Source")?)
             }),
             DutyCycle4_Frequency: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle4_Frequency")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle4.Frequency")?)
             }),
             DutyCycle4_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle4_Output")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle4.Output")?)
             }),
             DutyCycle4_HighTicks: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle4_HighTicks")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle4.HighTicks")?)
             }),
             DutyCycle5_Source: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle5_Source")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle5.Source")?)
             }),
             DutyCycle5_Frequency: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle5_Frequency")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle5.Frequency")?)
             }),
             DutyCycle5_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle5_Output")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle5.Output")?)
             }),
             DutyCycle5_HighTicks: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle5_HighTicks")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle5.HighTicks")?)
             }),
             DutyCycle6_Source: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle6_Source")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle6.Source")?)
             }),
             DutyCycle6_Frequency: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle6_Frequency")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle6.Frequency")?)
             }),
             DutyCycle6_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle6_Output")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle6.Output")?)
             }),
             DutyCycle6_HighTicks: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle6_HighTicks")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle6.HighTicks")?)
             }),
             DutyCycle7_Source: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle7_Source")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle7.Source")?)
             }),
             DutyCycle7_Frequency: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle7_Frequency")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle7.Frequency")?)
             }),
             DutyCycle7_Output: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle7_Output")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle7.Output")?)
             }),
             DutyCycle7_HighTicks: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DutyCycle7_HighTicks")?)
+                ni_fpga::Register::new(session.find_offset("DutyCycle7.HighTicks")?)
             }),
             LED_OutputSelect: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("LED_OutputSelect")?)
+                ni_fpga::Register::new(session.find_offset("LED.OutputSelect")?)
             }),
             LED_StringLength: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("LED_StringLength")?)
+                ni_fpga::Register::new(session.find_offset("LED.StringLength")?)
             }),
-            LED_Load: Some(unsafe { ni_fpga::Register::new(session.find_offset("LED_Load")?) }),
-            LED_Reset: Some(unsafe { ni_fpga::Register::new(session.find_offset("LED_Reset")?) }),
-            LED_Start: Some(unsafe { ni_fpga::Register::new(session.find_offset("LED_Start")?) }),
-            LED_Abort: Some(unsafe { ni_fpga::Register::new(session.find_offset("LED_Abort")?) }),
+            LED_Load: Some(unsafe { ni_fpga::Register::new(session.find_offset("LED.Load")?) }),
+            LED_Reset: Some(unsafe { ni_fpga::Register::new(session.find_offset("LED.Reset")?) }),
+            LED_Start: Some(unsafe { ni_fpga::Register::new(session.find_offset("LED.Start")?) }),
+            LED_Abort: Some(unsafe { ni_fpga::Register::new(session.find_offset("LED.Abort")?) }),
             LED_SyncTiming: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("LED_SyncTiming")?)
+                ni_fpga::Register::new(session.find_offset("LED.SyncTiming")?)
             }),
             LED_HighBitTickTiming: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("LED_HighBitTickTiming")?)
+                ni_fpga::Register::new(session.find_offset("LED.HighBitTickTiming")?)
             }),
             LED_LowBitTickTiming: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("LED_LowBitTickTiming")?)
+                ni_fpga::Register::new(session.find_offset("LED.LowBitTickTiming")?)
             }),
-            LED_Active: Some(unsafe { ni_fpga::Register::new(session.find_offset("LED_Active")?) }),
+            LED_Active: Some(unsafe { ni_fpga::Register::new(session.find_offset("LED.Active")?) }),
             LED_PixelWriteIndex: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("LED_PixelWriteIndex")?)
+                ni_fpga::Register::new(session.find_offset("LED.PixelWriteIndex")?)
             }),
             LED_PixelOutputIndex: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("LED_PixelOutputIndex")?)
+                ni_fpga::Register::new(session.find_offset("LED.PixelOutputIndex")?)
             }),
             HMB_ReadData: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("HMB_ReadData")?)
+                ni_fpga::Register::new(session.find_offset("HMB.ReadData")?)
             }),
             HMB_WriteCount: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("HMB_WriteCount")?)
+                ni_fpga::Register::new(session.find_offset("HMB.WriteCount")?)
             }),
             HMB_WriteAddress: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("HMB_WriteAddress")?)
+                ni_fpga::Register::new(session.find_offset("HMB.WriteAddress")?)
             }),
             HMB_WriteData: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("HMB_WriteData")?)
+                ni_fpga::Register::new(session.find_offset("HMB.WriteData")?)
             }),
             HMB_LoopCount: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("HMB_LoopCount")?)
+                ni_fpga::Register::new(session.find_offset("HMB.LoopCount")?)
             }),
             HMB_WriteReadyForInput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("HMB_WriteReadyForInput")?)
+                ni_fpga::Register::new(session.find_offset("HMB.WriteReadyForInput")?)
             }),
             HMB_ReqReadyForInput: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("HMB_ReqReadyForInput")?)
-            }),
-            ViControl: Some(unsafe { ni_fpga::Register::new(session.find_offset("ViControl")?) }),
-            DiagramReset: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("DiagramReset")?)
-            }),
-            InterruptEnable: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("InterruptEnable")?)
-            }),
-            InterruptMask: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("InterruptMask")?)
-            }),
-            InterruptStatus: Some(unsafe {
-                ni_fpga::Register::new(session.find_offset("InterruptStatus")?)
+                ni_fpga::Register::new(session.find_offset("HMB.ReqReadyForInput")?)
             }),
         })
     }

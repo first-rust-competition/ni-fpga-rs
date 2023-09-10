@@ -32,6 +32,8 @@ pub enum Error {
     NoResourceSpecified,
     #[error("Resource has already been taken")]
     ResourceAlreadyTaken,
+    #[error("Register {0} not found")]
+    RegisterNotFound(String),
 }
 
 impl From<NulError> for Error {

@@ -278,7 +278,7 @@ impl NiFpga {
             .ok_or(Error::FPGA(Status::FeatureNotSupported))?;
         let mut fifo_number = 0;
         unsafe {
-            api.NiFpgaDll_FindFifo(self.session, name.as_ptr(), &mut fifo_number)
+            api.NiFpgaDll_FindRegister(self.session, name.as_ptr(), &mut fifo_number)
                 .to_result()
                 .map(|_| fifo_number)
         }
