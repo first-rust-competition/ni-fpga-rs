@@ -34,3 +34,5 @@ pub use status::Status;
 pub use register::ReadOnly;
 pub use register::ReadWrite;
 pub use register::WriteOnly;
+
+pub use hmb::HmbDefinition;

@@ -16,6 +16,12 @@ struct VirtualAddressHandle(*mut c_void);
 unsafe impl Send for VirtualAddressHandle {}
 unsafe impl Sync for VirtualAddressHandle {}
 
+pub struct HmbDefinition {
+    pub name: &'static str,
+    pub stride: u32,
+    pub elements: u32,
+}
+
 pub struct Hmb<Fpga>
 where
     Fpga: Deref<Target = NiFpga>,

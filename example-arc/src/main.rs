@@ -1,8 +1,6 @@
 use std::{thread, time::Duration};
 
-use ni_fpga::{
-    ReadOnly, ReadWrite, Register, RegisterRead, RegisterWrite, SessionAccess, StoredOffset,
-};
+use ni_fpga::RegisterRead;
 
 use crate::registers::FpgaBitfile;
 
@@ -15,13 +13,26 @@ fn main() -> Result<(), ni_fpga::Error> {
     let frequency = regs.DutyCycle0_Frequency.take().unwrap();
     let output = regs.DutyCycle0_HighTicks.take().unwrap();
 
-    loop {
-        let o = output.read(&session)?.to_int();
-        let f = frequency.read(&session)?.to_int();
+    let frequency1 = regs.DutyCycle1_Frequency.take().unwrap();
 
-        println!("F: {f} O: {o}");
+    loop {
+        let o = output
+            .read(&session)?
+            .to_fxp()
+            .map(|f| f.to_int())
+            .unwrap_or(0);
+        let f = frequency
+            .read(&session)?
+            .to_fxp()
+            .map(|f| f.to_int())
+            .unwrap_or(0);
+        let f1 = frequency1
+            .read(&session)?
+            .to_fxp()
+            .map(|f| f.to_int())
+            .unwrap_or(-42);
+
+        println!("F: {f} O: {o} f1: {f1}");
         thread::sleep(Duration::from_secs(1));
     }
-
-    Ok(())
 }

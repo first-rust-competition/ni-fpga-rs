@@ -5,18 +5,18 @@ mod types {
     use ni_fpga_macros::{Cluster, Enum};
     #[derive(Cluster, Debug)]
     pub struct AI_Config {
-        pub ScanSize: ni_fpga::fxp::FXP<3, 3, false>,
-        pub ConvertRate: ni_fpga::fxp::FXP<26, 26, false>,
+        pub ScanSize: ni_fpga::fxp::FXP<3, 3, false, false>,
+        pub ConvertRate: ni_fpga::fxp::FXP<26, 26, false, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct AI_ReadSelect {
-        pub Channel: ni_fpga::fxp::FXP<3, 3, false>,
+        pub Channel: ni_fpga::fxp::FXP<3, 3, false, false>,
         pub Averaged: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct ASource {
-        pub Channel: ni_fpga::fxp::FXP<4, 4, false>,
-        pub Module: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Channel: ni_fpga::fxp::FXP<4, 4, false, false>,
+        pub Module: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub AnalogTrigger: bool,
     }
     #[derive(Cluster, Debug)]
@@ -31,75 +31,75 @@ mod types {
     }
     #[derive(Cluster, Debug)]
     pub struct AnalogTrigger0_SourceSelect {
-        pub Channel: ni_fpga::fxp::FXP<3, 3, false>,
+        pub Channel: ni_fpga::fxp::FXP<3, 3, false, false>,
         pub Averaged: bool,
         pub DutyCycle: bool,
         pub Filter: bool,
         pub FloatingRollover: bool,
-        pub RolloverLimit: ni_fpga::fxp::FXP<8, 12, true>,
+        pub RolloverLimit: ni_fpga::fxp::FXP<8, 12, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct AnalogTrigger1_SourceSelect {
-        pub Channel: ni_fpga::fxp::FXP<3, 3, false>,
+        pub Channel: ni_fpga::fxp::FXP<3, 3, false, false>,
         pub Averaged: bool,
         pub DutyCycle: bool,
         pub Filter: bool,
         pub FloatingRollover: bool,
-        pub RolloverLimit: ni_fpga::fxp::FXP<8, 12, true>,
+        pub RolloverLimit: ni_fpga::fxp::FXP<8, 12, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct AnalogTrigger2_SourceSelect {
-        pub Channel: ni_fpga::fxp::FXP<3, 3, false>,
+        pub Channel: ni_fpga::fxp::FXP<3, 3, false, false>,
         pub Averaged: bool,
         pub DutyCycle: bool,
         pub Filter: bool,
         pub FloatingRollover: bool,
-        pub RolloverLimit: ni_fpga::fxp::FXP<8, 12, true>,
+        pub RolloverLimit: ni_fpga::fxp::FXP<8, 12, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct AnalogTrigger3_SourceSelect {
-        pub Channel: ni_fpga::fxp::FXP<3, 3, false>,
+        pub Channel: ni_fpga::fxp::FXP<3, 3, false, false>,
         pub Averaged: bool,
         pub DutyCycle: bool,
         pub Filter: bool,
         pub FloatingRollover: bool,
-        pub RolloverLimit: ni_fpga::fxp::FXP<8, 12, true>,
+        pub RolloverLimit: ni_fpga::fxp::FXP<8, 12, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct AnalogTrigger4_SourceSelect {
-        pub Channel: ni_fpga::fxp::FXP<3, 3, false>,
+        pub Channel: ni_fpga::fxp::FXP<3, 3, false, false>,
         pub Averaged: bool,
         pub DutyCycle: bool,
         pub Filter: bool,
         pub FloatingRollover: bool,
-        pub RolloverLimit: ni_fpga::fxp::FXP<8, 12, true>,
+        pub RolloverLimit: ni_fpga::fxp::FXP<8, 12, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct AnalogTrigger5_SourceSelect {
-        pub Channel: ni_fpga::fxp::FXP<3, 3, false>,
+        pub Channel: ni_fpga::fxp::FXP<3, 3, false, false>,
         pub Averaged: bool,
         pub DutyCycle: bool,
         pub Filter: bool,
         pub FloatingRollover: bool,
-        pub RolloverLimit: ni_fpga::fxp::FXP<8, 12, true>,
+        pub RolloverLimit: ni_fpga::fxp::FXP<8, 12, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct AnalogTrigger6_SourceSelect {
-        pub Channel: ni_fpga::fxp::FXP<3, 3, false>,
+        pub Channel: ni_fpga::fxp::FXP<3, 3, false, false>,
         pub Averaged: bool,
         pub DutyCycle: bool,
         pub Filter: bool,
         pub FloatingRollover: bool,
-        pub RolloverLimit: ni_fpga::fxp::FXP<8, 12, true>,
+        pub RolloverLimit: ni_fpga::fxp::FXP<8, 12, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct AnalogTrigger7_SourceSelect {
-        pub Channel: ni_fpga::fxp::FXP<3, 3, false>,
+        pub Channel: ni_fpga::fxp::FXP<3, 3, false, false>,
         pub Averaged: bool,
         pub DutyCycle: bool,
         pub Filter: bool,
         pub FloatingRollover: bool,
-        pub RolloverLimit: ni_fpga::fxp::FXP<8, 12, true>,
+        pub RolloverLimit: ni_fpga::fxp::FXP<8, 12, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct AnalogTrigger_Output {
@@ -110,8 +110,8 @@ mod types {
     }
     #[derive(Cluster, Debug)]
     pub struct BSource {
-        pub Channel: ni_fpga::fxp::FXP<4, 4, false>,
-        pub Module: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Channel: ni_fpga::fxp::FXP<4, 4, false, false>,
+        pub Module: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub AnalogTrigger: bool,
     }
     #[derive(Cluster, Debug)]
@@ -125,24 +125,24 @@ mod types {
         pub UpFallingEdge: bool,
         pub DownRisingEdge: bool,
         pub DownFallingEdge: bool,
-        pub Mode: ni_fpga::fxp::FXP<2, 2, false>,
-        pub PulseLengthThreshold: ni_fpga::fxp::FXP<6, 14, false>,
+        pub Mode: ni_fpga::fxp::FXP<2, 2, false, false>,
+        pub PulseLengthThreshold: ni_fpga::fxp::FXP<6, 14, false, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter0_Output {
         pub Direction: bool,
-        pub Value: ni_fpga::fxp::FXP<31, 31, true>,
+        pub Value: ni_fpga::fxp::FXP<31, 31, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter0_TimerConfig {
-        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false>,
-        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false>,
+        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false, false>,
+        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false, false>,
         pub UpdateWhenEmpty: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter0_TimerOutput {
-        pub Period: ni_fpga::fxp::FXP<23, 24, false>,
-        pub Count: ni_fpga::fxp::FXP<8, 8, true>,
+        pub Period: ni_fpga::fxp::FXP<23, 24, false, false>,
+        pub Count: ni_fpga::fxp::FXP<8, 8, true, false>,
         pub Stalled: bool,
     }
     #[derive(Cluster, Debug)]
@@ -156,24 +156,24 @@ mod types {
         pub UpFallingEdge: bool,
         pub DownRisingEdge: bool,
         pub DownFallingEdge: bool,
-        pub Mode: ni_fpga::fxp::FXP<2, 2, false>,
-        pub PulseLengthThreshold: ni_fpga::fxp::FXP<6, 14, false>,
+        pub Mode: ni_fpga::fxp::FXP<2, 2, false, false>,
+        pub PulseLengthThreshold: ni_fpga::fxp::FXP<6, 14, false, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter1_Output {
         pub Direction: bool,
-        pub Value: ni_fpga::fxp::FXP<31, 31, true>,
+        pub Value: ni_fpga::fxp::FXP<31, 31, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter1_TimerConfig {
-        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false>,
-        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false>,
+        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false, false>,
+        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false, false>,
         pub UpdateWhenEmpty: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter1_TimerOutput {
-        pub Period: ni_fpga::fxp::FXP<23, 24, false>,
-        pub Count: ni_fpga::fxp::FXP<8, 8, true>,
+        pub Period: ni_fpga::fxp::FXP<23, 24, false, false>,
+        pub Count: ni_fpga::fxp::FXP<8, 8, true, false>,
         pub Stalled: bool,
     }
     #[derive(Cluster, Debug)]
@@ -187,24 +187,24 @@ mod types {
         pub UpFallingEdge: bool,
         pub DownRisingEdge: bool,
         pub DownFallingEdge: bool,
-        pub Mode: ni_fpga::fxp::FXP<2, 2, false>,
-        pub PulseLengthThreshold: ni_fpga::fxp::FXP<6, 14, false>,
+        pub Mode: ni_fpga::fxp::FXP<2, 2, false, false>,
+        pub PulseLengthThreshold: ni_fpga::fxp::FXP<6, 14, false, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter2_Output {
         pub Direction: bool,
-        pub Value: ni_fpga::fxp::FXP<31, 31, true>,
+        pub Value: ni_fpga::fxp::FXP<31, 31, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter2_TimerConfig {
-        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false>,
-        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false>,
+        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false, false>,
+        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false, false>,
         pub UpdateWhenEmpty: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter2_TimerOutput {
-        pub Period: ni_fpga::fxp::FXP<23, 24, false>,
-        pub Count: ni_fpga::fxp::FXP<8, 8, true>,
+        pub Period: ni_fpga::fxp::FXP<23, 24, false, false>,
+        pub Count: ni_fpga::fxp::FXP<8, 8, true, false>,
         pub Stalled: bool,
     }
     #[derive(Cluster, Debug)]
@@ -218,24 +218,24 @@ mod types {
         pub UpFallingEdge: bool,
         pub DownRisingEdge: bool,
         pub DownFallingEdge: bool,
-        pub Mode: ni_fpga::fxp::FXP<2, 2, false>,
-        pub PulseLengthThreshold: ni_fpga::fxp::FXP<6, 14, false>,
+        pub Mode: ni_fpga::fxp::FXP<2, 2, false, false>,
+        pub PulseLengthThreshold: ni_fpga::fxp::FXP<6, 14, false, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter3_Output {
         pub Direction: bool,
-        pub Value: ni_fpga::fxp::FXP<31, 31, true>,
+        pub Value: ni_fpga::fxp::FXP<31, 31, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter3_TimerConfig {
-        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false>,
-        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false>,
+        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false, false>,
+        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false, false>,
         pub UpdateWhenEmpty: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter3_TimerOutput {
-        pub Period: ni_fpga::fxp::FXP<23, 24, false>,
-        pub Count: ni_fpga::fxp::FXP<8, 8, true>,
+        pub Period: ni_fpga::fxp::FXP<23, 24, false, false>,
+        pub Count: ni_fpga::fxp::FXP<8, 8, true, false>,
         pub Stalled: bool,
     }
     #[derive(Cluster, Debug)]
@@ -249,24 +249,24 @@ mod types {
         pub UpFallingEdge: bool,
         pub DownRisingEdge: bool,
         pub DownFallingEdge: bool,
-        pub Mode: ni_fpga::fxp::FXP<2, 2, false>,
-        pub PulseLengthThreshold: ni_fpga::fxp::FXP<6, 14, false>,
+        pub Mode: ni_fpga::fxp::FXP<2, 2, false, false>,
+        pub PulseLengthThreshold: ni_fpga::fxp::FXP<6, 14, false, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter4_Output {
         pub Direction: bool,
-        pub Value: ni_fpga::fxp::FXP<31, 31, true>,
+        pub Value: ni_fpga::fxp::FXP<31, 31, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter4_TimerConfig {
-        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false>,
-        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false>,
+        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false, false>,
+        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false, false>,
         pub UpdateWhenEmpty: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter4_TimerOutput {
-        pub Period: ni_fpga::fxp::FXP<23, 24, false>,
-        pub Count: ni_fpga::fxp::FXP<8, 8, true>,
+        pub Period: ni_fpga::fxp::FXP<23, 24, false, false>,
+        pub Count: ni_fpga::fxp::FXP<8, 8, true, false>,
         pub Stalled: bool,
     }
     #[derive(Cluster, Debug)]
@@ -280,24 +280,24 @@ mod types {
         pub UpFallingEdge: bool,
         pub DownRisingEdge: bool,
         pub DownFallingEdge: bool,
-        pub Mode: ni_fpga::fxp::FXP<2, 2, false>,
-        pub PulseLengthThreshold: ni_fpga::fxp::FXP<6, 14, false>,
+        pub Mode: ni_fpga::fxp::FXP<2, 2, false, false>,
+        pub PulseLengthThreshold: ni_fpga::fxp::FXP<6, 14, false, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter5_Output {
         pub Direction: bool,
-        pub Value: ni_fpga::fxp::FXP<31, 31, true>,
+        pub Value: ni_fpga::fxp::FXP<31, 31, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter5_TimerConfig {
-        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false>,
-        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false>,
+        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false, false>,
+        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false, false>,
         pub UpdateWhenEmpty: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter5_TimerOutput {
-        pub Period: ni_fpga::fxp::FXP<23, 24, false>,
-        pub Count: ni_fpga::fxp::FXP<8, 8, true>,
+        pub Period: ni_fpga::fxp::FXP<23, 24, false, false>,
+        pub Count: ni_fpga::fxp::FXP<8, 8, true, false>,
         pub Stalled: bool,
     }
     #[derive(Cluster, Debug)]
@@ -311,24 +311,24 @@ mod types {
         pub UpFallingEdge: bool,
         pub DownRisingEdge: bool,
         pub DownFallingEdge: bool,
-        pub Mode: ni_fpga::fxp::FXP<2, 2, false>,
-        pub PulseLengthThreshold: ni_fpga::fxp::FXP<6, 14, false>,
+        pub Mode: ni_fpga::fxp::FXP<2, 2, false, false>,
+        pub PulseLengthThreshold: ni_fpga::fxp::FXP<6, 14, false, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter6_Output {
         pub Direction: bool,
-        pub Value: ni_fpga::fxp::FXP<31, 31, true>,
+        pub Value: ni_fpga::fxp::FXP<31, 31, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter6_TimerConfig {
-        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false>,
-        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false>,
+        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false, false>,
+        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false, false>,
         pub UpdateWhenEmpty: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter6_TimerOutput {
-        pub Period: ni_fpga::fxp::FXP<23, 24, false>,
-        pub Count: ni_fpga::fxp::FXP<8, 8, true>,
+        pub Period: ni_fpga::fxp::FXP<23, 24, false, false>,
+        pub Count: ni_fpga::fxp::FXP<8, 8, true, false>,
         pub Stalled: bool,
     }
     #[derive(Cluster, Debug)]
@@ -342,52 +342,52 @@ mod types {
         pub UpFallingEdge: bool,
         pub DownRisingEdge: bool,
         pub DownFallingEdge: bool,
-        pub Mode: ni_fpga::fxp::FXP<2, 2, false>,
-        pub PulseLengthThreshold: ni_fpga::fxp::FXP<6, 14, false>,
+        pub Mode: ni_fpga::fxp::FXP<2, 2, false, false>,
+        pub PulseLengthThreshold: ni_fpga::fxp::FXP<6, 14, false, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter7_Output {
         pub Direction: bool,
-        pub Value: ni_fpga::fxp::FXP<31, 31, true>,
+        pub Value: ni_fpga::fxp::FXP<31, 31, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter7_TimerConfig {
-        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false>,
-        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false>,
+        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false, false>,
+        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false, false>,
         pub UpdateWhenEmpty: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct Counter7_TimerOutput {
-        pub Period: ni_fpga::fxp::FXP<23, 24, false>,
-        pub Count: ni_fpga::fxp::FXP<8, 8, true>,
+        pub Period: ni_fpga::fxp::FXP<23, 24, false, false>,
+        pub Count: ni_fpga::fxp::FXP<8, 8, true, false>,
         pub Stalled: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct DIO_DI {
-        pub Headers: ni_fpga::fxp::FXP<10, 10, false>,
-        pub SPIPort: ni_fpga::fxp::FXP<5, 5, false>,
-        pub Reserved: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Headers: ni_fpga::fxp::FXP<10, 10, false, false>,
+        pub SPIPort: ni_fpga::fxp::FXP<5, 5, false, false>,
+        pub Reserved: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub MXP: u16,
     }
     #[derive(Cluster, Debug)]
     pub struct DIO_DO {
-        pub Headers: ni_fpga::fxp::FXP<10, 10, false>,
-        pub SPIPort: ni_fpga::fxp::FXP<5, 5, false>,
-        pub Reserved: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Headers: ni_fpga::fxp::FXP<10, 10, false, false>,
+        pub SPIPort: ni_fpga::fxp::FXP<5, 5, false, false>,
+        pub Reserved: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub MXP: u16,
     }
     #[derive(Cluster, Debug)]
     pub struct DIO_OutputEnable {
-        pub Headers: ni_fpga::fxp::FXP<10, 10, false>,
-        pub SPIPort: ni_fpga::fxp::FXP<5, 5, false>,
-        pub Reserved: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Headers: ni_fpga::fxp::FXP<10, 10, false, false>,
+        pub SPIPort: ni_fpga::fxp::FXP<5, 5, false, false>,
+        pub Reserved: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub MXP: u16,
     }
     #[derive(Cluster, Debug)]
     pub struct DIO_Pulse {
-        pub Headers: ni_fpga::fxp::FXP<10, 10, false>,
-        pub SPIPort: ni_fpga::fxp::FXP<5, 5, false>,
-        pub Reserved: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Headers: ni_fpga::fxp::FXP<10, 10, false, false>,
+        pub SPIPort: ni_fpga::fxp::FXP<5, 5, false, false>,
+        pub Reserved: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub MXP: u16,
     }
     #[derive(Cluster, Debug)]
@@ -398,56 +398,56 @@ mod types {
     }
     #[derive(Cluster, Debug)]
     pub struct DownSource {
-        pub Channel: ni_fpga::fxp::FXP<4, 4, false>,
-        pub Module: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Channel: ni_fpga::fxp::FXP<4, 4, false, false>,
+        pub Module: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub AnalogTrigger: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct DutyCycle0_Source {
-        pub Channel: ni_fpga::fxp::FXP<4, 4, false>,
-        pub Module: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Channel: ni_fpga::fxp::FXP<4, 4, false, false>,
+        pub Module: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub AnalogTrigger: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct DutyCycle1_Source {
-        pub Channel: ni_fpga::fxp::FXP<4, 4, false>,
-        pub Module: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Channel: ni_fpga::fxp::FXP<4, 4, false, false>,
+        pub Module: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub AnalogTrigger: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct DutyCycle2_Source {
-        pub Channel: ni_fpga::fxp::FXP<4, 4, false>,
-        pub Module: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Channel: ni_fpga::fxp::FXP<4, 4, false, false>,
+        pub Module: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub AnalogTrigger: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct DutyCycle3_Source {
-        pub Channel: ni_fpga::fxp::FXP<4, 4, false>,
-        pub Module: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Channel: ni_fpga::fxp::FXP<4, 4, false, false>,
+        pub Module: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub AnalogTrigger: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct DutyCycle4_Source {
-        pub Channel: ni_fpga::fxp::FXP<4, 4, false>,
-        pub Module: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Channel: ni_fpga::fxp::FXP<4, 4, false, false>,
+        pub Module: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub AnalogTrigger: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct DutyCycle5_Source {
-        pub Channel: ni_fpga::fxp::FXP<4, 4, false>,
-        pub Module: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Channel: ni_fpga::fxp::FXP<4, 4, false, false>,
+        pub Module: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub AnalogTrigger: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct DutyCycle6_Source {
-        pub Channel: ni_fpga::fxp::FXP<4, 4, false>,
-        pub Module: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Channel: ni_fpga::fxp::FXP<4, 4, false, false>,
+        pub Module: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub AnalogTrigger: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct DutyCycle7_Source {
-        pub Channel: ni_fpga::fxp::FXP<4, 4, false>,
-        pub Module: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Channel: ni_fpga::fxp::FXP<4, 4, false, false>,
+        pub Module: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub AnalogTrigger: bool,
     }
     #[derive(Cluster, Debug)]
@@ -517,18 +517,18 @@ mod types {
     #[derive(Cluster, Debug)]
     pub struct Encoder0_Output {
         pub Direction: bool,
-        pub Value: ni_fpga::fxp::FXP<31, 31, true>,
+        pub Value: ni_fpga::fxp::FXP<31, 31, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Encoder0_TimerConfig {
-        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false>,
-        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false>,
+        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false, false>,
+        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false, false>,
         pub UpdateWhenEmpty: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct Encoder0_TimerOutput {
-        pub Period: ni_fpga::fxp::FXP<23, 24, false>,
-        pub Count: ni_fpga::fxp::FXP<8, 8, true>,
+        pub Period: ni_fpga::fxp::FXP<23, 24, false, false>,
+        pub Count: ni_fpga::fxp::FXP<8, 8, true, false>,
         pub Stalled: bool,
     }
     #[derive(Cluster, Debug)]
@@ -543,18 +543,18 @@ mod types {
     #[derive(Cluster, Debug)]
     pub struct Encoder1_Output {
         pub Direction: bool,
-        pub Value: ni_fpga::fxp::FXP<31, 31, true>,
+        pub Value: ni_fpga::fxp::FXP<31, 31, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Encoder1_TimerConfig {
-        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false>,
-        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false>,
+        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false, false>,
+        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false, false>,
         pub UpdateWhenEmpty: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct Encoder1_TimerOutput {
-        pub Period: ni_fpga::fxp::FXP<23, 24, false>,
-        pub Count: ni_fpga::fxp::FXP<8, 8, true>,
+        pub Period: ni_fpga::fxp::FXP<23, 24, false, false>,
+        pub Count: ni_fpga::fxp::FXP<8, 8, true, false>,
         pub Stalled: bool,
     }
     #[derive(Cluster, Debug)]
@@ -569,18 +569,18 @@ mod types {
     #[derive(Cluster, Debug)]
     pub struct Encoder2_Output {
         pub Direction: bool,
-        pub Value: ni_fpga::fxp::FXP<31, 31, true>,
+        pub Value: ni_fpga::fxp::FXP<31, 31, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Encoder2_TimerConfig {
-        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false>,
-        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false>,
+        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false, false>,
+        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false, false>,
         pub UpdateWhenEmpty: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct Encoder2_TimerOutput {
-        pub Period: ni_fpga::fxp::FXP<23, 24, false>,
-        pub Count: ni_fpga::fxp::FXP<8, 8, true>,
+        pub Period: ni_fpga::fxp::FXP<23, 24, false, false>,
+        pub Count: ni_fpga::fxp::FXP<8, 8, true, false>,
         pub Stalled: bool,
     }
     #[derive(Cluster, Debug)]
@@ -595,18 +595,18 @@ mod types {
     #[derive(Cluster, Debug)]
     pub struct Encoder3_Output {
         pub Direction: bool,
-        pub Value: ni_fpga::fxp::FXP<31, 31, true>,
+        pub Value: ni_fpga::fxp::FXP<31, 31, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Encoder3_TimerConfig {
-        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false>,
-        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false>,
+        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false, false>,
+        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false, false>,
         pub UpdateWhenEmpty: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct Encoder3_TimerOutput {
-        pub Period: ni_fpga::fxp::FXP<23, 24, false>,
-        pub Count: ni_fpga::fxp::FXP<8, 8, true>,
+        pub Period: ni_fpga::fxp::FXP<23, 24, false, false>,
+        pub Count: ni_fpga::fxp::FXP<8, 8, true, false>,
         pub Stalled: bool,
     }
     #[derive(Cluster, Debug)]
@@ -621,18 +621,18 @@ mod types {
     #[derive(Cluster, Debug)]
     pub struct Encoder4_Output {
         pub Direction: bool,
-        pub Value: ni_fpga::fxp::FXP<31, 31, true>,
+        pub Value: ni_fpga::fxp::FXP<31, 31, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Encoder4_TimerConfig {
-        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false>,
-        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false>,
+        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false, false>,
+        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false, false>,
         pub UpdateWhenEmpty: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct Encoder4_TimerOutput {
-        pub Period: ni_fpga::fxp::FXP<23, 24, false>,
-        pub Count: ni_fpga::fxp::FXP<8, 8, true>,
+        pub Period: ni_fpga::fxp::FXP<23, 24, false, false>,
+        pub Count: ni_fpga::fxp::FXP<8, 8, true, false>,
         pub Stalled: bool,
     }
     #[derive(Cluster, Debug)]
@@ -647,18 +647,18 @@ mod types {
     #[derive(Cluster, Debug)]
     pub struct Encoder5_Output {
         pub Direction: bool,
-        pub Value: ni_fpga::fxp::FXP<31, 31, true>,
+        pub Value: ni_fpga::fxp::FXP<31, 31, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Encoder5_TimerConfig {
-        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false>,
-        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false>,
+        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false, false>,
+        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false, false>,
         pub UpdateWhenEmpty: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct Encoder5_TimerOutput {
-        pub Period: ni_fpga::fxp::FXP<23, 24, false>,
-        pub Count: ni_fpga::fxp::FXP<8, 8, true>,
+        pub Period: ni_fpga::fxp::FXP<23, 24, false, false>,
+        pub Count: ni_fpga::fxp::FXP<8, 8, true, false>,
         pub Stalled: bool,
     }
     #[derive(Cluster, Debug)]
@@ -673,18 +673,18 @@ mod types {
     #[derive(Cluster, Debug)]
     pub struct Encoder6_Output {
         pub Direction: bool,
-        pub Value: ni_fpga::fxp::FXP<31, 31, true>,
+        pub Value: ni_fpga::fxp::FXP<31, 31, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Encoder6_TimerConfig {
-        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false>,
-        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false>,
+        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false, false>,
+        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false, false>,
         pub UpdateWhenEmpty: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct Encoder6_TimerOutput {
-        pub Period: ni_fpga::fxp::FXP<23, 24, false>,
-        pub Count: ni_fpga::fxp::FXP<8, 8, true>,
+        pub Period: ni_fpga::fxp::FXP<23, 24, false, false>,
+        pub Count: ni_fpga::fxp::FXP<8, 8, true, false>,
         pub Stalled: bool,
     }
     #[derive(Cluster, Debug)]
@@ -699,24 +699,24 @@ mod types {
     #[derive(Cluster, Debug)]
     pub struct Encoder7_Output {
         pub Direction: bool,
-        pub Value: ni_fpga::fxp::FXP<31, 31, true>,
+        pub Value: ni_fpga::fxp::FXP<31, 31, true, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Encoder7_TimerConfig {
-        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false>,
-        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false>,
+        pub StallPeriod: ni_fpga::fxp::FXP<24, 25, false, false>,
+        pub AverageSize: ni_fpga::fxp::FXP<7, 7, false, false>,
         pub UpdateWhenEmpty: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct Encoder7_TimerOutput {
-        pub Period: ni_fpga::fxp::FXP<23, 24, false>,
-        pub Count: ni_fpga::fxp::FXP<8, 8, true>,
+        pub Period: ni_fpga::fxp::FXP<23, 24, false, false>,
+        pub Count: ni_fpga::fxp::FXP<8, 8, true, false>,
         pub Stalled: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct ExternalClockSource {
-        pub Channel: ni_fpga::fxp::FXP<4, 4, false>,
-        pub Module: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Channel: ni_fpga::fxp::FXP<4, 4, false, false>,
+        pub Module: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub AnalogTrigger: bool,
     }
     #[derive(Cluster, Debug)]
@@ -725,8 +725,8 @@ mod types {
     }
     #[derive(Cluster, Debug)]
     pub struct IndexSource {
-        pub Channel: ni_fpga::fxp::FXP<4, 4, false>,
-        pub Module: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Channel: ni_fpga::fxp::FXP<4, 4, false, false>,
+        pub Module: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub AnalogTrigger: bool,
     }
     #[derive(Cluster, Debug)]
@@ -817,13 +817,13 @@ mod types {
     }
     #[derive(Cluster, Debug)]
     pub struct Relay_Value {
-        pub Forward: ni_fpga::fxp::FXP<4, 4, false>,
-        pub Reverse: ni_fpga::fxp::FXP<4, 4, false>,
+        pub Forward: ni_fpga::fxp::FXP<4, 4, false, false>,
+        pub Reverse: ni_fpga::fxp::FXP<4, 4, false, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct SPI_AutoByteCount {
-        pub TxByteCount: ni_fpga::fxp::FXP<5, 5, false>,
-        pub ZeroByteCount: ni_fpga::fxp::FXP<7, 7, false>,
+        pub TxByteCount: ni_fpga::fxp::FXP<5, 5, false, false>,
+        pub ZeroByteCount: ni_fpga::fxp::FXP<7, 7, false, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct SPI_AutoTriggerConfig {
@@ -834,8 +834,8 @@ mod types {
     }
     #[derive(Cluster, Debug)]
     pub struct SPI_ChipSelectActiveHigh {
-        pub Hdr: ni_fpga::fxp::FXP<4, 4, false>,
-        pub MXP: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Hdr: ni_fpga::fxp::FXP<4, 4, false, false>,
+        pub MXP: ni_fpga::fxp::FXP<1, 1, false, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct SPI_StallConfig {
@@ -845,16 +845,16 @@ mod types {
     }
     #[derive(Cluster, Debug)]
     pub struct Source {
-        pub Channel: ni_fpga::fxp::FXP<4, 4, false>,
-        pub Module: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Channel: ni_fpga::fxp::FXP<4, 4, false, false>,
+        pub Module: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub AnalogTrigger: bool,
     }
     #[derive(Cluster, Debug)]
     pub struct SysWatchdog_Status {
         pub SystemActive: bool,
         pub PowerAlive: bool,
-        pub SysDisableCount: ni_fpga::fxp::FXP<15, 15, false>,
-        pub PowerDisableCount: ni_fpga::fxp::FXP<15, 15, false>,
+        pub SysDisableCount: ni_fpga::fxp::FXP<15, 15, false, false>,
+        pub PowerDisableCount: ni_fpga::fxp::FXP<15, 15, false, false>,
     }
     #[derive(Cluster, Debug)]
     pub struct Trigger {
@@ -864,8 +864,8 @@ mod types {
     }
     #[derive(Cluster, Debug)]
     pub struct UpSource {
-        pub Channel: ni_fpga::fxp::FXP<4, 4, false>,
-        pub Module: ni_fpga::fxp::FXP<1, 1, false>,
+        pub Channel: ni_fpga::fxp::FXP<4, 4, false, false>,
+        pub Module: ni_fpga::fxp::FXP<1, 1, false, false>,
         pub AnalogTrigger: bool,
     }
     #[derive(Debug, Enum)]
@@ -880,6 +880,10 @@ mod types {
         Shuffle_Data,
         Disable,
     }
+}
+pub struct FpgaBitfileHmbDefs {
+    pub HMB_0_LED: ni_fpga::HmbDefinition,
+    pub HMB_0_RAM: ni_fpga::HmbDefinition,
 }
 pub struct FpgaBitfile {
     pub LocalTime: Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
@@ -904,7 +908,7 @@ pub struct FpgaBitfile {
         Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub SysWatchdog_ForcedKills: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<15, 15, false>,
+            ni_fpga::fxp::FXP<15, 15, false, false>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
@@ -917,21 +921,21 @@ pub struct FpgaBitfile {
         Option<ni_fpga::Register<types::AI_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AI_ScanList: Option<
         ni_fpga::Register<
-            [ni_fpga::fxp::FXP<3, 3, false>; 8],
+            [ni_fpga::fxp::FXP<3, 3, false, false>; 8],
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub AI_OversampleBits: Option<
         ni_fpga::Register<
-            [ni_fpga::fxp::FXP<4, 4, false>; 8],
+            [ni_fpga::fxp::FXP<4, 4, false, false>; 8],
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub AI_AverageBits: Option<
         ni_fpga::Register<
-            [ni_fpga::fxp::FXP<4, 4, false>; 8],
+            [ni_fpga::fxp::FXP<4, 4, false, false>; 8],
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
@@ -1059,14 +1063,14 @@ pub struct FpgaBitfile {
         Option<ni_fpga::Register<types::PWM_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub PWM_PeriodScaleHdr: Option<
         ni_fpga::Register<
-            [ni_fpga::fxp::FXP<2, 2, false>; 10],
+            [ni_fpga::fxp::FXP<2, 2, false, false>; 10],
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_PeriodScaleMXP: Option<
         ni_fpga::Register<
-            [ni_fpga::fxp::FXP<2, 2, false>; 10],
+            [ni_fpga::fxp::FXP<2, 2, false, false>; 10],
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
@@ -1075,140 +1079,140 @@ pub struct FpgaBitfile {
         Option<ni_fpga::Register<[bool; 20], ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub PWM_Hdr0: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr1: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr2: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr3: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr4: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr5: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr6: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr7: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr8: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr9: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP0: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP1: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP2: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP3: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP4: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP5: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP6: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP7: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP8: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP9: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<12, 12, false>,
+            ni_fpga::fxp::FXP<12, 12, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
@@ -1220,56 +1224,56 @@ pub struct FpgaBitfile {
     pub DIO_DI: Option<ni_fpga::Register<types::DIO_DI, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub DIO_FilterSelectHdr: Option<
         ni_fpga::Register<
-            [ni_fpga::fxp::FXP<2, 2, false>; 16],
+            [ni_fpga::fxp::FXP<2, 2, false, false>; 16],
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DIO_FilterPeriodHdr0: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<24, 24, false>,
+            ni_fpga::fxp::FXP<24, 24, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DIO_FilterPeriodHdr1: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<24, 24, false>,
+            ni_fpga::fxp::FXP<24, 24, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DIO_FilterPeriodHdr2: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<24, 24, false>,
+            ni_fpga::fxp::FXP<24, 24, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DIO_FilterSelectMXP: Option<
         ni_fpga::Register<
-            [ni_fpga::fxp::FXP<2, 2, false>; 16],
+            [ni_fpga::fxp::FXP<2, 2, false, false>; 16],
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DIO_FilterPeriodMXP0: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<24, 24, false>,
+            ni_fpga::fxp::FXP<24, 24, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DIO_FilterPeriodMXP1: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<24, 24, false>,
+            ni_fpga::fxp::FXP<24, 24, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DIO_FilterPeriodMXP2: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<24, 24, false>,
+            ni_fpga::fxp::FXP<24, 24, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
@@ -1285,7 +1289,7 @@ pub struct FpgaBitfile {
         Option<ni_fpga::Register<[u8; 2], ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub DIO_PWMOutputSelect: Option<
         ni_fpga::Register<
-            [ni_fpga::fxp::FXP<5, 5, false>; 6],
+            [ni_fpga::fxp::FXP<5, 5, false, false>; 6],
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
@@ -1606,7 +1610,7 @@ pub struct FpgaBitfile {
     >,
     pub SPI_EnableDIO: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<5, 5, false>,
+            ni_fpga::fxp::FXP<5, 5, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
@@ -1659,21 +1663,21 @@ pub struct FpgaBitfile {
     >,
     pub DutyCycle0_Frequency: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<11, 11, false>,
+            ni_fpga::fxp::FXP<11, 11, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle0_Output: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<31, 31, false>,
+            ni_fpga::fxp::FXP<31, 31, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle0_HighTicks: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<20, 20, false>,
+            ni_fpga::fxp::FXP<20, 20, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
@@ -1683,21 +1687,21 @@ pub struct FpgaBitfile {
     >,
     pub DutyCycle1_Frequency: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<11, 11, false>,
+            ni_fpga::fxp::FXP<11, 11, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle1_Output: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<31, 31, false>,
+            ni_fpga::fxp::FXP<31, 31, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle1_HighTicks: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<20, 20, false>,
+            ni_fpga::fxp::FXP<20, 20, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
@@ -1707,21 +1711,21 @@ pub struct FpgaBitfile {
     >,
     pub DutyCycle2_Frequency: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<11, 11, false>,
+            ni_fpga::fxp::FXP<11, 11, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle2_Output: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<31, 31, false>,
+            ni_fpga::fxp::FXP<31, 31, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle2_HighTicks: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<20, 20, false>,
+            ni_fpga::fxp::FXP<20, 20, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
@@ -1731,21 +1735,21 @@ pub struct FpgaBitfile {
     >,
     pub DutyCycle3_Frequency: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<11, 11, false>,
+            ni_fpga::fxp::FXP<11, 11, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle3_Output: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<31, 31, false>,
+            ni_fpga::fxp::FXP<31, 31, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle3_HighTicks: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<20, 20, false>,
+            ni_fpga::fxp::FXP<20, 20, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
@@ -1755,21 +1759,21 @@ pub struct FpgaBitfile {
     >,
     pub DutyCycle4_Frequency: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<11, 11, false>,
+            ni_fpga::fxp::FXP<11, 11, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle4_Output: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<31, 31, false>,
+            ni_fpga::fxp::FXP<31, 31, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle4_HighTicks: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<20, 20, false>,
+            ni_fpga::fxp::FXP<20, 20, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
@@ -1779,21 +1783,21 @@ pub struct FpgaBitfile {
     >,
     pub DutyCycle5_Frequency: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<11, 11, false>,
+            ni_fpga::fxp::FXP<11, 11, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle5_Output: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<31, 31, false>,
+            ni_fpga::fxp::FXP<31, 31, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle5_HighTicks: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<20, 20, false>,
+            ni_fpga::fxp::FXP<20, 20, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
@@ -1803,21 +1807,21 @@ pub struct FpgaBitfile {
     >,
     pub DutyCycle6_Frequency: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<11, 11, false>,
+            ni_fpga::fxp::FXP<11, 11, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle6_Output: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<31, 31, false>,
+            ni_fpga::fxp::FXP<31, 31, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle6_HighTicks: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<20, 20, false>,
+            ni_fpga::fxp::FXP<20, 20, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
@@ -1827,28 +1831,28 @@ pub struct FpgaBitfile {
     >,
     pub DutyCycle7_Frequency: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<11, 11, false>,
+            ni_fpga::fxp::FXP<11, 11, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle7_Output: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<31, 31, false>,
+            ni_fpga::fxp::FXP<31, 31, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle7_HighTicks: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<20, 20, false>,
+            ni_fpga::fxp::FXP<20, 20, false, true>,
             ni_fpga::ReadOnly,
             ni_fpga::StoredOffset,
         >,
     >,
     pub LED_OutputSelect: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<4, 4, false>,
+            ni_fpga::fxp::FXP<4, 4, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
@@ -1860,7 +1864,7 @@ pub struct FpgaBitfile {
     pub LED_Abort: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub LED_SyncTiming: Option<
         ni_fpga::Register<
-            ni_fpga::fxp::FXP<16, 16, false>,
+            ni_fpga::fxp::FXP<16, 16, false, false>,
             ni_fpga::ReadWrite,
             ni_fpga::StoredOffset,
         >,
@@ -1877,7 +1881,11 @@ pub struct FpgaBitfile {
     pub HMB_ReadData: Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub HMB_WriteCount: Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub HMB_WriteAddress: Option<
-        ni_fpga::Register<ni_fpga::fxp::FXP<9, 9, false>, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
+        ni_fpga::Register<
+            ni_fpga::fxp::FXP<9, 9, false, false>,
+            ni_fpga::ReadOnly,
+            ni_fpga::StoredOffset,
+        >,
     >,
     pub HMB_WriteData: Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub HMB_LoopCount: Option<ni_fpga::Register<i32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
@@ -1885,6 +1893,7 @@ pub struct FpgaBitfile {
         Option<ni_fpga::Register<bool, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub HMB_ReqReadyForInput:
         Option<ni_fpga::Register<bool, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    hmb_definitions: FpgaBitfileHmbDefs,
 }
 impl FpgaBitfile {
     pub fn take(session: &impl ni_fpga::SessionAccess) -> Result<Self, ni_fpga::Error> {
@@ -2754,6 +2763,18 @@ impl FpgaBitfile {
             HMB_ReqReadyForInput: Some(unsafe {
                 ni_fpga::Register::new(session.find_offset("HMB.ReqReadyForInput")?)
             }),
+            hmb_definitions: FpgaBitfileHmbDefs {
+                HMB_0_LED: ni_fpga::HmbDefinition {
+                    name: "HMB_0_LED",
+                    stride: 32,
+                    elements: 524288,
+                },
+                HMB_0_RAM: ni_fpga::HmbDefinition {
+                    name: "HMB_0_RAM",
+                    stride: 32,
+                    elements: 524288,
+                },
+            },
         })
     }
     pub const fn contents() -> &'static str {

@@ -8,18 +8,105 @@ use bitvec::prelude::*;
 
 #[allow(clippy::upper_case_acronyms)]
 #[derive(Clone, Copy)]
-pub struct FXP<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool>(u64);
+pub struct FXP<
+    const WORD_LENGTH: u8,
+    const INTEGER_LENGTH: u8,
+    const SIGNED: bool,
+    const INCLUDE_OVERFLOW: bool = false,
+>(u64);
 
-pub type PackedNumber<const LENGTH: u8, const SIGNED: bool> = FXP<LENGTH, LENGTH, SIGNED>;
-pub type SignedPackedNumber<const LENGTH: u8> = PackedNumber<LENGTH, true>;
-pub type UnsignedPackedNumber<const LENGTH: u8> = PackedNumber<LENGTH, false>;
+pub type PackedNumber<const LENGTH: u8, const SIGNED: bool, const INCLUDE_OVERFLOW: bool = false> =
+    FXP<LENGTH, LENGTH, SIGNED, INCLUDE_OVERFLOW>;
+pub type SignedPackedNumber<const LENGTH: u8, const INCLUDE_OVERFLOW: bool = false> =
+    PackedNumber<LENGTH, true, INCLUDE_OVERFLOW>;
+pub type UnsignedPackedNumber<const LENGTH: u8, const INCLUDE_OVERFLOW: bool = false> =
+    PackedNumber<LENGTH, false, INCLUDE_OVERFLOW>;
 
-pub type SignedFXP<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8> =
-    FXP<WORD_LENGTH, INTEGER_LENGTH, true>;
-pub type UnsignedFXP<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8> =
-    FXP<WORD_LENGTH, INTEGER_LENGTH, false>;
+pub type SignedFXP<
+    const WORD_LENGTH: u8,
+    const INTEGER_LENGTH: u8,
+    const INCLUDE_OVERFLOW: bool = false,
+> = FXP<WORD_LENGTH, INTEGER_LENGTH, true, INCLUDE_OVERFLOW>;
+pub type UnsignedFXP<
+    const WORD_LENGTH: u8,
+    const INTEGER_LENGTH: u8,
+    const INCLUDE_OVERFLOW: bool = false,
+> = FXP<WORD_LENGTH, INTEGER_LENGTH, false, INCLUDE_OVERFLOW>;
 
-impl<const LENGTH: u8, const SIGNED: bool> FXP<LENGTH, LENGTH, SIGNED> {
+impl<const LENGTH: u8, const SIGNED: bool> FXP<LENGTH, LENGTH, SIGNED, true> {
+    pub fn from_int_overflow(num: i64) -> Self {
+        if !SIGNED {
+            if num >= (1 << LENGTH) || num < 0 {
+                Self(u64::MAX)
+            } else {
+                Self(num as u64)
+            }
+        } else if num >= (1 << (LENGTH - 1)) || num < -(1 << (LENGTH - 1)) {
+            Self(u64::MAX)
+        } else {
+            let abs_bits = num.unsigned_abs();
+            if num >= 0 {
+                Self(abs_bits)
+            } else {
+                Self((abs_bits ^ Self::WORD_MASK) + 1)
+            }
+        }
+    }
+}
+
+impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool>
+    FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, true>
+{
+    pub fn from_raw_overflow(num: u64) -> Self {
+        if num >= (1 << WORD_LENGTH) {
+            Self(u64::MAX)
+        } else {
+            Self(num)
+        }
+    }
+
+    pub fn from_float_overflow(num: f64) -> Self {
+        if !SIGNED {
+            if num >= (1 << INTEGER_LENGTH) as f64 || num < 0.0 {
+                Self(u64::MAX)
+            } else {
+                Self(
+                    FXP::<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>::from_float_unbounded(num)
+                        .unwrap_or(u64::MAX),
+                )
+            }
+        } else if num >= (1 << (INTEGER_LENGTH - 1)) as f64
+            || num < -(1 << (INTEGER_LENGTH - 1)) as f64
+        {
+            Self(u64::MAX)
+        } else {
+            let abs_bits =
+                match FXP::<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>::from_float_unbounded(num) {
+                    Ok(bits) => bits,
+                    Err(_) => return Self(u64::MAX),
+                };
+            if num >= 0.0 {
+                Self(abs_bits)
+            } else {
+                Self((abs_bits ^ Self::WORD_MASK) + 1)
+            }
+        }
+    }
+
+    pub fn is_overflowed(&self) -> bool {
+        self.0 == u64::MAX
+    }
+
+    pub fn to_fxp(self) -> Option<FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>> {
+        if self.is_overflowed() {
+            None
+        } else {
+            Some(FXP::<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>(self.0))
+        }
+    }
+}
+
+impl<const LENGTH: u8, const SIGNED: bool> FXP<LENGTH, LENGTH, SIGNED, false> {
     pub fn from_int(num: i64) -> Result<Self, Error> {
         if !SIGNED {
             if num >= (1 << LENGTH) || num < 0 {
@@ -57,13 +144,21 @@ impl<const LENGTH: u8, const SIGNED: bool> FXP<LENGTH, LENGTH, SIGNED> {
     }
 }
 
-impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool>
-    FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+impl<
+        const WORD_LENGTH: u8,
+        const INTEGER_LENGTH: u8,
+        const SIGNED: bool,
+        const INCLUDE_OVERFLOW: bool,
+    > FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, INCLUDE_OVERFLOW>
 {
     const SCALING_FACTOR: i16 = WORD_LENGTH as i16 - INTEGER_LENGTH as i16;
     const WORD_MASK: u64 = (1 << WORD_LENGTH) - 1;
     const SIGN_MASK: u64 = 1 << (WORD_LENGTH - 1);
+}
 
+impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool>
+    FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
+{
     pub fn from_raw(num: u64) -> Result<Self, Error> {
         if num >= (1 << WORD_LENGTH) {
             Err(Error::FixedPointRawOutOfBounds(
@@ -189,7 +284,7 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool>
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::ops::Add
-    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
 {
     type Output = Self;
 
@@ -199,7 +294,7 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::o
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::ops::BitAnd
-    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
 {
     type Output = Self;
 
@@ -209,7 +304,7 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::o
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::ops::BitOr
-    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
 {
     type Output = Self;
 
@@ -219,7 +314,7 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::o
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::ops::BitXor
-    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
 {
     type Output = Self;
 
@@ -242,7 +337,7 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::o
 // }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::ops::Mul
-    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
 {
     type Output = Self;
 
@@ -253,7 +348,7 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::o
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::ops::Rem
-    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
 {
     type Output = Self;
 
@@ -267,7 +362,7 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::o
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::ops::Shl<u8>
-    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
 {
     type Output = Self;
 
@@ -277,7 +372,7 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::o
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::ops::Shr<u8>
-    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
 {
     type Output = Self;
 
@@ -292,7 +387,7 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::o
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::ops::Sub
-    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
 {
     type Output = Self;
 
@@ -302,7 +397,7 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::o
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::cmp::PartialEq
-    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
 {
     fn eq(&self, other: &Self) -> bool {
         self.0.eq(&other.0)
@@ -310,12 +405,12 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::c
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::cmp::Eq
-    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
 {
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::cmp::PartialOrd
-    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
 {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.cmp(other))
@@ -323,7 +418,7 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::c
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::cmp::Ord
-    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
 {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         if SIGNED && self.0 & Self::SIGN_MASK != other.0 & Self::SIGN_MASK {
@@ -335,7 +430,7 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::c
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::fmt::Debug
-    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_fmt(format_args!(
@@ -349,7 +444,7 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::f
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::fmt::Display
-    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.write_fmt(format_args!("{}", self.to_float(),))
@@ -357,11 +452,13 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> std::f
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> DatatypePacker
-    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, true>
 {
-    const SIZE_IN_BITS: usize = WORD_LENGTH as usize;
+    const SIZE_IN_BITS: usize = WORD_LENGTH as usize + 1;
 
     fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        let (overflow, fpga_bits) = fpga_bits.split_at_mut(1);
+        overflow.set(0, data.0 == u64::MAX);
         if WORD_LENGTH > 32 {
             u64::pack(fpga_bits, &(data.0))
         } else {
@@ -370,18 +467,23 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> Dataty
     }
 
     fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        let (overflow, fpga_bits) = fpga_bits.split_at(1);
         Ok(FXP({
-            if WORD_LENGTH > 32 {
-                u64::unpack(fpga_bits)?
+            if overflow[0] {
+                u64::MAX
             } else {
-                u32::unpack(fpga_bits)? as u64
+                if WORD_LENGTH > 32 {
+                    u64::unpack(fpga_bits)?
+                } else {
+                    u32::unpack(fpga_bits)? as u64
+                }
             }
         }))
     }
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> Datatype
-    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, true>
 {
     unsafe fn read(
         session: &impl crate::SessionAccess,
@@ -432,16 +534,171 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> Dataty
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool, const N: usize>
-    DatatypePacker for [FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>; N]
+    DatatypePacker for [FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, true>; N]
 {
     const SIZE_IN_BITS: usize =
-        <FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED> as DatatypePacker>::SIZE_IN_BITS * N;
+        <FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, true> as DatatypePacker>::SIZE_IN_BITS * N;
 
     fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
         data.iter()
             .zip(unsafe {
                 fpga_bits
-                    .chunks_mut(<bool as DatatypePacker>::SIZE_IN_BITS)
+                    .chunks_mut(<FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, true> as DatatypePacker>::SIZE_IN_BITS)
+                    .remove_alias()
+            })
+            .try_for_each(|(src, bits)| {
+                DatatypePacker::pack(bits, src)
+            })
+    }
+
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        let mut data = [FXP(0); N];
+        data.iter_mut()
+            .zip(fpga_bits.chunks(
+                <FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, true> as DatatypePacker>::SIZE_IN_BITS,
+            ))
+            .try_for_each(|(dest, bits)| {
+                *dest = DatatypePacker::unpack(bits)?;
+                Ok::<(), Error>(())
+            })?;
+        Ok(data)
+    }
+}
+
+impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool, const N: usize> Datatype
+    for [FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, true>; N]
+{
+    #[inline]
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+        // Most types are smaller then 4, so preallocate for 4
+        let byte_size = (Self::SIZE_IN_BITS - 1) / 8 + 1;
+        let mut buffer: SmallBuffer<u8, 4> = SmallBuffer::new(byte_size, 0u8);
+        match session.fpga().read_u8_array(offset, buffer.buffer()) {
+            Ok(_) => {
+                // Values larger then a single element (32 bit) are left justified, not right
+                let bit_slice = crate::datatype::FpgaBitsRaw::from_slice_mut(buffer.buffer());
+                let bit_slice = if byte_size <= 4 {
+                    bit_slice.split_at_mut(byte_size * 8 - Self::SIZE_IN_BITS).1
+                } else {
+                    bit_slice.split_at_mut(Self::SIZE_IN_BITS).0
+                };
+
+                Ok(DatatypePacker::unpack(bit_slice)?)
+            }
+            Err(err) => Err(err),
+        }
+    }
+
+    #[inline]
+    unsafe fn write(
+        session: &impl SessionAccess,
+        offset: Offset,
+        value: impl Borrow<Self>,
+    ) -> Result<(), Error> {
+        // Most types are smaller then 4, so preallocate for 4
+        let byte_size = (Self::SIZE_IN_BITS - 1) / 8 + 1;
+        let mut buffer: SmallBuffer<u8, 4> = SmallBuffer::new(byte_size, 0u8);
+
+        // Values larger then a single element (32 bit) are left justified, not right
+        let bit_slice = crate::datatype::FpgaBitsRaw::from_slice_mut(buffer.buffer());
+        let bit_slice = if byte_size <= 4 {
+            bit_slice.split_at_mut(byte_size * 8 - Self::SIZE_IN_BITS).1
+        } else {
+            bit_slice.split_at_mut(Self::SIZE_IN_BITS).0
+        };
+
+        DatatypePacker::pack(bit_slice, value.borrow())?;
+
+        session.fpga().write_u8_array(offset, buffer.buffer())
+    }
+}
+
+impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> DatatypePacker
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
+{
+    const SIZE_IN_BITS: usize = WORD_LENGTH as usize;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        if WORD_LENGTH > 32 {
+            u64::pack(fpga_bits, &(data.0))
+        } else {
+            u32::pack(fpga_bits, &(data.0 as u32))
+        }
+    }
+
+    fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
+        Ok(FXP({
+            if WORD_LENGTH > 32 {
+                u64::unpack(fpga_bits)?
+            } else {
+                u32::unpack(fpga_bits)? as u64
+            }
+        }))
+    }
+}
+
+impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> Datatype
+    for FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>
+{
+    unsafe fn read(
+        session: &impl crate::SessionAccess,
+        offset: crate::Offset,
+    ) -> Result<Self, Error> {
+        // Buffer cannot be larger then 8
+        let byte_size = (Self::SIZE_IN_BITS - 1) / 8 + 1;
+        let mut raw_buffer = [0u8; 8];
+        let buffer = &mut raw_buffer[0..byte_size];
+        match session.fpga().read_u8_array(offset, buffer) {
+            Ok(_) => {
+                // Values larger then a single element (32 bit) are left justified, not right
+                let bit_slice = crate::datatype::FpgaBitsRaw::from_slice_mut(buffer);
+                let bit_slice = if byte_size <= 4 {
+                    bit_slice.split_at_mut(byte_size * 8 - Self::SIZE_IN_BITS).1
+                } else {
+                    bit_slice.split_at_mut(Self::SIZE_IN_BITS).0
+                };
+
+                Ok(DatatypePacker::unpack(bit_slice)?)
+            }
+            Err(err) => Err(err),
+        }
+    }
+
+    unsafe fn write(
+        session: &impl crate::SessionAccess,
+        offset: crate::Offset,
+        value: impl std::borrow::Borrow<Self>,
+    ) -> Result<(), Error> {
+        // Buffer cannot be larger then 8
+        let byte_size = (Self::SIZE_IN_BITS - 1) / 8 + 1;
+        let mut raw_buffer = [0u8; 8];
+        let buffer = &mut raw_buffer[0..byte_size];
+
+        // Values larger then a single element (32 bit) are left justified, not right
+        let bit_slice = crate::datatype::FpgaBitsRaw::from_slice_mut(buffer);
+        let bit_slice = if byte_size <= 4 {
+            bit_slice.split_at_mut(byte_size * 8 - Self::SIZE_IN_BITS).1
+        } else {
+            bit_slice.split_at_mut(Self::SIZE_IN_BITS).0
+        };
+
+        DatatypePacker::pack(bit_slice, value.borrow())?;
+
+        session.fpga().write_u8_array(offset, buffer)
+    }
+}
+
+impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool, const N: usize>
+    DatatypePacker for [FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>; N]
+{
+    const SIZE_IN_BITS: usize =
+        <FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false> as DatatypePacker>::SIZE_IN_BITS * N;
+
+    fn pack(fpga_bits: &mut FpgaBits, data: &Self) -> Result<(), Error> {
+        data.iter()
+            .zip(unsafe {
+                fpga_bits
+                    .chunks_mut(<FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false> as DatatypePacker>::SIZE_IN_BITS)
                     .remove_alias()
             })
             .for_each(|(src, bits)| {
@@ -457,7 +714,9 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool, const 
     fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
         let mut data = [FXP(0); N];
         data.iter_mut()
-            .zip(fpga_bits.chunks(<bool as DatatypePacker>::SIZE_IN_BITS))
+            .zip(fpga_bits.chunks(
+                <FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false> as DatatypePacker>::SIZE_IN_BITS,
+            ))
             .for_each(|(dest, bits)| {
                 if WORD_LENGTH > 32 {
                     dest.0 = bits.load_be();
@@ -470,7 +729,7 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool, const 
 }
 
 impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool, const N: usize> Datatype
-    for [FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED>; N]
+    for [FXP<WORD_LENGTH, INTEGER_LENGTH, SIGNED, false>; N]
 {
     #[inline]
     unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
