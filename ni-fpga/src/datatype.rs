@@ -44,7 +44,7 @@ impl<T: Copy, const N: usize> SmallBuffer<T, N> {
 
 pub trait Datatype: DatatypePacker {
     #[inline]
-    fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
+    unsafe fn read(session: &impl SessionAccess, offset: Offset) -> Result<Self, Error> {
         // Most types are smaller then 4, so preallocate for 4
         let byte_size = (Self::SIZE_IN_BITS - 1) / 8 + 1;
         let mut buffer: SmallBuffer<u8, 4> = SmallBuffer::new(byte_size, 0u8);
@@ -65,7 +65,7 @@ pub trait Datatype: DatatypePacker {
     }
 
     #[inline]
-    fn write(
+    unsafe fn write(
         session: &impl SessionAccess,
         offset: Offset,
         value: impl Borrow<Self>,

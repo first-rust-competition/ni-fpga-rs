@@ -30,7 +30,7 @@ impl<Fpga> Hmb<Fpga>
 where
     Fpga: Deref<Target = NiFpga>,
 {
-    pub fn new(session: Session<Fpga>, memory_name: &CString) -> Result<Hmb<Fpga>, Error> {
+    pub unsafe fn new(session: Session<Fpga>, memory_name: &CString) -> Result<Hmb<Fpga>, Error> {
         let fpga = session.fpga();
         match &fpga.api.hmb {
             Some(hmb) => {

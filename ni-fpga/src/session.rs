@@ -46,7 +46,7 @@ where
         Ok(create_self(NiFpga::from_session(session)?))
     }
 
-    pub fn open_hmb(
+    pub unsafe fn open_hmb(
         &'a self,
         memory_name: &str,
     ) -> Result<Hmb<<FpgaStorage as StorageClone<'a>>::Target>, Error>
@@ -259,25 +259,21 @@ impl SessionBuilder {
 }
 
 pub trait SessionAccess {
-    fn fpga(&self) -> &NiFpga;
+    unsafe fn fpga(&self) -> &NiFpga;
 
-    fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>;
-
-    fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>;
-
-    fn open_const_register<T: Datatype, P, const N: Offset>(&self) -> Register<T, P, ConstOffset<N>> {
+    unsafe fn open_const_register<T: Datatype, P, const N: Offset>(&self) -> Register<T, P, ConstOffset<N>> {
         Register::new_const()
     }
 
-    fn open_register<T: Datatype, P>(&self, offset: Offset) -> Register<T, P, StoredOffset> {
+    unsafe fn open_register<T: Datatype, P>(&self, offset: Offset) -> Register<T, P, StoredOffset> {
         Register::new(offset)
     }
 
-    fn open_readonly_const_register<T: Datatype, const N: Offset>(&self) -> Register<T, ReadOnly, ConstOffset<N>> {
+    unsafe fn open_readonly_const_register<T: Datatype, const N: Offset>(&self) -> Register<T, ReadOnly, ConstOffset<N>> {
         Register::new_const()
     }
 
-    fn open_readonly_register<T: Datatype>(&self, offset: Offset) -> Register<T, ReadOnly, StoredOffset> {
+    unsafe fn open_readonly_register<T: Datatype>(&self, offset: Offset) -> Register<T, ReadOnly, StoredOffset> {
         Register::new(offset)
     }
 }
@@ -286,15 +282,7 @@ impl<Fpga> SessionAccess for Session<Fpga>
 where
     Fpga: Deref<Target = NiFpga>,
 {
-    fn fpga(&self) -> &NiFpga {
+    unsafe fn fpga(&self) -> &NiFpga {
         &self.fpga_storage
-    }
-
-    fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error> {
-        T::read(self, offset)
-    }
-
-    fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error> {
-        T::write(self, offset, data)
     }
 }

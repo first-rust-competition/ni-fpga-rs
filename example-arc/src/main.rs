@@ -1,106 +1,29 @@
-use std::{ffi::CString, thread};
+use std::thread;
 
-use ni_fpga::fxp::UnsignedPackedNumber;
-use ni_fpga::{Register, RegisterReadAccess, SessionAccess, SessionBuilder, StoredOffset, ReadOnly};
-use ni_fpga_macros::{Cluster, Enum};
+use ni_fpga::{ReadOnly, Register, RegisterReadAccess, SessionAccess, StoredOffset};
 
-#[derive(Cluster, Debug)]
-struct DigitalSource {
-    channel: UnsignedPackedNumber<4>,
-    module: UnsignedPackedNumber<1>,
-    analog_trigger: bool,
-}
+use crate::registers::FpgaBitfile;
 
-#[derive(Cluster, Debug)]
-struct DutyCycleFrequency {
-    pub overflow: bool,
-    pub frequency: UnsignedPackedNumber<11>,
-}
-
-#[derive(Cluster, Debug)]
-struct PWMConfig {
-    period: u16,
-    min_high: u16,
-}
-#[derive(Cluster, Debug)]
-struct AnalogTriggerOutput {
-    in_hysteresis: bool,
-    over_limit: bool,
-    rising: bool,
-    falling: bool,
-}
-
-#[derive(Enum, Debug, Copy, Clone)]
-enum SPIDebugState {
-    Idle,
-    CheckWindow,
-    CheckAvailable,
-    SetFIFOMark,
-    EnableSPI,
-    StuffFIFO,
-    CheckMark,
-    ShuffleData,
-    Disable,
-}
-
-const BITFILE_CONTENTS: &str = include_str!("roboRIO_FPGA_2023_23.0.0.lvbitx");
+mod registers;
 
 fn main() -> Result<(), ni_fpga::Error> {
-    let session = SessionBuilder::new()
-        .bitfile_contents(BITFILE_CONTENTS)?
-        .ignore_signature()
-        .resource("rio://172.22.11.2/RIO0")?
-        .build_arc()?;
+    let mut regs = FpgaBitfile::take().unwrap();
 
-    let mut dc_offset: u32 = 0;
-    let c = CString::new("DutyCycle0.Frequency").unwrap();
-    let dc0 = unsafe {
-        session
-            .fpga()
-            .ffi()
-            .api21
-            .as_ref()
-            .unwrap()
-            .NiFpgaDll_FindRegister(session.fpga().session(), c.as_ptr(), &mut dc_offset)
-    };
+    let session = FpgaBitfile::session_builder("rio://172.22.11.2/RIO0")?.build_arc()?;
 
-    println!("{} {}", dc0, dc_offset);
+    let dc0 = regs.DutyCycle0_Frequency.take().unwrap();
+    let r = dc0.read(&session);
 
-    let dc = session.open_readonly_register::<DutyCycleFrequency>(dc_offset);
-    let r = dc.read(&session)?;
-
-    println!("{:?} {}", r, r.frequency);
-
-    let c = CString::new("DutyCycle1.Frequency").unwrap();
-    let dc0 = unsafe {
-        session
-            .fpga()
-            .ffi()
-            .api21
-            .as_ref()
-            .unwrap()
-            .NiFpgaDll_FindRegister(session.fpga().session(), c.as_ptr(), &mut dc_offset)
-    };
-
-    println!("{} {}", dc0, dc_offset);
-
-    let dc = session.open_readonly_register::<DutyCycleFrequency>(dc_offset);
-    let r = dc.read(&session)?;
-
-    println!("{:?} {}", r, r.frequency);
-
-    let dc0s = session.open_readonly_const_register::<DigitalSource, 99398>();
-    let config = dc0s.read(&session);
-
-    println!("{:?}", config);
+    let dc1_src = regs.DutyCycle1_Source.take().unwrap();
+    let configs = dc1_src.read(&session);
 
     let session_2 = session.clone();
 
-    let voltage_register = session.open_readonly_register::<u16>(99174);
-    let voltage_register_2 = session.open_readonly_const_register::<u16, 99174>();
+    let voltage_register = unsafe { session.open_readonly_register::<u16>(99174) };
+    let voltage_register_2 = unsafe { session.open_readonly_const_register::<u16, 99174>() };
 
     let voltage_register_3: Register<u16, ReadOnly, StoredOffset> =
-        session.open_readonly_const_register::<u16, 99174>().into();
+        unsafe { session.open_readonly_const_register::<u16, 99174>() }.into();
 
     let read_pwm_thread = thread::spawn(move || voltage_register_2.read(&session_2));
 

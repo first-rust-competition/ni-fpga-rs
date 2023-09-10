@@ -34,7 +34,7 @@ pub struct Register<T, P, O> {
 
 impl<T, P> Register<T, P, StoredOffset> {
     #[inline]
-    pub fn new(offset: Offset) -> Self {
+    pub const unsafe fn new(offset: Offset) -> Self {
         Self {
             _offset_type: StoredOffset(offset),
             _type: PhantomData,
@@ -45,7 +45,7 @@ impl<T, P> Register<T, P, StoredOffset> {
 
 impl<T, P, const N: Offset> Register<T, P, ConstOffset<N>> {
     #[inline]
-    pub fn new_const() -> Self {
+    pub const unsafe fn new_const() -> Self {
         Self {
             _offset_type: ConstOffset,
             _type: PhantomData,
@@ -69,11 +69,12 @@ pub trait RegisterReadAccess<T>
 where
     T: Datatype,
 {
+    #[doc(hidden)]
     fn offset_read(&self) -> Offset;
 
     #[inline(never)]
     fn read(&self, session: &impl SessionAccess) -> Result<T, Error> {
-        T::read(session, self.offset_read())
+        unsafe { T::read(session, self.offset_read()) }
     }
 }
 
@@ -81,6 +82,7 @@ pub trait RegisterWriteAccess<T>
 where
     T: Datatype,
 {
+    #[doc(hidden)]
     fn offset_write(&self) -> Offset;
 
     #[inline]
@@ -89,7 +91,7 @@ where
         session: &impl SessionAccess,
         value: impl Borrow<T>,
     ) -> Result<(), Error> {
-        T::write(session, self.offset_write(), value)
+        unsafe { T::write(session, self.offset_write(), value) }
     }
 }
 
