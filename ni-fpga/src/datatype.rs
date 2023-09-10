@@ -1,11 +1,15 @@
-use bitvec::prelude::*;
+use bitvec::{access::BitSafeU8, prelude::*};
 
 use crate::errors::Error;
 
 #[cfg(target_endian = "little")]
-pub type FpgaBits = BitSlice<Msb0, u8>;
+pub type FpgaBits = BitSlice<BitSafeU8, Msb0>;
+#[cfg(target_endian = "little")]
+pub(crate) type FpgaBitsRaw = BitSlice<u8, Msb0>;
 #[cfg(target_endian = "big")]
-pub type FpgaBits = BitSlice<Lsb0, u8>;
+pub type FpgaBits = BitSlice<BitSafeU8, Lsb0>;
+#[cfg(target_endian = "big")]
+pub(crate) type FpgaBits = BitSlice<u8, Lsb0>;
 
 pub trait Datatype: Sized {
     const SIZE_IN_BITS: usize;
@@ -24,6 +28,7 @@ impl<T: Datatype, const N: usize> Datatype for [T; N] {
             .try_for_each(|(src, bits)| Datatype::pack(bits, src))
     }
 
+    #[allow(clippy::forget_non_drop)]
     fn unpack(fpga_bits: &FpgaBits) -> Result<Self, Error> {
         let mut data: [std::mem::MaybeUninit<T>; N] = std::mem::MaybeUninit::uninit_array();
         data.iter_mut()

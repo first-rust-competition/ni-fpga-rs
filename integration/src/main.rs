@@ -26,6 +26,12 @@ fn test_case<T: PartialEq + std::fmt::Debug>(test_case_name: &str, actual: T, ex
     }
 }
 
+#[cfg(target_arch = "arm")]
+const RESOURCE: &str = "RIO0";
+
+#[cfg(not(target_arch = "arm"))]
+const RESOURCE: &str = "rio://172.22.11.2/RIO0";
+
 #[allow(overflowing_literals)]
 fn main() -> Result<(), ni_fpga::Error> {
     let mut tmp_bitfile = NamedTempFile::new().unwrap();
@@ -34,7 +40,7 @@ fn main() -> Result<(), ni_fpga::Error> {
     let session = Session::open(
         tmp_bitfile.path().to_str().unwrap(),
         "D08F17F77A45A5692FA2342C6B86E0EE",
-        "RIO0",
+        RESOURCE,
     )?;
 
     test_case("read plain U8", session.read::<u8>(98306)?, 0b00000001);
@@ -98,15 +104,12 @@ fn main() -> Result<(), ni_fpga::Error> {
         session.read::<TestCluster>(98360)?,
         TestCluster { b: false, u: 1337 },
     );
-    // TODO: Investigate cluster array memory layout in order to fix this test.
-    // The expected array may be incorrect here, I don't exactly remember what I used for the
-    // fixture bitfile before my LabView FPGA trial expired.
     test_case(
         "read cluster array",
-        session.read::<[TestCluster; 2]>(98360)?,
+        session.read::<[TestCluster; 2]>(98364)?,
         [
-            TestCluster { b: true, u: 255 },
-            TestCluster { b: false, u: 1337 },
+            TestCluster { b: true, u: 1234 },
+            TestCluster { b: false, u: 5678 },
         ],
     );
 
