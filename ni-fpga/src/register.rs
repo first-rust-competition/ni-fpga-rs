@@ -86,11 +86,7 @@ where
     fn offset_write(&self) -> Offset;
 
     #[inline]
-    fn write(
-        &mut self,
-        session: &impl SessionAccess,
-        value: impl Borrow<T>,
-    ) -> Result<(), Error> {
+    fn write(&mut self, session: &impl SessionAccess, value: impl Borrow<T>) -> Result<(), Error> {
         unsafe { T::write(session, self.offset_write(), value) }
     }
 }

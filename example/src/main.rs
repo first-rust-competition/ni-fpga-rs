@@ -1,4 +1,4 @@
-use ni_fpga::{Session, SessionAccess};
+use ni_fpga::Session;
 use ni_fpga_macros::{Cluster, Enum};
 
 #[derive(Cluster, Debug)]
@@ -28,15 +28,15 @@ enum SPIDebugState {
 }
 
 fn main() -> Result<(), ni_fpga::Error> {
-    let session = Session::open(
+    let _session = Session::open(
         "/boot/user.lvbitx",
         "264D0BA312FF00B741D4742415E1D470",
         "RIO0",
     )?;
 
-    println!("Input voltage: {:?}", session.read::<u16>(99174)?);
-    println!("{:#?}", session.read::<PWMConfig>(98536)?);
-    println!("{:#?}", session.read::<[AnalogTriggerOutput; 8]>(98424)?);
-    println!("{:#?}", session.read::<SPIDebugState>(99314)?);
+    // println!("Input voltage: {:?}", session.read::<u16>(99174)?);
+    // println!("{:#?}", session.read::<PWMConfig>(98536)?);
+    // println!("{:#?}", session.read::<[AnalogTriggerOutput; 8]>(98424)?);
+    // println!("{:#?}", session.read::<SPIDebugState>(99314)?);
     Ok(())
 }

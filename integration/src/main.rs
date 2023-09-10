@@ -1,16 +1,12 @@
 use bitvec::vec::BitVec;
-use ni_fpga::{Error, RegisterReadAccess, SessionAccess, SessionBuilder};
+use ni_fpga::{Error, RegisterReadAccess, SessionAccess};
 
 use colored::*;
 use ni_fpga::fxp::{SignedFXP, UnsignedFXP};
 use ni_fpga::Datatype;
-use ni_fpga_macros::Cluster;
+use registers::FpgaBitfile;
 
-#[derive(Cluster, Debug, PartialEq, Clone, Copy)]
-struct TestCluster {
-    b: bool,
-    u: u16,
-}
+mod registers;
 
 fn test_case<T: PartialEq + std::fmt::Debug>(test_case_name: &str, actual: T, expected: T) {
     eprint!("{}...", test_case_name);
@@ -26,24 +22,13 @@ fn test_case<T: PartialEq + std::fmt::Debug>(test_case_name: &str, actual: T, ex
     }
 }
 
-fn full_test_case<T: PartialEq + std::fmt::Debug + Datatype + Copy, const N: u32>(
+fn full_test_case<T: PartialEq + std::fmt::Debug + Datatype + Copy>(
     session: &impl SessionAccess,
     test_case_name: &str,
+    reg: impl RegisterReadAccess<T>,
     expected: T,
 ) -> Result<(), ni_fpga::Error> {
-    let reg = unsafe { session.open_readonly_register::<T>(N) } ;
-    test_case(
-        &format!("{} ref", test_case_name),
-        reg.read(session)?,
-        expected,
-    );
-    let reg = unsafe { session.open_readonly_const_register::<T, N>() };
-    test_case(
-        &format!("{} const ref", test_case_name),
-        reg.read(session)?,
-        expected,
-    );
-
+    test_case(test_case_name, reg.read(session)?, expected);
     round_trip_test(&expected)?;
 
     Ok(())
@@ -59,75 +44,99 @@ fn round_trip_test<T: Datatype + PartialEq + std::fmt::Debug>(data: &T) -> Resul
     Ok(())
 }
 
-const BITFILE_CONTENTS: &str = include_str!("integration.lvbitx");
-
 #[allow(overflowing_literals)]
 fn main() -> Result<(), ni_fpga::Error> {
-    let session = SessionBuilder::new()
-        .bitfile_contents(BITFILE_CONTENTS)?
-        .ignore_signature()
-        .resource("rio://172.22.11.2/RIO0")?
-        .build()?;
+    let session = FpgaBitfile::session_builder("rio://172.22.11.2/RIO0")?.build()?;
+    let registers = FpgaBitfile::take(&session)?;
 
-    full_test_case::<u8, 98306>(&session, "read plain U8", 0b00000001)?;
-    full_test_case::<u16, 98310>(&session, "read plain U16", 0b0000001100000001)?;
-    full_test_case::<u32, 98312>(
+    full_test_case(&session, "read plain U8", registers.U8.unwrap(), 0b00000001)?;
+    full_test_case(
+        &session,
+        "read plain U16",
+        registers.U16.unwrap(),
+        0b0000001100000001,
+    )?;
+    full_test_case(
         &session,
         "read plain U32",
+        registers.U32.unwrap(),
         0b00001111000001110000001100000001,
     )?;
-    full_test_case::<u64, 98316>(
+    full_test_case(
         &session,
         "read plain U64",
+        registers.U64.unwrap(),
         0b1111111101111111001111110001111100001111000001110000001100000001,
     )?;
 
-    full_test_case::<i8, 98322>(&session, "read plain I8", 0b10000000)?;
-    full_test_case::<i16, 98326>(&session, "read plain I16", 0b1100000010000000)?;
-    full_test_case::<i32, 98328>(
+    full_test_case(&session, "read plain I8", registers.I8.unwrap(), 0b10000000)?;
+    full_test_case(
+        &session,
+        "read plain I16",
+        registers.I16.unwrap(),
+        0b1100000010000000,
+    )?;
+    full_test_case(
         &session,
         "read plain I32",
+        registers.I32.unwrap(),
         0b11110000111000001100000010000000,
     )?;
-    full_test_case::<i64, 98332>(
+    full_test_case(
         &session,
         "read plain I64",
+        registers.I64.unwrap(),
         0b1111111111111110111111001111100011110000111000001100000010000000,
     )?;
 
     #[allow(clippy::approx_constant)]
-    full_test_case::<f32, 98336>(&session, "read SGL", 3.14)?;
+    full_test_case(&session, "read SGL", registers.SGL.unwrap(), 3.14)?;
 
-    full_test_case::<UnsignedFXP<4, 3>, 98342>(
+    full_test_case(
         &session,
         "read unsigned FXP",
+        registers.UnsignedFXP.unwrap(),
         UnsignedFXP::from_float(4.5)?,
     )?;
-    full_test_case::<SignedFXP<4, 3>, 98346>(
+    full_test_case(
         &session,
         "read unsigned FXP",
+        registers.SignedFXP.unwrap(),
         SignedFXP::from_float(-1.5)?,
     )?;
 
-    full_test_case::<bool, 98350>(&session, "read true bool", true)?;
-    full_test_case::<bool, 98354>(&session, "read false bool", false)?;
-    full_test_case::<[bool; 8], 98358>(
+    full_test_case(
+        &session,
+        "read true bool",
+        registers.TrueBool.unwrap(),
+        true,
+    )?;
+    full_test_case(
+        &session,
+        "read false bool",
+        registers.FalseBool.unwrap(),
+        false,
+    )?;
+    full_test_case(
         &session,
         "read bool array",
+        registers.BoolArray.unwrap(),
         [true, false, true, false, true, false, true, false],
     )?;
 
-    full_test_case::<TestCluster, 98360>(
+    full_test_case(
         &session,
         "read cluster",
-        TestCluster { b: false, u: 1337 },
+        registers.TestCluster.unwrap(),
+        registers::types::TestCluster { b: false, u: 1337 },
     )?;
-    full_test_case::<[TestCluster; 2], 98364>(
+    full_test_case(
         &session,
         "read cluster array",
+        registers.TestClusterArray.unwrap(),
         [
-            TestCluster { b: true, u: 1234 },
-            TestCluster { b: false, u: 5678 },
+            registers::types::TestClusterArray { b: true, u: 1234 },
+            registers::types::TestClusterArray { b: false, u: 5678 },
         ],
     )?;
 

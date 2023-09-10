@@ -9,7 +9,7 @@ use crate::datatype::Datatype;
 use crate::errors::Error;
 use crate::hmb::Hmb;
 use crate::nifpga::NiFpga;
-use crate::register::{ConstOffset, Register, StoredOffset, ReadOnly};
+use crate::register::{ConstOffset, ReadOnly, Register, StoredOffset};
 use crate::session_lifetimes::{ArcStorage, InPlaceStorage, StorageClone};
 use crate::Offset;
 
@@ -261,7 +261,11 @@ impl SessionBuilder {
 pub trait SessionAccess {
     unsafe fn fpga(&self) -> &NiFpga;
 
-    unsafe fn open_const_register<T: Datatype, P, const N: Offset>(&self) -> Register<T, P, ConstOffset<N>> {
+    fn find_offset(&self, name: impl AsRef<str>) -> Result<Offset, Error>;
+
+    unsafe fn open_const_register<T: Datatype, P, const N: Offset>(
+        &self,
+    ) -> Register<T, P, ConstOffset<N>> {
         Register::new_const()
     }
 
@@ -269,11 +273,16 @@ pub trait SessionAccess {
         Register::new(offset)
     }
 
-    unsafe fn open_readonly_const_register<T: Datatype, const N: Offset>(&self) -> Register<T, ReadOnly, ConstOffset<N>> {
+    unsafe fn open_readonly_const_register<T: Datatype, const N: Offset>(
+        &self,
+    ) -> Register<T, ReadOnly, ConstOffset<N>> {
         Register::new_const()
     }
 
-    unsafe fn open_readonly_register<T: Datatype>(&self, offset: Offset) -> Register<T, ReadOnly, StoredOffset> {
+    unsafe fn open_readonly_register<T: Datatype>(
+        &self,
+        offset: Offset,
+    ) -> Register<T, ReadOnly, StoredOffset> {
         Register::new(offset)
     }
 }
@@ -284,5 +293,9 @@ where
 {
     unsafe fn fpga(&self) -> &NiFpga {
         &self.fpga_storage
+    }
+
+    fn find_offset(&self, name: impl AsRef<str>) -> Result<Offset, Error> {
+        self.fpga_storage.find_offset(CString::new(name.as_ref())?)
     }
 }

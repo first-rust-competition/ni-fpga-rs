@@ -7,15 +7,14 @@ use crate::registers::FpgaBitfile;
 mod registers;
 
 fn main() -> Result<(), ni_fpga::Error> {
-    let mut regs = FpgaBitfile::take().unwrap();
-
     let session = FpgaBitfile::session_builder("rio://172.22.11.2/RIO0")?.build_arc()?;
+    let mut regs = FpgaBitfile::take(&session).unwrap();
 
     let dc0 = regs.DutyCycle0_Frequency.take().unwrap();
-    let r = dc0.read(&session);
+    let _r = dc0.read(&session);
 
     let dc1_src = regs.DutyCycle1_Source.take().unwrap();
-    let configs = dc1_src.read(&session);
+    let _configs = dc1_src.read(&session);
 
     let session_2 = session.clone();
 

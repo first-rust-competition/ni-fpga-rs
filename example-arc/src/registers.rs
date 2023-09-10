@@ -1,5 +1,6 @@
-use std::marker::PhantomData;
-mod types {
+#![allow(warnings)]
+
+pub mod types {
     use super::types;
     use ni_fpga_macros::{Cluster, Enum};
     #[derive(Cluster, Debug)]
@@ -881,1642 +882,1897 @@ mod types {
     }
 }
 pub struct FpgaBitfile {
-    pub LocalTime: Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98304>>>,
-    pub Revision: Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98308>>>,
-    pub Version: Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98314>>>,
-    pub LocalTimeUpper:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98316>>>,
-    pub LEDs:
-        Option<ni_fpga::Register<types::LEDs, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98320>>>,
-    pub UserButton: Option<ni_fpga::Register<bool, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98326>>>,
+    pub LocalTime: Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub Revision: Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub Version: Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub LocalTimeUpper: Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub LEDs: Option<ni_fpga::Register<types::LEDs, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub UserButton: Option<ni_fpga::Register<bool, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub InterruptForceOnce:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98330>>>,
+        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub InterruptForceNumber:
-        Option<ni_fpga::Register<u8, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98334>>>,
+        Option<ni_fpga::Register<u8, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub SysWatchdog_Status: Option<
-        ni_fpga::Register<
-            types::SysWatchdog_Status,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98336>,
-        >,
+        ni_fpga::Register<types::SysWatchdog_Status, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub SysWatchdog_Command:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98340>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub SysWatchdog_Challenge:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98344>>>,
-    pub SysWatchdog_Timer:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98348>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub SysWatchdog_Timer: Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub SysWatchdog_Active:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98354>>>,
+        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub SysWatchdog_ForcedKills: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<15, 15, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98358>,
+            ni_fpga::StoredOffset,
         >,
     >,
-    pub AI_ReadSelect: Option<
-        ni_fpga::Register<types::AI_ReadSelect, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98362>>,
-    >,
-    pub AI_LatchOutput:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98366>>>,
-    pub AI_Output: Option<ni_fpga::Register<i32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98368>>>,
-    pub AI_Config: Option<
-        ni_fpga::Register<types::AI_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98372>>,
-    >,
+    pub AI_ReadSelect:
+        Option<ni_fpga::Register<types::AI_ReadSelect, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub AI_LatchOutput: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub AI_Output: Option<ni_fpga::Register<i32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub AI_Config:
+        Option<ni_fpga::Register<types::AI_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AI_ScanList: Option<
         ni_fpga::Register<
             [ni_fpga::fxp::FXP<3, 3, false>; 8],
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98376>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub AI_OversampleBits: Option<
         ni_fpga::Register<
             [ni_fpga::fxp::FXP<4, 4, false>; 8],
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98380>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub AI_AverageBits: Option<
         ni_fpga::Register<
             [ni_fpga::fxp::FXP<4, 4, false>; 8],
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98384>,
+            ni_fpga::StoredOffset,
         >,
     >,
-    pub AI_LoopTiming:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98388>>>,
+    pub AI_LoopTiming: Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Accumulator0_Center:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98392>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub Accumulator0_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98398>>>,
+        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub Accumulator0_Output: Option<
-        ni_fpga::Register<
-            types::Accumulator0_Output,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98400>,
-        >,
+        ni_fpga::Register<types::Accumulator0_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Accumulator0_Deadband:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98404>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub Accumulator1_Center:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98408>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub Accumulator1_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98414>>>,
+        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub Accumulator1_Output: Option<
-        ni_fpga::Register<
-            types::Accumulator1_Output,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98416>,
-        >,
+        ni_fpga::Register<types::Accumulator1_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Accumulator1_Deadband:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98420>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AnalogTrigger_Output: Option<
         ni_fpga::Register<
             [types::AnalogTrigger_Output; 8],
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98424>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub AnalogTrigger0_SourceSelect: Option<
         ni_fpga::Register<
             types::AnalogTrigger0_SourceSelect,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98430>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub AnalogTrigger0_UpperLimit:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98432>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AnalogTrigger0_LowerLimit:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98436>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AnalogTrigger1_SourceSelect: Option<
         ni_fpga::Register<
             types::AnalogTrigger1_SourceSelect,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98442>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub AnalogTrigger1_UpperLimit:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98444>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AnalogTrigger1_LowerLimit:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98448>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AnalogTrigger2_SourceSelect: Option<
         ni_fpga::Register<
             types::AnalogTrigger2_SourceSelect,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98454>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub AnalogTrigger2_UpperLimit:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98456>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AnalogTrigger2_LowerLimit:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98460>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AnalogTrigger3_SourceSelect: Option<
         ni_fpga::Register<
             types::AnalogTrigger3_SourceSelect,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98466>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub AnalogTrigger3_UpperLimit:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98468>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AnalogTrigger3_LowerLimit:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98472>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AnalogTrigger4_SourceSelect: Option<
         ni_fpga::Register<
             types::AnalogTrigger4_SourceSelect,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98478>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub AnalogTrigger4_UpperLimit:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98480>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AnalogTrigger4_LowerLimit:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98484>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AnalogTrigger5_SourceSelect: Option<
         ni_fpga::Register<
             types::AnalogTrigger5_SourceSelect,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98490>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub AnalogTrigger6_UpperLimit:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98492>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AnalogTrigger6_LowerLimit:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98496>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AnalogTrigger6_SourceSelect: Option<
         ni_fpga::Register<
             types::AnalogTrigger6_SourceSelect,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98502>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub AnalogTrigger5_UpperLimit:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98504>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AnalogTrigger5_LowerLimit:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98508>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AnalogTrigger7_SourceSelect: Option<
         ni_fpga::Register<
             types::AnalogTrigger7_SourceSelect,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98514>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub AnalogTrigger7_UpperLimit:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98516>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub AnalogTrigger7_LowerLimit:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98520>>>,
-    pub PWM_LoopTiming:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98526>>>,
+        Option<ni_fpga::Register<i32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub PWM_LoopTiming: Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub PWM_CycleStartTimeUpper:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98528>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub PWM_CycleStartTime:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98532>>>,
-    pub PWM_Config: Option<
-        ni_fpga::Register<types::PWM_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98536>>,
-    >,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub PWM_Config:
+        Option<ni_fpga::Register<types::PWM_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub PWM_PeriodScaleHdr: Option<
         ni_fpga::Register<
             [ni_fpga::fxp::FXP<2, 2, false>; 10],
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98540>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_PeriodScaleMXP: Option<
         ni_fpga::Register<
             [ni_fpga::fxp::FXP<2, 2, false>; 10],
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98544>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_ZeroLatch:
-        Option<ni_fpga::Register<[bool; 20], ni_fpga::ReadWrite, ni_fpga::ConstOffset<98548>>>,
+        Option<ni_fpga::Register<[bool; 20], ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub PWM_Hdr0: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98554>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr1: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98558>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr2: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98562>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr3: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98566>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr4: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98570>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr5: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98574>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr6: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98578>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr7: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98582>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr8: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98586>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_Hdr9: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98590>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP0: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98594>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP1: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98598>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP2: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98602>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP3: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98606>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP4: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98610>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP5: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98614>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP6: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98618>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP7: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98622>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP8: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98626>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub PWM_MXP9: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<12, 12, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98630>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DIO_OutputEnable: Option<
-        ni_fpga::Register<types::DIO_OutputEnable, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98632>>,
+        ni_fpga::Register<types::DIO_OutputEnable, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub DIO_DO:
-        Option<ni_fpga::Register<types::DIO_DO, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98636>>>,
-    pub DIO_DI:
-        Option<ni_fpga::Register<types::DIO_DI, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98640>>>,
+    pub DIO_DO: Option<ni_fpga::Register<types::DIO_DO, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub DIO_DI: Option<ni_fpga::Register<types::DIO_DI, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub DIO_FilterSelectHdr: Option<
         ni_fpga::Register<
             [ni_fpga::fxp::FXP<2, 2, false>; 16],
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98644>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DIO_FilterPeriodHdr0: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<24, 24, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98648>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DIO_FilterPeriodHdr1: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<24, 24, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98652>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DIO_FilterPeriodHdr2: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<24, 24, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98656>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DIO_FilterSelectMXP: Option<
         ni_fpga::Register<
             [ni_fpga::fxp::FXP<2, 2, false>; 16],
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98660>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DIO_FilterPeriodMXP0: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<24, 24, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98664>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DIO_FilterPeriodMXP1: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<24, 24, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98668>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DIO_FilterPeriodMXP2: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<24, 24, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98672>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DIO_EnableMXPSpecialFunction:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98678>>>,
-    pub DIO_PulseLength:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98682>>>,
-    pub DIO_Pulse: Option<
-        ni_fpga::Register<types::DIO_Pulse, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98684>>,
-    >,
+        Option<ni_fpga::Register<u16, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub DIO_PulseLength: Option<ni_fpga::Register<u16, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub DIO_Pulse:
+        Option<ni_fpga::Register<types::DIO_Pulse, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub DIO_PWMDutyCycleA:
-        Option<ni_fpga::Register<[u8; 4], ni_fpga::ReadWrite, ni_fpga::ConstOffset<98688>>>,
+        Option<ni_fpga::Register<[u8; 4], ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub DIO_PWMDutyCycleB:
-        Option<ni_fpga::Register<[u8; 2], ni_fpga::ReadWrite, ni_fpga::ConstOffset<98694>>>,
+        Option<ni_fpga::Register<[u8; 2], ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub DIO_PWMOutputSelect: Option<
         ni_fpga::Register<
             [ni_fpga::fxp::FXP<5, 5, false>; 6],
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98696>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DIO_PWMPeriodPower:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98702>>>,
+        Option<ni_fpga::Register<u16, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub Counter0_Config: Option<
-        ni_fpga::Register<types::Counter0_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98704>>,
+        ni_fpga::Register<types::Counter0_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub Counter0_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98710>>>,
-    pub Counter0_Output: Option<
-        ni_fpga::Register<types::Counter0_Output, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98712>>,
-    >,
+    pub Counter0_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Counter0_Output:
+        Option<ni_fpga::Register<types::Counter0_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Counter0_TimerConfig: Option<
-        ni_fpga::Register<
-            types::Counter0_TimerConfig,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98716>,
-        >,
+        ni_fpga::Register<types::Counter0_TimerConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Counter0_TimerOutput: Option<
-        ni_fpga::Register<
-            types::Counter0_TimerOutput,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98720>,
-        >,
+        ni_fpga::Register<types::Counter0_TimerOutput, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Counter1_Config: Option<
-        ni_fpga::Register<types::Counter1_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98724>>,
+        ni_fpga::Register<types::Counter1_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub Counter1_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98730>>>,
-    pub Counter1_Output: Option<
-        ni_fpga::Register<types::Counter1_Output, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98732>>,
-    >,
+    pub Counter1_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Counter1_Output:
+        Option<ni_fpga::Register<types::Counter1_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Counter1_TimerConfig: Option<
-        ni_fpga::Register<
-            types::Counter1_TimerConfig,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98736>,
-        >,
+        ni_fpga::Register<types::Counter1_TimerConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Counter1_TimerOutput: Option<
-        ni_fpga::Register<
-            types::Counter1_TimerOutput,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98740>,
-        >,
+        ni_fpga::Register<types::Counter1_TimerOutput, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Counter2_Config: Option<
-        ni_fpga::Register<types::Counter2_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98744>>,
+        ni_fpga::Register<types::Counter2_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub Counter2_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98750>>>,
-    pub Counter2_Output: Option<
-        ni_fpga::Register<types::Counter2_Output, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98752>>,
-    >,
+    pub Counter2_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Counter2_Output:
+        Option<ni_fpga::Register<types::Counter2_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Counter2_TimerConfig: Option<
-        ni_fpga::Register<
-            types::Counter2_TimerConfig,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98756>,
-        >,
+        ni_fpga::Register<types::Counter2_TimerConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Counter2_TimerOutput: Option<
-        ni_fpga::Register<
-            types::Counter2_TimerOutput,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98760>,
-        >,
+        ni_fpga::Register<types::Counter2_TimerOutput, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Counter3_Config: Option<
-        ni_fpga::Register<types::Counter3_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98764>>,
+        ni_fpga::Register<types::Counter3_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub Counter3_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98770>>>,
-    pub Counter3_Output: Option<
-        ni_fpga::Register<types::Counter3_Output, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98772>>,
-    >,
+    pub Counter3_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Counter3_Output:
+        Option<ni_fpga::Register<types::Counter3_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Counter3_TimerConfig: Option<
-        ni_fpga::Register<
-            types::Counter3_TimerConfig,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98776>,
-        >,
+        ni_fpga::Register<types::Counter3_TimerConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Counter3_TimerOutput: Option<
-        ni_fpga::Register<
-            types::Counter3_TimerOutput,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98780>,
-        >,
+        ni_fpga::Register<types::Counter3_TimerOutput, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Counter4_Config: Option<
-        ni_fpga::Register<types::Counter4_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98784>>,
+        ni_fpga::Register<types::Counter4_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub Counter4_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98790>>>,
-    pub Counter4_Output: Option<
-        ni_fpga::Register<types::Counter4_Output, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98792>>,
-    >,
+    pub Counter4_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Counter4_Output:
+        Option<ni_fpga::Register<types::Counter4_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Counter4_TimerConfig: Option<
-        ni_fpga::Register<
-            types::Counter4_TimerConfig,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98796>,
-        >,
+        ni_fpga::Register<types::Counter4_TimerConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Counter4_TimerOutput: Option<
-        ni_fpga::Register<
-            types::Counter4_TimerOutput,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98800>,
-        >,
+        ni_fpga::Register<types::Counter4_TimerOutput, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Counter5_Config: Option<
-        ni_fpga::Register<types::Counter5_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98804>>,
+        ni_fpga::Register<types::Counter5_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub Counter5_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98810>>>,
-    pub Counter5_Output: Option<
-        ni_fpga::Register<types::Counter5_Output, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98812>>,
-    >,
+    pub Counter5_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Counter5_Output:
+        Option<ni_fpga::Register<types::Counter5_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Counter5_TimerConfig: Option<
-        ni_fpga::Register<
-            types::Counter5_TimerConfig,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98816>,
-        >,
+        ni_fpga::Register<types::Counter5_TimerConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Counter5_TimerOutput: Option<
-        ni_fpga::Register<
-            types::Counter5_TimerOutput,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98820>,
-        >,
+        ni_fpga::Register<types::Counter5_TimerOutput, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Counter6_Config: Option<
-        ni_fpga::Register<types::Counter6_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98824>>,
+        ni_fpga::Register<types::Counter6_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub Counter6_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98830>>>,
-    pub Counter6_Output: Option<
-        ni_fpga::Register<types::Counter6_Output, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98832>>,
-    >,
+    pub Counter6_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Counter6_Output:
+        Option<ni_fpga::Register<types::Counter6_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Counter6_TimerConfig: Option<
-        ni_fpga::Register<
-            types::Counter6_TimerConfig,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98836>,
-        >,
+        ni_fpga::Register<types::Counter6_TimerConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Counter6_TimerOutput: Option<
-        ni_fpga::Register<
-            types::Counter6_TimerOutput,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98840>,
-        >,
+        ni_fpga::Register<types::Counter6_TimerOutput, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Counter7_Config: Option<
-        ni_fpga::Register<types::Counter7_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98844>>,
+        ni_fpga::Register<types::Counter7_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub Counter7_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98850>>>,
-    pub Counter7_Output: Option<
-        ni_fpga::Register<types::Counter7_Output, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98852>>,
-    >,
+    pub Counter7_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Counter7_Output:
+        Option<ni_fpga::Register<types::Counter7_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Counter7_TimerConfig: Option<
-        ni_fpga::Register<
-            types::Counter7_TimerConfig,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98856>,
-        >,
+        ni_fpga::Register<types::Counter7_TimerConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Counter7_TimerOutput: Option<
-        ni_fpga::Register<
-            types::Counter7_TimerOutput,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98860>,
-        >,
+        ni_fpga::Register<types::Counter7_TimerOutput, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Encoder0_Config: Option<
-        ni_fpga::Register<types::Encoder0_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98864>>,
+        ni_fpga::Register<types::Encoder0_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub Encoder0_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98870>>>,
-    pub Encoder0_Output: Option<
-        ni_fpga::Register<types::Encoder0_Output, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98872>>,
-    >,
+    pub Encoder0_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Encoder0_Output:
+        Option<ni_fpga::Register<types::Encoder0_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Encoder0_TimerConfig: Option<
-        ni_fpga::Register<
-            types::Encoder0_TimerConfig,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98876>,
-        >,
+        ni_fpga::Register<types::Encoder0_TimerConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Encoder0_TimerOutput: Option<
-        ni_fpga::Register<
-            types::Encoder0_TimerOutput,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98880>,
-        >,
+        ni_fpga::Register<types::Encoder0_TimerOutput, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Encoder1_Config: Option<
-        ni_fpga::Register<types::Encoder1_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98884>>,
+        ni_fpga::Register<types::Encoder1_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub Encoder1_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98890>>>,
-    pub Encoder1_Output: Option<
-        ni_fpga::Register<types::Encoder1_Output, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98892>>,
-    >,
+    pub Encoder1_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Encoder1_Output:
+        Option<ni_fpga::Register<types::Encoder1_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Encoder1_TimerConfig: Option<
-        ni_fpga::Register<
-            types::Encoder1_TimerConfig,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98896>,
-        >,
+        ni_fpga::Register<types::Encoder1_TimerConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Encoder1_TimerOutput: Option<
-        ni_fpga::Register<
-            types::Encoder1_TimerOutput,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98900>,
-        >,
+        ni_fpga::Register<types::Encoder1_TimerOutput, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Encoder2_Config: Option<
-        ni_fpga::Register<types::Encoder2_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98904>>,
+        ni_fpga::Register<types::Encoder2_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub Encoder2_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98910>>>,
-    pub Encoder2_Output: Option<
-        ni_fpga::Register<types::Encoder2_Output, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98912>>,
-    >,
+    pub Encoder2_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Encoder2_Output:
+        Option<ni_fpga::Register<types::Encoder2_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Encoder2_TimerConfig: Option<
-        ni_fpga::Register<
-            types::Encoder2_TimerConfig,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98916>,
-        >,
+        ni_fpga::Register<types::Encoder2_TimerConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Encoder2_TimerOutput: Option<
-        ni_fpga::Register<
-            types::Encoder2_TimerOutput,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98920>,
-        >,
+        ni_fpga::Register<types::Encoder2_TimerOutput, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Encoder3_Config: Option<
-        ni_fpga::Register<types::Encoder3_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98924>>,
+        ni_fpga::Register<types::Encoder3_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub Encoder3_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98930>>>,
-    pub Encoder3_Output: Option<
-        ni_fpga::Register<types::Encoder3_Output, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98932>>,
-    >,
+    pub Encoder3_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Encoder3_Output:
+        Option<ni_fpga::Register<types::Encoder3_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Encoder3_TimerConfig: Option<
-        ni_fpga::Register<
-            types::Encoder3_TimerConfig,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98936>,
-        >,
+        ni_fpga::Register<types::Encoder3_TimerConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Encoder3_TimerOutput: Option<
-        ni_fpga::Register<
-            types::Encoder3_TimerOutput,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98940>,
-        >,
+        ni_fpga::Register<types::Encoder3_TimerOutput, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Encoder4_Config: Option<
-        ni_fpga::Register<types::Encoder4_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98944>>,
+        ni_fpga::Register<types::Encoder4_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub Encoder4_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98950>>>,
-    pub Encoder4_Output: Option<
-        ni_fpga::Register<types::Encoder4_Output, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98952>>,
-    >,
+    pub Encoder4_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Encoder4_Output:
+        Option<ni_fpga::Register<types::Encoder4_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Encoder4_TimerConfig: Option<
-        ni_fpga::Register<
-            types::Encoder4_TimerConfig,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98956>,
-        >,
+        ni_fpga::Register<types::Encoder4_TimerConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Encoder4_TimerOutput: Option<
-        ni_fpga::Register<
-            types::Encoder4_TimerOutput,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98960>,
-        >,
+        ni_fpga::Register<types::Encoder4_TimerOutput, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Encoder5_Config: Option<
-        ni_fpga::Register<types::Encoder5_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98964>>,
+        ni_fpga::Register<types::Encoder5_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub Encoder5_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98970>>>,
-    pub Encoder5_Output: Option<
-        ni_fpga::Register<types::Encoder5_Output, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98972>>,
-    >,
+    pub Encoder5_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Encoder5_Output:
+        Option<ni_fpga::Register<types::Encoder5_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Encoder5_TimerConfig: Option<
-        ni_fpga::Register<
-            types::Encoder5_TimerConfig,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98976>,
-        >,
+        ni_fpga::Register<types::Encoder5_TimerConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Encoder5_TimerOutput: Option<
-        ni_fpga::Register<
-            types::Encoder5_TimerOutput,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<98980>,
-        >,
+        ni_fpga::Register<types::Encoder5_TimerOutput, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Encoder6_Config: Option<
-        ni_fpga::Register<types::Encoder6_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98984>>,
+        ni_fpga::Register<types::Encoder6_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub Encoder6_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<98990>>>,
-    pub Encoder6_Output: Option<
-        ni_fpga::Register<types::Encoder6_Output, ni_fpga::ReadOnly, ni_fpga::ConstOffset<98992>>,
-    >,
+    pub Encoder6_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Encoder6_Output:
+        Option<ni_fpga::Register<types::Encoder6_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Encoder6_TimerConfig: Option<
-        ni_fpga::Register<
-            types::Encoder6_TimerConfig,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<98996>,
-        >,
+        ni_fpga::Register<types::Encoder6_TimerConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Encoder6_TimerOutput: Option<
-        ni_fpga::Register<
-            types::Encoder6_TimerOutput,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99000>,
-        >,
+        ni_fpga::Register<types::Encoder6_TimerOutput, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Encoder7_Config: Option<
-        ni_fpga::Register<types::Encoder7_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99004>>,
+        ni_fpga::Register<types::Encoder7_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub Encoder7_Reset:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99010>>>,
-    pub Encoder7_Output: Option<
-        ni_fpga::Register<types::Encoder7_Output, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99012>>,
-    >,
+    pub Encoder7_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Encoder7_Output:
+        Option<ni_fpga::Register<types::Encoder7_Output, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Encoder7_TimerConfig: Option<
-        ni_fpga::Register<
-            types::Encoder7_TimerConfig,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99016>,
-        >,
+        ni_fpga::Register<types::Encoder7_TimerConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Encoder7_TimerOutput: Option<
-        ni_fpga::Register<
-            types::Encoder7_TimerOutput,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99020>,
-        >,
+        ni_fpga::Register<types::Encoder7_TimerOutput, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Interrupt0_Config: Option<
-        ni_fpga::Register<
-            types::Interrupt0_Config,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99026>,
-        >,
+        ni_fpga::Register<types::Interrupt0_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Interrupt0_RisingTimeStamp:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99028>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Interrupt0_FallingTimeStamp:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99032>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Interrupt1_Config: Option<
-        ni_fpga::Register<
-            types::Interrupt1_Config,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99038>,
-        >,
+        ni_fpga::Register<types::Interrupt1_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Interrupt1_RisingTimeStamp:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99040>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Interrupt1_FallingTimeStamp:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99044>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Interrupt2_Config: Option<
-        ni_fpga::Register<
-            types::Interrupt2_Config,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99050>,
-        >,
+        ni_fpga::Register<types::Interrupt2_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Interrupt2_RisingTimeStamp:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99052>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Interrupt2_FallingTimeStamp:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99056>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Interrupt3_Config: Option<
-        ni_fpga::Register<
-            types::Interrupt3_Config,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99062>,
-        >,
+        ni_fpga::Register<types::Interrupt3_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Interrupt3_RisingTimeStamp:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99064>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Interrupt3_FallingTimeStamp:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99068>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Interrupt4_Config: Option<
-        ni_fpga::Register<
-            types::Interrupt4_Config,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99074>,
-        >,
+        ni_fpga::Register<types::Interrupt4_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Interrupt4_RisingTimeStamp:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99076>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Interrupt4_FallingTimeStamp:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99080>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Interrupt5_Config: Option<
-        ni_fpga::Register<
-            types::Interrupt5_Config,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99086>,
-        >,
+        ni_fpga::Register<types::Interrupt5_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Interrupt5_RisingTimeStamp:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99088>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Interrupt5_FallingTimeStamp:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99092>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Interrupt6_Config: Option<
-        ni_fpga::Register<
-            types::Interrupt6_Config,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99098>,
-        >,
+        ni_fpga::Register<types::Interrupt6_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Interrupt6_RisingTimeStamp:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99100>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Interrupt6_FallingTimeStamp:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99104>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Interrupt7_Config: Option<
-        ni_fpga::Register<
-            types::Interrupt7_Config,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99110>,
-        >,
+        ni_fpga::Register<types::Interrupt7_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub Interrupt7_RisingTimeStamp:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99112>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Interrupt7_FallingTimeStamp:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99116>>>,
-    pub DMA_Rate: Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99120>>>,
-    pub DMA_Config: Option<
-        ni_fpga::Register<types::DMA_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99124>>,
-    >,
-    pub DMA_ExternalTriggers0: Option<
-        ni_fpga::Register<[types::Trigger; 4], ni_fpga::ReadWrite, ni_fpga::ConstOffset<99128>>,
-    >,
-    pub DMA_ExternalTriggers1: Option<
-        ni_fpga::Register<[types::Trigger; 4], ni_fpga::ReadWrite, ni_fpga::ConstOffset<99132>>,
-    >,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub DMA_Rate: Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub DMA_Config:
+        Option<ni_fpga::Register<types::DMA_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub DMA_ExternalTriggers0:
+        Option<ni_fpga::Register<[types::Trigger; 4], ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub DMA_ExternalTriggers1:
+        Option<ni_fpga::Register<[types::Trigger; 4], ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub Alarm_TriggerTime:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99136>>>,
-    pub Alarm_Enable:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99142>>>,
-    pub Relay_Value: Option<
-        ni_fpga::Register<types::Relay_Value, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99146>>,
-    >,
-    pub Power_Status: Option<
-        ni_fpga::Register<types::Power_Status, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99148>>,
-    >,
-    pub Power_Disable: Option<
-        ni_fpga::Register<types::Power_Disable, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99154>>,
-    >,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Alarm_Enable: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Relay_Value:
+        Option<ni_fpga::Register<types::Relay_Value, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Power_Status:
+        Option<ni_fpga::Register<types::Power_Status, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub Power_Disable:
+        Option<ni_fpga::Register<types::Power_Disable, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub Power_UserVoltage6V:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99158>>>,
+        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Power_UserCurrent6V:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99162>>>,
+        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Power_UserVoltage5V:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99166>>>,
+        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Power_UserCurrent5V:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99170>>>,
+        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Power_UserVoltage3V3:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99174>>>,
+        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Power_UserCurrent3V3:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99178>>>,
-    pub Power_VinVoltage:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99182>>>,
-    pub Power_VinCurrent:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99186>>>,
+        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub Power_VinVoltage: Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub Power_VinCurrent: Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Power_OnChipTemperature:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99190>>>,
+        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Power_MXP_DIOVoltage:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99194>>>,
+        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Power_IntegratedIO:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99198>>>,
-    pub Power_AOVoltage:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99202>>>,
+        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub Power_AOVoltage: Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub Power_FaultCounts: Option<
-        ni_fpga::Register<types::Power_FaultCounts, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99204>>,
+        ni_fpga::Register<types::Power_FaultCounts, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
     pub Power_ResetFaultCounts:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99210>>>,
+        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub Power_BrownoutVoltage250mV:
-        Option<ni_fpga::Register<u8, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99214>>>,
-    pub BIST_Enable:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99218>>>,
+        Option<ni_fpga::Register<u8, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub BIST_Enable: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub BIST_DO0SquareEnable:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99222>>>,
+        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub BIST_DO0SquareTicks:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99224>>>,
-    pub BIST_DO0: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99230>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub BIST_DO0: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub BIST_DO1SquareEnable:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99234>>>,
+        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub BIST_DO1SquareTicks:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99236>>>,
-    pub BIST_DO1: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99242>>>,
-    pub AO_MXP0: Option<ni_fpga::Register<u16, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99246>>>,
-    pub AO_MXP1: Option<ni_fpga::Register<u16, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99250>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub BIST_DO1: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub AO_MXP0: Option<ni_fpga::Register<u16, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub AO_MXP1: Option<ni_fpga::Register<u16, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub SPI_ChipSelectActiveHigh: Option<
         ni_fpga::Register<
             types::SPI_ChipSelectActiveHigh,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99254>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub SPI_EnableDIO: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<5, 5, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99258>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub SPI_AutoSPI1Select:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99262>>>,
+        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub SPI_AutoByteCount: Option<
-        ni_fpga::Register<
-            types::SPI_AutoByteCount,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99266>,
-        >,
+        ni_fpga::Register<types::SPI_AutoByteCount, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub SPI_AutoForceOne:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99270>>>,
-    pub SPI_AutoRate:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99272>>>,
+        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub SPI_AutoRate: Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub SPI_AutoTriggerConfig: Option<
-        ni_fpga::Register<
-            types::SPI_AutoTriggerConfig,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99278>,
-        >,
+        ni_fpga::Register<types::SPI_AutoTriggerConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub SPI_AutoChipSelect:
-        Option<ni_fpga::Register<u8, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99282>>>,
-    pub SPI_AutoTx0:
-        Option<ni_fpga::Register<[u8; 4], ni_fpga::ReadWrite, ni_fpga::ConstOffset<99284>>>,
-    pub SPI_AutoTx1:
-        Option<ni_fpga::Register<[u8; 4], ni_fpga::ReadWrite, ni_fpga::ConstOffset<99288>>>,
-    pub SPI_AutoTx2:
-        Option<ni_fpga::Register<[u8; 4], ni_fpga::ReadWrite, ni_fpga::ConstOffset<99292>>>,
-    pub SPI_AutoTx3:
-        Option<ni_fpga::Register<[u8; 4], ni_fpga::ReadWrite, ni_fpga::ConstOffset<99296>>>,
-    pub SPI_AutoTx4:
-        Option<ni_fpga::Register<[u8; 4], ni_fpga::ReadWrite, ni_fpga::ConstOffset<99300>>>,
-    pub SPI_AutoTx5:
-        Option<ni_fpga::Register<[u8; 4], ni_fpga::ReadWrite, ni_fpga::ConstOffset<99304>>>,
+        Option<ni_fpga::Register<u8, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub SPI_AutoTx0: Option<ni_fpga::Register<[u8; 4], ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub SPI_AutoTx1: Option<ni_fpga::Register<[u8; 4], ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub SPI_AutoTx2: Option<ni_fpga::Register<[u8; 4], ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub SPI_AutoTx3: Option<ni_fpga::Register<[u8; 4], ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub SPI_AutoTx4: Option<ni_fpga::Register<[u8; 4], ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub SPI_AutoTx5: Option<ni_fpga::Register<[u8; 4], ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub SPI_TransferSkippedFullCount:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99308>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub SPI_StallConfig: Option<
-        ni_fpga::Register<types::SPI_StallConfig, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99312>>,
+        ni_fpga::Register<types::SPI_StallConfig, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
-    pub SPI_DebugState: Option<
-        ni_fpga::Register<types::SPI_DebugState, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99318>>,
-    >,
-    pub SPI_DebugSubstate:
-        Option<ni_fpga::Register<u8, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99322>>>,
-    pub SPI_DebugRevision:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99324>>>,
-    pub SPI_DebugEnabled:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99328>>>,
-    pub SPI_DebugIntStat:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99332>>>,
+    pub SPI_DebugState:
+        Option<ni_fpga::Register<types::SPI_DebugState, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub SPI_DebugSubstate: Option<ni_fpga::Register<u8, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub SPI_DebugRevision: Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub SPI_DebugEnabled: Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub SPI_DebugIntStat: Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub SPI_DebugIntStatReadCount:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99336>>>,
-    pub Accel_ADDR: Option<ni_fpga::Register<u8, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99342>>>,
-    pub Accel_CNTR: Option<ni_fpga::Register<u8, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99346>>>,
-    pub Accel_DATO: Option<ni_fpga::Register<u8, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99350>>>,
-    pub Accel_DATI: Option<ni_fpga::Register<u8, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99354>>>,
-    pub Accel_CNTL: Option<ni_fpga::Register<u8, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99358>>>,
-    pub Accel_STAT: Option<ni_fpga::Register<u8, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99362>>>,
-    pub Accel_CNFG: Option<ni_fpga::Register<u8, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99366>>>,
-    pub Accel_GO: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99370>>>,
-    pub HMB_Config: Option<
-        ni_fpga::Register<types::HMB_Config, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99372>>,
-    >,
-    pub HMB_ForceOnce:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99378>>>,
+        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub Accel_ADDR: Option<ni_fpga::Register<u8, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Accel_CNTR: Option<ni_fpga::Register<u8, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Accel_DATO: Option<ni_fpga::Register<u8, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Accel_DATI: Option<ni_fpga::Register<u8, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub Accel_CNTL: Option<ni_fpga::Register<u8, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Accel_STAT: Option<ni_fpga::Register<u8, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub Accel_CNFG: Option<ni_fpga::Register<u8, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub Accel_GO: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub HMB_Config:
+        Option<ni_fpga::Register<types::HMB_Config, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub HMB_ForceOnce: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub DutyCycle0_Source: Option<
-        ni_fpga::Register<
-            types::DutyCycle0_Source,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99382>,
-        >,
+        ni_fpga::Register<types::DutyCycle0_Source, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub DutyCycle0_Frequency: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<11, 11, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99386>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle0_Output: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<31, 31, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99388>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle0_HighTicks: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<20, 20, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99392>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle1_Source: Option<
-        ni_fpga::Register<
-            types::DutyCycle1_Source,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99398>,
-        >,
+        ni_fpga::Register<types::DutyCycle1_Source, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub DutyCycle1_Frequency: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<11, 11, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99402>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle1_Output: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<31, 31, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99404>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle1_HighTicks: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<20, 20, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99408>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle2_Source: Option<
-        ni_fpga::Register<
-            types::DutyCycle2_Source,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99414>,
-        >,
+        ni_fpga::Register<types::DutyCycle2_Source, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub DutyCycle2_Frequency: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<11, 11, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99418>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle2_Output: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<31, 31, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99420>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle2_HighTicks: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<20, 20, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99424>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle3_Source: Option<
-        ni_fpga::Register<
-            types::DutyCycle3_Source,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99430>,
-        >,
+        ni_fpga::Register<types::DutyCycle3_Source, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub DutyCycle3_Frequency: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<11, 11, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99434>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle3_Output: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<31, 31, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99436>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle3_HighTicks: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<20, 20, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99440>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle4_Source: Option<
-        ni_fpga::Register<
-            types::DutyCycle4_Source,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99446>,
-        >,
+        ni_fpga::Register<types::DutyCycle4_Source, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub DutyCycle4_Frequency: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<11, 11, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99450>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle4_Output: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<31, 31, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99452>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle4_HighTicks: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<20, 20, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99456>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle5_Source: Option<
-        ni_fpga::Register<
-            types::DutyCycle5_Source,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99462>,
-        >,
+        ni_fpga::Register<types::DutyCycle5_Source, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub DutyCycle5_Frequency: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<11, 11, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99466>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle5_Output: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<31, 31, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99468>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle5_HighTicks: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<20, 20, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99472>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle6_Source: Option<
-        ni_fpga::Register<
-            types::DutyCycle6_Source,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99478>,
-        >,
+        ni_fpga::Register<types::DutyCycle6_Source, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub DutyCycle6_Frequency: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<11, 11, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99482>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle6_Output: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<31, 31, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99484>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle6_HighTicks: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<20, 20, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99488>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle7_Source: Option<
-        ni_fpga::Register<
-            types::DutyCycle7_Source,
-            ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99494>,
-        >,
+        ni_fpga::Register<types::DutyCycle7_Source, ni_fpga::ReadWrite, ni_fpga::StoredOffset>,
     >,
     pub DutyCycle7_Frequency: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<11, 11, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99498>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle7_Output: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<31, 31, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99500>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub DutyCycle7_HighTicks: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<20, 20, false>,
             ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99504>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub LED_OutputSelect: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<4, 4, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99510>,
+            ni_fpga::StoredOffset,
         >,
     >,
-    pub LED_StringLength:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99514>>>,
-    pub LED_Load: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99518>>>,
-    pub LED_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99522>>>,
-    pub LED_Start: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99526>>>,
-    pub LED_Abort: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::ConstOffset<99530>>>,
+    pub LED_StringLength: Option<ni_fpga::Register<u16, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub LED_Load: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub LED_Reset: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub LED_Start: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub LED_Abort: Option<ni_fpga::Register<bool, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub LED_SyncTiming: Option<
         ni_fpga::Register<
             ni_fpga::fxp::FXP<16, 16, false>,
             ni_fpga::ReadWrite,
-            ni_fpga::ConstOffset<99534>,
+            ni_fpga::StoredOffset,
         >,
     >,
     pub LED_HighBitTickTiming:
-        Option<ni_fpga::Register<[u8; 2], ni_fpga::ReadWrite, ni_fpga::ConstOffset<99538>>>,
+        Option<ni_fpga::Register<[u8; 2], ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
     pub LED_LowBitTickTiming:
-        Option<ni_fpga::Register<[u8; 2], ni_fpga::ReadWrite, ni_fpga::ConstOffset<99542>>>,
-    pub LED_Active: Option<ni_fpga::Register<bool, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99546>>>,
+        Option<ni_fpga::Register<[u8; 2], ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub LED_Active: Option<ni_fpga::Register<bool, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub LED_PixelWriteIndex:
-        Option<ni_fpga::Register<i16, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99550>>>,
+        Option<ni_fpga::Register<i16, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub LED_PixelOutputIndex:
-        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99554>>>,
-    pub HMB_ReadData:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99556>>>,
-    pub HMB_WriteCount:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99560>>>,
+        Option<ni_fpga::Register<u16, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub HMB_ReadData: Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub HMB_WriteCount: Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub HMB_WriteAddress: Option<
-        ni_fpga::Register<
-            ni_fpga::fxp::FXP<9, 9, false>,
-            ni_fpga::ReadOnly,
-            ni_fpga::ConstOffset<99566>,
-        >,
+        ni_fpga::Register<ni_fpga::fxp::FXP<9, 9, false>, ni_fpga::ReadOnly, ni_fpga::StoredOffset>,
     >,
-    pub HMB_WriteData:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99568>>>,
-    pub HMB_LoopCount:
-        Option<ni_fpga::Register<i32, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99572>>>,
+    pub HMB_WriteData: Option<ni_fpga::Register<u32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub HMB_LoopCount: Option<ni_fpga::Register<i32, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub HMB_WriteReadyForInput:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99578>>>,
+        Option<ni_fpga::Register<bool, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
     pub HMB_ReqReadyForInput:
-        Option<ni_fpga::Register<bool, ni_fpga::ReadOnly, ni_fpga::ConstOffset<99582>>>,
-    pub ViControl: Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<94208>>>,
-    pub DiagramReset:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<94216>>>,
-    pub InterruptEnable:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<90112>>>,
-    pub InterruptMask:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<90120>>>,
-    pub InterruptStatus:
-        Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::ConstOffset<90124>>>,
+        Option<ni_fpga::Register<bool, ni_fpga::ReadOnly, ni_fpga::StoredOffset>>,
+    pub ViControl: Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub DiagramReset: Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub InterruptEnable: Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub InterruptMask: Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
+    pub InterruptStatus: Option<ni_fpga::Register<u32, ni_fpga::ReadWrite, ni_fpga::StoredOffset>>,
 }
 impl FpgaBitfile {
-    pub fn take() -> Option<Self> {
-        static REGISTERS: std::sync::Mutex<Option<FpgaBitfile>> =
-            std::sync::Mutex::new(Some(FpgaBitfile {
-                LocalTime: Some(unsafe { ni_fpga::Register::new_const() }),
-                Revision: Some(unsafe { ni_fpga::Register::new_const() }),
-                Version: Some(unsafe { ni_fpga::Register::new_const() }),
-                LocalTimeUpper: Some(unsafe { ni_fpga::Register::new_const() }),
-                LEDs: Some(unsafe { ni_fpga::Register::new_const() }),
-                UserButton: Some(unsafe { ni_fpga::Register::new_const() }),
-                InterruptForceOnce: Some(unsafe { ni_fpga::Register::new_const() }),
-                InterruptForceNumber: Some(unsafe { ni_fpga::Register::new_const() }),
-                SysWatchdog_Status: Some(unsafe { ni_fpga::Register::new_const() }),
-                SysWatchdog_Command: Some(unsafe { ni_fpga::Register::new_const() }),
-                SysWatchdog_Challenge: Some(unsafe { ni_fpga::Register::new_const() }),
-                SysWatchdog_Timer: Some(unsafe { ni_fpga::Register::new_const() }),
-                SysWatchdog_Active: Some(unsafe { ni_fpga::Register::new_const() }),
-                SysWatchdog_ForcedKills: Some(unsafe { ni_fpga::Register::new_const() }),
-                AI_ReadSelect: Some(unsafe { ni_fpga::Register::new_const() }),
-                AI_LatchOutput: Some(unsafe { ni_fpga::Register::new_const() }),
-                AI_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                AI_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                AI_ScanList: Some(unsafe { ni_fpga::Register::new_const() }),
-                AI_OversampleBits: Some(unsafe { ni_fpga::Register::new_const() }),
-                AI_AverageBits: Some(unsafe { ni_fpga::Register::new_const() }),
-                AI_LoopTiming: Some(unsafe { ni_fpga::Register::new_const() }),
-                Accumulator0_Center: Some(unsafe { ni_fpga::Register::new_const() }),
-                Accumulator0_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Accumulator0_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Accumulator0_Deadband: Some(unsafe { ni_fpga::Register::new_const() }),
-                Accumulator1_Center: Some(unsafe { ni_fpga::Register::new_const() }),
-                Accumulator1_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Accumulator1_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Accumulator1_Deadband: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger0_SourceSelect: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger0_UpperLimit: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger0_LowerLimit: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger1_SourceSelect: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger1_UpperLimit: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger1_LowerLimit: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger2_SourceSelect: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger2_UpperLimit: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger2_LowerLimit: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger3_SourceSelect: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger3_UpperLimit: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger3_LowerLimit: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger4_SourceSelect: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger4_UpperLimit: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger4_LowerLimit: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger5_SourceSelect: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger6_UpperLimit: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger6_LowerLimit: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger6_SourceSelect: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger5_UpperLimit: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger5_LowerLimit: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger7_SourceSelect: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger7_UpperLimit: Some(unsafe { ni_fpga::Register::new_const() }),
-                AnalogTrigger7_LowerLimit: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_LoopTiming: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_CycleStartTimeUpper: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_CycleStartTime: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_PeriodScaleHdr: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_PeriodScaleMXP: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_ZeroLatch: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_Hdr0: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_Hdr1: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_Hdr2: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_Hdr3: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_Hdr4: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_Hdr5: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_Hdr6: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_Hdr7: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_Hdr8: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_Hdr9: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_MXP0: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_MXP1: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_MXP2: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_MXP3: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_MXP4: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_MXP5: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_MXP6: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_MXP7: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_MXP8: Some(unsafe { ni_fpga::Register::new_const() }),
-                PWM_MXP9: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_OutputEnable: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_DO: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_DI: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_FilterSelectHdr: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_FilterPeriodHdr0: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_FilterPeriodHdr1: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_FilterPeriodHdr2: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_FilterSelectMXP: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_FilterPeriodMXP0: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_FilterPeriodMXP1: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_FilterPeriodMXP2: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_EnableMXPSpecialFunction: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_PulseLength: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_Pulse: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_PWMDutyCycleA: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_PWMDutyCycleB: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_PWMOutputSelect: Some(unsafe { ni_fpga::Register::new_const() }),
-                DIO_PWMPeriodPower: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter0_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter0_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter0_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter0_TimerConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter0_TimerOutput: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter1_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter1_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter1_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter1_TimerConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter1_TimerOutput: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter2_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter2_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter2_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter2_TimerConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter2_TimerOutput: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter3_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter3_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter3_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter3_TimerConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter3_TimerOutput: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter4_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter4_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter4_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter4_TimerConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter4_TimerOutput: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter5_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter5_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter5_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter5_TimerConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter5_TimerOutput: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter6_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter6_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter6_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter6_TimerConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter6_TimerOutput: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter7_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter7_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter7_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter7_TimerConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                Counter7_TimerOutput: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder0_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder0_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder0_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder0_TimerConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder0_TimerOutput: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder1_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder1_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder1_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder1_TimerConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder1_TimerOutput: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder2_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder2_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder2_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder2_TimerConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder2_TimerOutput: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder3_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder3_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder3_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder3_TimerConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder3_TimerOutput: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder4_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder4_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder4_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder4_TimerConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder4_TimerOutput: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder5_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder5_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder5_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder5_TimerConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder5_TimerOutput: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder6_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder6_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder6_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder6_TimerConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder6_TimerOutput: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder7_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder7_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder7_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder7_TimerConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                Encoder7_TimerOutput: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt0_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt0_RisingTimeStamp: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt0_FallingTimeStamp: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt1_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt1_RisingTimeStamp: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt1_FallingTimeStamp: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt2_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt2_RisingTimeStamp: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt2_FallingTimeStamp: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt3_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt3_RisingTimeStamp: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt3_FallingTimeStamp: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt4_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt4_RisingTimeStamp: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt4_FallingTimeStamp: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt5_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt5_RisingTimeStamp: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt5_FallingTimeStamp: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt6_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt6_RisingTimeStamp: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt6_FallingTimeStamp: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt7_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt7_RisingTimeStamp: Some(unsafe { ni_fpga::Register::new_const() }),
-                Interrupt7_FallingTimeStamp: Some(unsafe { ni_fpga::Register::new_const() }),
-                DMA_Rate: Some(unsafe { ni_fpga::Register::new_const() }),
-                DMA_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                DMA_ExternalTriggers0: Some(unsafe { ni_fpga::Register::new_const() }),
-                DMA_ExternalTriggers1: Some(unsafe { ni_fpga::Register::new_const() }),
-                Alarm_TriggerTime: Some(unsafe { ni_fpga::Register::new_const() }),
-                Alarm_Enable: Some(unsafe { ni_fpga::Register::new_const() }),
-                Relay_Value: Some(unsafe { ni_fpga::Register::new_const() }),
-                Power_Status: Some(unsafe { ni_fpga::Register::new_const() }),
-                Power_Disable: Some(unsafe { ni_fpga::Register::new_const() }),
-                Power_UserVoltage6V: Some(unsafe { ni_fpga::Register::new_const() }),
-                Power_UserCurrent6V: Some(unsafe { ni_fpga::Register::new_const() }),
-                Power_UserVoltage5V: Some(unsafe { ni_fpga::Register::new_const() }),
-                Power_UserCurrent5V: Some(unsafe { ni_fpga::Register::new_const() }),
-                Power_UserVoltage3V3: Some(unsafe { ni_fpga::Register::new_const() }),
-                Power_UserCurrent3V3: Some(unsafe { ni_fpga::Register::new_const() }),
-                Power_VinVoltage: Some(unsafe { ni_fpga::Register::new_const() }),
-                Power_VinCurrent: Some(unsafe { ni_fpga::Register::new_const() }),
-                Power_OnChipTemperature: Some(unsafe { ni_fpga::Register::new_const() }),
-                Power_MXP_DIOVoltage: Some(unsafe { ni_fpga::Register::new_const() }),
-                Power_IntegratedIO: Some(unsafe { ni_fpga::Register::new_const() }),
-                Power_AOVoltage: Some(unsafe { ni_fpga::Register::new_const() }),
-                Power_FaultCounts: Some(unsafe { ni_fpga::Register::new_const() }),
-                Power_ResetFaultCounts: Some(unsafe { ni_fpga::Register::new_const() }),
-                Power_BrownoutVoltage250mV: Some(unsafe { ni_fpga::Register::new_const() }),
-                BIST_Enable: Some(unsafe { ni_fpga::Register::new_const() }),
-                BIST_DO0SquareEnable: Some(unsafe { ni_fpga::Register::new_const() }),
-                BIST_DO0SquareTicks: Some(unsafe { ni_fpga::Register::new_const() }),
-                BIST_DO0: Some(unsafe { ni_fpga::Register::new_const() }),
-                BIST_DO1SquareEnable: Some(unsafe { ni_fpga::Register::new_const() }),
-                BIST_DO1SquareTicks: Some(unsafe { ni_fpga::Register::new_const() }),
-                BIST_DO1: Some(unsafe { ni_fpga::Register::new_const() }),
-                AO_MXP0: Some(unsafe { ni_fpga::Register::new_const() }),
-                AO_MXP1: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_ChipSelectActiveHigh: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_EnableDIO: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_AutoSPI1Select: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_AutoByteCount: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_AutoForceOne: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_AutoRate: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_AutoTriggerConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_AutoChipSelect: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_AutoTx0: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_AutoTx1: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_AutoTx2: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_AutoTx3: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_AutoTx4: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_AutoTx5: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_TransferSkippedFullCount: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_StallConfig: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_DebugState: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_DebugSubstate: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_DebugRevision: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_DebugEnabled: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_DebugIntStat: Some(unsafe { ni_fpga::Register::new_const() }),
-                SPI_DebugIntStatReadCount: Some(unsafe { ni_fpga::Register::new_const() }),
-                Accel_ADDR: Some(unsafe { ni_fpga::Register::new_const() }),
-                Accel_CNTR: Some(unsafe { ni_fpga::Register::new_const() }),
-                Accel_DATO: Some(unsafe { ni_fpga::Register::new_const() }),
-                Accel_DATI: Some(unsafe { ni_fpga::Register::new_const() }),
-                Accel_CNTL: Some(unsafe { ni_fpga::Register::new_const() }),
-                Accel_STAT: Some(unsafe { ni_fpga::Register::new_const() }),
-                Accel_CNFG: Some(unsafe { ni_fpga::Register::new_const() }),
-                Accel_GO: Some(unsafe { ni_fpga::Register::new_const() }),
-                HMB_Config: Some(unsafe { ni_fpga::Register::new_const() }),
-                HMB_ForceOnce: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle0_Source: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle0_Frequency: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle0_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle0_HighTicks: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle1_Source: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle1_Frequency: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle1_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle1_HighTicks: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle2_Source: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle2_Frequency: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle2_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle2_HighTicks: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle3_Source: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle3_Frequency: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle3_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle3_HighTicks: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle4_Source: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle4_Frequency: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle4_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle4_HighTicks: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle5_Source: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle5_Frequency: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle5_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle5_HighTicks: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle6_Source: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle6_Frequency: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle6_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle6_HighTicks: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle7_Source: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle7_Frequency: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle7_Output: Some(unsafe { ni_fpga::Register::new_const() }),
-                DutyCycle7_HighTicks: Some(unsafe { ni_fpga::Register::new_const() }),
-                LED_OutputSelect: Some(unsafe { ni_fpga::Register::new_const() }),
-                LED_StringLength: Some(unsafe { ni_fpga::Register::new_const() }),
-                LED_Load: Some(unsafe { ni_fpga::Register::new_const() }),
-                LED_Reset: Some(unsafe { ni_fpga::Register::new_const() }),
-                LED_Start: Some(unsafe { ni_fpga::Register::new_const() }),
-                LED_Abort: Some(unsafe { ni_fpga::Register::new_const() }),
-                LED_SyncTiming: Some(unsafe { ni_fpga::Register::new_const() }),
-                LED_HighBitTickTiming: Some(unsafe { ni_fpga::Register::new_const() }),
-                LED_LowBitTickTiming: Some(unsafe { ni_fpga::Register::new_const() }),
-                LED_Active: Some(unsafe { ni_fpga::Register::new_const() }),
-                LED_PixelWriteIndex: Some(unsafe { ni_fpga::Register::new_const() }),
-                LED_PixelOutputIndex: Some(unsafe { ni_fpga::Register::new_const() }),
-                HMB_ReadData: Some(unsafe { ni_fpga::Register::new_const() }),
-                HMB_WriteCount: Some(unsafe { ni_fpga::Register::new_const() }),
-                HMB_WriteAddress: Some(unsafe { ni_fpga::Register::new_const() }),
-                HMB_WriteData: Some(unsafe { ni_fpga::Register::new_const() }),
-                HMB_LoopCount: Some(unsafe { ni_fpga::Register::new_const() }),
-                HMB_WriteReadyForInput: Some(unsafe { ni_fpga::Register::new_const() }),
-                HMB_ReqReadyForInput: Some(unsafe { ni_fpga::Register::new_const() }),
-                ViControl: Some(unsafe { ni_fpga::Register::new_const() }),
-                DiagramReset: Some(unsafe { ni_fpga::Register::new_const() }),
-                InterruptEnable: Some(unsafe { ni_fpga::Register::new_const() }),
-                InterruptMask: Some(unsafe { ni_fpga::Register::new_const() }),
-                InterruptStatus: Some(unsafe { ni_fpga::Register::new_const() }),
-            }));
+    pub fn take(session: &impl ni_fpga::SessionAccess) -> Result<Self, ni_fpga::Error> {
+        static REGISTERS: std::sync::Mutex<Option<()>> = std::sync::Mutex::new(Some(()));
         let mut lock = REGISTERS.lock().unwrap();
-        lock.take()
+        let contents = lock.take();
+        drop(lock);
+        if contents.is_none() {
+            return Err(ni_fpga::Error::ResourceAlreadyTaken);
+        }
+        Ok(Self {
+            LocalTime: Some(unsafe { ni_fpga::Register::new(session.find_offset("LocalTime")?) }),
+            Revision: Some(unsafe { ni_fpga::Register::new(session.find_offset("Revision")?) }),
+            Version: Some(unsafe { ni_fpga::Register::new(session.find_offset("Version")?) }),
+            LocalTimeUpper: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("LocalTimeUpper")?)
+            }),
+            LEDs: Some(unsafe { ni_fpga::Register::new(session.find_offset("LEDs")?) }),
+            UserButton: Some(unsafe { ni_fpga::Register::new(session.find_offset("UserButton")?) }),
+            InterruptForceOnce: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("InterruptForceOnce")?)
+            }),
+            InterruptForceNumber: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("InterruptForceNumber")?)
+            }),
+            SysWatchdog_Status: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SysWatchdog_Status")?)
+            }),
+            SysWatchdog_Command: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SysWatchdog_Command")?)
+            }),
+            SysWatchdog_Challenge: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SysWatchdog_Challenge")?)
+            }),
+            SysWatchdog_Timer: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SysWatchdog_Timer")?)
+            }),
+            SysWatchdog_Active: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SysWatchdog_Active")?)
+            }),
+            SysWatchdog_ForcedKills: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SysWatchdog_ForcedKills")?)
+            }),
+            AI_ReadSelect: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AI_ReadSelect")?)
+            }),
+            AI_LatchOutput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AI_LatchOutput")?)
+            }),
+            AI_Output: Some(unsafe { ni_fpga::Register::new(session.find_offset("AI_Output")?) }),
+            AI_Config: Some(unsafe { ni_fpga::Register::new(session.find_offset("AI_Config")?) }),
+            AI_ScanList: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AI_ScanList")?)
+            }),
+            AI_OversampleBits: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AI_OversampleBits")?)
+            }),
+            AI_AverageBits: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AI_AverageBits")?)
+            }),
+            AI_LoopTiming: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AI_LoopTiming")?)
+            }),
+            Accumulator0_Center: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Accumulator0_Center")?)
+            }),
+            Accumulator0_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Accumulator0_Reset")?)
+            }),
+            Accumulator0_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Accumulator0_Output")?)
+            }),
+            Accumulator0_Deadband: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Accumulator0_Deadband")?)
+            }),
+            Accumulator1_Center: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Accumulator1_Center")?)
+            }),
+            Accumulator1_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Accumulator1_Reset")?)
+            }),
+            Accumulator1_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Accumulator1_Output")?)
+            }),
+            Accumulator1_Deadband: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Accumulator1_Deadband")?)
+            }),
+            AnalogTrigger_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger_Output")?)
+            }),
+            AnalogTrigger0_SourceSelect: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger0_SourceSelect")?)
+            }),
+            AnalogTrigger0_UpperLimit: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger0_UpperLimit")?)
+            }),
+            AnalogTrigger0_LowerLimit: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger0_LowerLimit")?)
+            }),
+            AnalogTrigger1_SourceSelect: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger1_SourceSelect")?)
+            }),
+            AnalogTrigger1_UpperLimit: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger1_UpperLimit")?)
+            }),
+            AnalogTrigger1_LowerLimit: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger1_LowerLimit")?)
+            }),
+            AnalogTrigger2_SourceSelect: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger2_SourceSelect")?)
+            }),
+            AnalogTrigger2_UpperLimit: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger2_UpperLimit")?)
+            }),
+            AnalogTrigger2_LowerLimit: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger2_LowerLimit")?)
+            }),
+            AnalogTrigger3_SourceSelect: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger3_SourceSelect")?)
+            }),
+            AnalogTrigger3_UpperLimit: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger3_UpperLimit")?)
+            }),
+            AnalogTrigger3_LowerLimit: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger3_LowerLimit")?)
+            }),
+            AnalogTrigger4_SourceSelect: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger4_SourceSelect")?)
+            }),
+            AnalogTrigger4_UpperLimit: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger4_UpperLimit")?)
+            }),
+            AnalogTrigger4_LowerLimit: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger4_LowerLimit")?)
+            }),
+            AnalogTrigger5_SourceSelect: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger5_SourceSelect")?)
+            }),
+            AnalogTrigger6_UpperLimit: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger6_UpperLimit")?)
+            }),
+            AnalogTrigger6_LowerLimit: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger6_LowerLimit")?)
+            }),
+            AnalogTrigger6_SourceSelect: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger6_SourceSelect")?)
+            }),
+            AnalogTrigger5_UpperLimit: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger5_UpperLimit")?)
+            }),
+            AnalogTrigger5_LowerLimit: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger5_LowerLimit")?)
+            }),
+            AnalogTrigger7_SourceSelect: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger7_SourceSelect")?)
+            }),
+            AnalogTrigger7_UpperLimit: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger7_UpperLimit")?)
+            }),
+            AnalogTrigger7_LowerLimit: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("AnalogTrigger7_LowerLimit")?)
+            }),
+            PWM_LoopTiming: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("PWM_LoopTiming")?)
+            }),
+            PWM_CycleStartTimeUpper: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("PWM_CycleStartTimeUpper")?)
+            }),
+            PWM_CycleStartTime: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("PWM_CycleStartTime")?)
+            }),
+            PWM_Config: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Config")?) }),
+            PWM_PeriodScaleHdr: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("PWM_PeriodScaleHdr")?)
+            }),
+            PWM_PeriodScaleMXP: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("PWM_PeriodScaleMXP")?)
+            }),
+            PWM_ZeroLatch: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("PWM_ZeroLatch")?)
+            }),
+            PWM_Hdr0: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr0")?) }),
+            PWM_Hdr1: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr1")?) }),
+            PWM_Hdr2: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr2")?) }),
+            PWM_Hdr3: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr3")?) }),
+            PWM_Hdr4: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr4")?) }),
+            PWM_Hdr5: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr5")?) }),
+            PWM_Hdr6: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr6")?) }),
+            PWM_Hdr7: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr7")?) }),
+            PWM_Hdr8: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr8")?) }),
+            PWM_Hdr9: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_Hdr9")?) }),
+            PWM_MXP0: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP0")?) }),
+            PWM_MXP1: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP1")?) }),
+            PWM_MXP2: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP2")?) }),
+            PWM_MXP3: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP3")?) }),
+            PWM_MXP4: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP4")?) }),
+            PWM_MXP5: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP5")?) }),
+            PWM_MXP6: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP6")?) }),
+            PWM_MXP7: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP7")?) }),
+            PWM_MXP8: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP8")?) }),
+            PWM_MXP9: Some(unsafe { ni_fpga::Register::new(session.find_offset("PWM_MXP9")?) }),
+            DIO_OutputEnable: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DIO_OutputEnable")?)
+            }),
+            DIO_DO: Some(unsafe { ni_fpga::Register::new(session.find_offset("DIO_DO")?) }),
+            DIO_DI: Some(unsafe { ni_fpga::Register::new(session.find_offset("DIO_DI")?) }),
+            DIO_FilterSelectHdr: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DIO_FilterSelectHdr")?)
+            }),
+            DIO_FilterPeriodHdr0: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DIO_FilterPeriodHdr0")?)
+            }),
+            DIO_FilterPeriodHdr1: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DIO_FilterPeriodHdr1")?)
+            }),
+            DIO_FilterPeriodHdr2: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DIO_FilterPeriodHdr2")?)
+            }),
+            DIO_FilterSelectMXP: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DIO_FilterSelectMXP")?)
+            }),
+            DIO_FilterPeriodMXP0: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DIO_FilterPeriodMXP0")?)
+            }),
+            DIO_FilterPeriodMXP1: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DIO_FilterPeriodMXP1")?)
+            }),
+            DIO_FilterPeriodMXP2: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DIO_FilterPeriodMXP2")?)
+            }),
+            DIO_EnableMXPSpecialFunction: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DIO_EnableMXPSpecialFunction")?)
+            }),
+            DIO_PulseLength: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DIO_PulseLength")?)
+            }),
+            DIO_Pulse: Some(unsafe { ni_fpga::Register::new(session.find_offset("DIO_Pulse")?) }),
+            DIO_PWMDutyCycleA: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DIO_PWMDutyCycleA")?)
+            }),
+            DIO_PWMDutyCycleB: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DIO_PWMDutyCycleB")?)
+            }),
+            DIO_PWMOutputSelect: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DIO_PWMOutputSelect")?)
+            }),
+            DIO_PWMPeriodPower: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DIO_PWMPeriodPower")?)
+            }),
+            Counter0_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter0_Config")?)
+            }),
+            Counter0_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter0_Reset")?)
+            }),
+            Counter0_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter0_Output")?)
+            }),
+            Counter0_TimerConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter0_TimerConfig")?)
+            }),
+            Counter0_TimerOutput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter0_TimerOutput")?)
+            }),
+            Counter1_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter1_Config")?)
+            }),
+            Counter1_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter1_Reset")?)
+            }),
+            Counter1_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter1_Output")?)
+            }),
+            Counter1_TimerConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter1_TimerConfig")?)
+            }),
+            Counter1_TimerOutput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter1_TimerOutput")?)
+            }),
+            Counter2_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter2_Config")?)
+            }),
+            Counter2_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter2_Reset")?)
+            }),
+            Counter2_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter2_Output")?)
+            }),
+            Counter2_TimerConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter2_TimerConfig")?)
+            }),
+            Counter2_TimerOutput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter2_TimerOutput")?)
+            }),
+            Counter3_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter3_Config")?)
+            }),
+            Counter3_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter3_Reset")?)
+            }),
+            Counter3_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter3_Output")?)
+            }),
+            Counter3_TimerConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter3_TimerConfig")?)
+            }),
+            Counter3_TimerOutput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter3_TimerOutput")?)
+            }),
+            Counter4_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter4_Config")?)
+            }),
+            Counter4_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter4_Reset")?)
+            }),
+            Counter4_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter4_Output")?)
+            }),
+            Counter4_TimerConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter4_TimerConfig")?)
+            }),
+            Counter4_TimerOutput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter4_TimerOutput")?)
+            }),
+            Counter5_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter5_Config")?)
+            }),
+            Counter5_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter5_Reset")?)
+            }),
+            Counter5_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter5_Output")?)
+            }),
+            Counter5_TimerConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter5_TimerConfig")?)
+            }),
+            Counter5_TimerOutput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter5_TimerOutput")?)
+            }),
+            Counter6_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter6_Config")?)
+            }),
+            Counter6_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter6_Reset")?)
+            }),
+            Counter6_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter6_Output")?)
+            }),
+            Counter6_TimerConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter6_TimerConfig")?)
+            }),
+            Counter6_TimerOutput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter6_TimerOutput")?)
+            }),
+            Counter7_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter7_Config")?)
+            }),
+            Counter7_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter7_Reset")?)
+            }),
+            Counter7_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter7_Output")?)
+            }),
+            Counter7_TimerConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter7_TimerConfig")?)
+            }),
+            Counter7_TimerOutput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Counter7_TimerOutput")?)
+            }),
+            Encoder0_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder0_Config")?)
+            }),
+            Encoder0_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder0_Reset")?)
+            }),
+            Encoder0_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder0_Output")?)
+            }),
+            Encoder0_TimerConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder0_TimerConfig")?)
+            }),
+            Encoder0_TimerOutput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder0_TimerOutput")?)
+            }),
+            Encoder1_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder1_Config")?)
+            }),
+            Encoder1_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder1_Reset")?)
+            }),
+            Encoder1_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder1_Output")?)
+            }),
+            Encoder1_TimerConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder1_TimerConfig")?)
+            }),
+            Encoder1_TimerOutput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder1_TimerOutput")?)
+            }),
+            Encoder2_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder2_Config")?)
+            }),
+            Encoder2_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder2_Reset")?)
+            }),
+            Encoder2_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder2_Output")?)
+            }),
+            Encoder2_TimerConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder2_TimerConfig")?)
+            }),
+            Encoder2_TimerOutput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder2_TimerOutput")?)
+            }),
+            Encoder3_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder3_Config")?)
+            }),
+            Encoder3_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder3_Reset")?)
+            }),
+            Encoder3_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder3_Output")?)
+            }),
+            Encoder3_TimerConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder3_TimerConfig")?)
+            }),
+            Encoder3_TimerOutput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder3_TimerOutput")?)
+            }),
+            Encoder4_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder4_Config")?)
+            }),
+            Encoder4_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder4_Reset")?)
+            }),
+            Encoder4_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder4_Output")?)
+            }),
+            Encoder4_TimerConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder4_TimerConfig")?)
+            }),
+            Encoder4_TimerOutput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder4_TimerOutput")?)
+            }),
+            Encoder5_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder5_Config")?)
+            }),
+            Encoder5_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder5_Reset")?)
+            }),
+            Encoder5_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder5_Output")?)
+            }),
+            Encoder5_TimerConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder5_TimerConfig")?)
+            }),
+            Encoder5_TimerOutput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder5_TimerOutput")?)
+            }),
+            Encoder6_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder6_Config")?)
+            }),
+            Encoder6_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder6_Reset")?)
+            }),
+            Encoder6_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder6_Output")?)
+            }),
+            Encoder6_TimerConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder6_TimerConfig")?)
+            }),
+            Encoder6_TimerOutput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder6_TimerOutput")?)
+            }),
+            Encoder7_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder7_Config")?)
+            }),
+            Encoder7_Reset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder7_Reset")?)
+            }),
+            Encoder7_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder7_Output")?)
+            }),
+            Encoder7_TimerConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder7_TimerConfig")?)
+            }),
+            Encoder7_TimerOutput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Encoder7_TimerOutput")?)
+            }),
+            Interrupt0_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt0_Config")?)
+            }),
+            Interrupt0_RisingTimeStamp: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt0_RisingTimeStamp")?)
+            }),
+            Interrupt0_FallingTimeStamp: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt0_FallingTimeStamp")?)
+            }),
+            Interrupt1_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt1_Config")?)
+            }),
+            Interrupt1_RisingTimeStamp: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt1_RisingTimeStamp")?)
+            }),
+            Interrupt1_FallingTimeStamp: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt1_FallingTimeStamp")?)
+            }),
+            Interrupt2_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt2_Config")?)
+            }),
+            Interrupt2_RisingTimeStamp: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt2_RisingTimeStamp")?)
+            }),
+            Interrupt2_FallingTimeStamp: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt2_FallingTimeStamp")?)
+            }),
+            Interrupt3_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt3_Config")?)
+            }),
+            Interrupt3_RisingTimeStamp: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt3_RisingTimeStamp")?)
+            }),
+            Interrupt3_FallingTimeStamp: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt3_FallingTimeStamp")?)
+            }),
+            Interrupt4_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt4_Config")?)
+            }),
+            Interrupt4_RisingTimeStamp: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt4_RisingTimeStamp")?)
+            }),
+            Interrupt4_FallingTimeStamp: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt4_FallingTimeStamp")?)
+            }),
+            Interrupt5_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt5_Config")?)
+            }),
+            Interrupt5_RisingTimeStamp: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt5_RisingTimeStamp")?)
+            }),
+            Interrupt5_FallingTimeStamp: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt5_FallingTimeStamp")?)
+            }),
+            Interrupt6_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt6_Config")?)
+            }),
+            Interrupt6_RisingTimeStamp: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt6_RisingTimeStamp")?)
+            }),
+            Interrupt6_FallingTimeStamp: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt6_FallingTimeStamp")?)
+            }),
+            Interrupt7_Config: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt7_Config")?)
+            }),
+            Interrupt7_RisingTimeStamp: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt7_RisingTimeStamp")?)
+            }),
+            Interrupt7_FallingTimeStamp: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Interrupt7_FallingTimeStamp")?)
+            }),
+            DMA_Rate: Some(unsafe { ni_fpga::Register::new(session.find_offset("DMA_Rate")?) }),
+            DMA_Config: Some(unsafe { ni_fpga::Register::new(session.find_offset("DMA_Config")?) }),
+            DMA_ExternalTriggers0: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DMA_ExternalTriggers0")?)
+            }),
+            DMA_ExternalTriggers1: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DMA_ExternalTriggers1")?)
+            }),
+            Alarm_TriggerTime: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Alarm_TriggerTime")?)
+            }),
+            Alarm_Enable: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Alarm_Enable")?)
+            }),
+            Relay_Value: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Relay_Value")?)
+            }),
+            Power_Status: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Power_Status")?)
+            }),
+            Power_Disable: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Power_Disable")?)
+            }),
+            Power_UserVoltage6V: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Power_UserVoltage6V")?)
+            }),
+            Power_UserCurrent6V: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Power_UserCurrent6V")?)
+            }),
+            Power_UserVoltage5V: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Power_UserVoltage5V")?)
+            }),
+            Power_UserCurrent5V: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Power_UserCurrent5V")?)
+            }),
+            Power_UserVoltage3V3: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Power_UserVoltage3V3")?)
+            }),
+            Power_UserCurrent3V3: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Power_UserCurrent3V3")?)
+            }),
+            Power_VinVoltage: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Power_VinVoltage")?)
+            }),
+            Power_VinCurrent: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Power_VinCurrent")?)
+            }),
+            Power_OnChipTemperature: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Power_OnChipTemperature")?)
+            }),
+            Power_MXP_DIOVoltage: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Power_MXP_DIOVoltage")?)
+            }),
+            Power_IntegratedIO: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Power_IntegratedIO")?)
+            }),
+            Power_AOVoltage: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Power_AOVoltage")?)
+            }),
+            Power_FaultCounts: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Power_FaultCounts")?)
+            }),
+            Power_ResetFaultCounts: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Power_ResetFaultCounts")?)
+            }),
+            Power_BrownoutVoltage250mV: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("Power_BrownoutVoltage250mV")?)
+            }),
+            BIST_Enable: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("BIST_Enable")?)
+            }),
+            BIST_DO0SquareEnable: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("BIST_DO0SquareEnable")?)
+            }),
+            BIST_DO0SquareTicks: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("BIST_DO0SquareTicks")?)
+            }),
+            BIST_DO0: Some(unsafe { ni_fpga::Register::new(session.find_offset("BIST_DO0")?) }),
+            BIST_DO1SquareEnable: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("BIST_DO1SquareEnable")?)
+            }),
+            BIST_DO1SquareTicks: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("BIST_DO1SquareTicks")?)
+            }),
+            BIST_DO1: Some(unsafe { ni_fpga::Register::new(session.find_offset("BIST_DO1")?) }),
+            AO_MXP0: Some(unsafe { ni_fpga::Register::new(session.find_offset("AO_MXP0")?) }),
+            AO_MXP1: Some(unsafe { ni_fpga::Register::new(session.find_offset("AO_MXP1")?) }),
+            SPI_ChipSelectActiveHigh: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_ChipSelectActiveHigh")?)
+            }),
+            SPI_EnableDIO: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_EnableDIO")?)
+            }),
+            SPI_AutoSPI1Select: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_AutoSPI1Select")?)
+            }),
+            SPI_AutoByteCount: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_AutoByteCount")?)
+            }),
+            SPI_AutoForceOne: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_AutoForceOne")?)
+            }),
+            SPI_AutoRate: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_AutoRate")?)
+            }),
+            SPI_AutoTriggerConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_AutoTriggerConfig")?)
+            }),
+            SPI_AutoChipSelect: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_AutoChipSelect")?)
+            }),
+            SPI_AutoTx0: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_AutoTx0")?)
+            }),
+            SPI_AutoTx1: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_AutoTx1")?)
+            }),
+            SPI_AutoTx2: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_AutoTx2")?)
+            }),
+            SPI_AutoTx3: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_AutoTx3")?)
+            }),
+            SPI_AutoTx4: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_AutoTx4")?)
+            }),
+            SPI_AutoTx5: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_AutoTx5")?)
+            }),
+            SPI_TransferSkippedFullCount: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_TransferSkippedFullCount")?)
+            }),
+            SPI_StallConfig: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_StallConfig")?)
+            }),
+            SPI_DebugState: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_DebugState")?)
+            }),
+            SPI_DebugSubstate: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_DebugSubstate")?)
+            }),
+            SPI_DebugRevision: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_DebugRevision")?)
+            }),
+            SPI_DebugEnabled: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_DebugEnabled")?)
+            }),
+            SPI_DebugIntStat: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_DebugIntStat")?)
+            }),
+            SPI_DebugIntStatReadCount: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("SPI_DebugIntStatReadCount")?)
+            }),
+            Accel_ADDR: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel_ADDR")?) }),
+            Accel_CNTR: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel_CNTR")?) }),
+            Accel_DATO: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel_DATO")?) }),
+            Accel_DATI: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel_DATI")?) }),
+            Accel_CNTL: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel_CNTL")?) }),
+            Accel_STAT: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel_STAT")?) }),
+            Accel_CNFG: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel_CNFG")?) }),
+            Accel_GO: Some(unsafe { ni_fpga::Register::new(session.find_offset("Accel_GO")?) }),
+            HMB_Config: Some(unsafe { ni_fpga::Register::new(session.find_offset("HMB_Config")?) }),
+            HMB_ForceOnce: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("HMB_ForceOnce")?)
+            }),
+            DutyCycle0_Source: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle0_Source")?)
+            }),
+            DutyCycle0_Frequency: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle0_Frequency")?)
+            }),
+            DutyCycle0_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle0_Output")?)
+            }),
+            DutyCycle0_HighTicks: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle0_HighTicks")?)
+            }),
+            DutyCycle1_Source: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle1_Source")?)
+            }),
+            DutyCycle1_Frequency: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle1_Frequency")?)
+            }),
+            DutyCycle1_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle1_Output")?)
+            }),
+            DutyCycle1_HighTicks: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle1_HighTicks")?)
+            }),
+            DutyCycle2_Source: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle2_Source")?)
+            }),
+            DutyCycle2_Frequency: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle2_Frequency")?)
+            }),
+            DutyCycle2_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle2_Output")?)
+            }),
+            DutyCycle2_HighTicks: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle2_HighTicks")?)
+            }),
+            DutyCycle3_Source: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle3_Source")?)
+            }),
+            DutyCycle3_Frequency: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle3_Frequency")?)
+            }),
+            DutyCycle3_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle3_Output")?)
+            }),
+            DutyCycle3_HighTicks: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle3_HighTicks")?)
+            }),
+            DutyCycle4_Source: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle4_Source")?)
+            }),
+            DutyCycle4_Frequency: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle4_Frequency")?)
+            }),
+            DutyCycle4_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle4_Output")?)
+            }),
+            DutyCycle4_HighTicks: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle4_HighTicks")?)
+            }),
+            DutyCycle5_Source: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle5_Source")?)
+            }),
+            DutyCycle5_Frequency: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle5_Frequency")?)
+            }),
+            DutyCycle5_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle5_Output")?)
+            }),
+            DutyCycle5_HighTicks: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle5_HighTicks")?)
+            }),
+            DutyCycle6_Source: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle6_Source")?)
+            }),
+            DutyCycle6_Frequency: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle6_Frequency")?)
+            }),
+            DutyCycle6_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle6_Output")?)
+            }),
+            DutyCycle6_HighTicks: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle6_HighTicks")?)
+            }),
+            DutyCycle7_Source: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle7_Source")?)
+            }),
+            DutyCycle7_Frequency: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle7_Frequency")?)
+            }),
+            DutyCycle7_Output: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle7_Output")?)
+            }),
+            DutyCycle7_HighTicks: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DutyCycle7_HighTicks")?)
+            }),
+            LED_OutputSelect: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("LED_OutputSelect")?)
+            }),
+            LED_StringLength: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("LED_StringLength")?)
+            }),
+            LED_Load: Some(unsafe { ni_fpga::Register::new(session.find_offset("LED_Load")?) }),
+            LED_Reset: Some(unsafe { ni_fpga::Register::new(session.find_offset("LED_Reset")?) }),
+            LED_Start: Some(unsafe { ni_fpga::Register::new(session.find_offset("LED_Start")?) }),
+            LED_Abort: Some(unsafe { ni_fpga::Register::new(session.find_offset("LED_Abort")?) }),
+            LED_SyncTiming: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("LED_SyncTiming")?)
+            }),
+            LED_HighBitTickTiming: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("LED_HighBitTickTiming")?)
+            }),
+            LED_LowBitTickTiming: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("LED_LowBitTickTiming")?)
+            }),
+            LED_Active: Some(unsafe { ni_fpga::Register::new(session.find_offset("LED_Active")?) }),
+            LED_PixelWriteIndex: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("LED_PixelWriteIndex")?)
+            }),
+            LED_PixelOutputIndex: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("LED_PixelOutputIndex")?)
+            }),
+            HMB_ReadData: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("HMB_ReadData")?)
+            }),
+            HMB_WriteCount: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("HMB_WriteCount")?)
+            }),
+            HMB_WriteAddress: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("HMB_WriteAddress")?)
+            }),
+            HMB_WriteData: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("HMB_WriteData")?)
+            }),
+            HMB_LoopCount: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("HMB_LoopCount")?)
+            }),
+            HMB_WriteReadyForInput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("HMB_WriteReadyForInput")?)
+            }),
+            HMB_ReqReadyForInput: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("HMB_ReqReadyForInput")?)
+            }),
+            ViControl: Some(unsafe { ni_fpga::Register::new(session.find_offset("ViControl")?) }),
+            DiagramReset: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("DiagramReset")?)
+            }),
+            InterruptEnable: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("InterruptEnable")?)
+            }),
+            InterruptMask: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("InterruptMask")?)
+            }),
+            InterruptStatus: Some(unsafe {
+                ni_fpga::Register::new(session.find_offset("InterruptStatus")?)
+            }),
+        })
     }
     pub const fn contents() -> &'static str {
         include_str!("roboRIO_FPGA_2023_23.0.0.lvbitx")

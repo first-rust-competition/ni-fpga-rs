@@ -270,6 +270,20 @@ impl NiFpga {
         })
     }
 
+    pub fn find_offset(&self, name: CString) -> Result<Offset, Error> {
+        let api = self
+            .api
+            .api21
+            .as_ref()
+            .ok_or(Error::FPGA(Status::FeatureNotSupported))?;
+        let mut fifo_number = 0;
+        unsafe {
+            api.NiFpgaDll_FindFifo(self.session, name.as_ptr(), &mut fifo_number)
+                .to_result()
+                .map(|_| fifo_number)
+        }
+    }
+
     pub fn open(
         bitfile: CString,
         signature: CString,

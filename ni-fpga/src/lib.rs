@@ -1,3 +1,5 @@
+#![allow(clippy::missing_safety_doc)]
+
 extern crate ni_fpga_sys as ffi;
 
 mod datatype;

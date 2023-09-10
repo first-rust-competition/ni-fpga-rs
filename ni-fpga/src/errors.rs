@@ -30,6 +30,8 @@ pub enum Error {
     NoSignatureSpecified,
     #[error("No resource specified")]
     NoResourceSpecified,
+    #[error("Resource has already been taken")]
+    ResourceAlreadyTaken,
 }
 
 impl From<NulError> for Error {
