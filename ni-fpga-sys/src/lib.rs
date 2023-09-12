@@ -707,9 +707,6 @@ pub struct NiFpgaApi {
 
 impl NiFpgaApi {
     pub fn load() -> Result<NiFpgaApiContainer, Error> {
-        match unsafe { Container::load(platform_file_name("NiFpga")) } {
-            Ok(api) => Ok(api),
-            Err(err) => Err(err),
-        }
+        unsafe { Container::load(platform_file_name("NiFpga")) }
     }
 }

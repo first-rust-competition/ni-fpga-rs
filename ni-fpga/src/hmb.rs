@@ -70,6 +70,8 @@ where
 pub trait HmbAccess {
     fn read<T>(&self, offset: usize) -> T;
     fn write<T>(&mut self, offset: usize, value: T);
+    unsafe fn get_ptr(&self) -> *const c_void;
+    unsafe fn get_ptr_mut(&mut self) -> *mut c_void;
 }
 
 impl<Fpga> HmbAccess for Hmb<Fpga>
@@ -94,6 +96,14 @@ where
             let typed_address = address as *mut T;
             ptr::write_volatile(typed_address, value);
         }
+    }
+
+    unsafe fn get_ptr(&self) -> *const c_void {
+        self.virtual_address.0
+    }
+
+    unsafe fn get_ptr_mut(&mut self) -> *mut c_void {
+        self.virtual_address.0
     }
 }
 
