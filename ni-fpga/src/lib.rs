@@ -16,6 +16,9 @@ mod status;
 pub use interrupt_manager::InterruptContext;
 pub use interrupt_manager::InterruptWaiter;
 
+pub use ni_fpga_sys::Irq;
+pub use ni_fpga_sys::IrqContext;
+
 // Keep these for backwards compatibility, but don't use them internally
 pub use datatype::{Datatype, DatatypePacker, FpgaBits};
 pub use errors::Error;
