@@ -1,16 +1,12 @@
-use std::io::Write;
+use bitvec::vec::BitVec;
+use ni_fpga::{Error, RegisterRead, SessionAccess};
 
 use colored::*;
 use ni_fpga::fxp::{SignedFXP, UnsignedFXP};
-use ni_fpga::Session;
-use ni_fpga_macros::Cluster;
-use tempfile::NamedTempFile;
+use ni_fpga::Datatype;
+use registers::FpgaBitfile;
 
-#[derive(Cluster, Debug, PartialEq)]
-struct TestCluster {
-    b: bool,
-    u: u16,
-}
+mod registers;
 
 fn test_case<T: PartialEq + std::fmt::Debug>(test_case_name: &str, actual: T, expected: T) {
     eprint!("{}...", test_case_name);
@@ -26,89 +22,123 @@ fn test_case<T: PartialEq + std::fmt::Debug>(test_case_name: &str, actual: T, ex
     }
 }
 
+fn full_test_case<T: PartialEq + std::fmt::Debug + Datatype + Copy>(
+    session: &impl SessionAccess,
+    test_case_name: &str,
+    reg: impl RegisterRead<T>,
+    expected: T,
+) -> Result<(), ni_fpga::Error> {
+    test_case(test_case_name, reg.read(session)?, expected);
+    round_trip_test(&expected)?;
+
+    Ok(())
+}
+
+fn round_trip_test<T: Datatype + PartialEq + std::fmt::Debug>(data: &T) -> Result<(), Error> {
+    let mut bv = BitVec::with_capacity(T::SIZE_IN_BITS);
+    unsafe { bv.set_len(T::SIZE_IN_BITS) }
+
+    let fpga_bits = bv.as_mut_bitslice();
+    T::pack(fpga_bits, data)?;
+    assert_eq!(T::unpack(fpga_bits)?, *data);
+    Ok(())
+}
+
 #[allow(overflowing_literals)]
 fn main() -> Result<(), ni_fpga::Error> {
-    let mut tmp_bitfile = NamedTempFile::new().unwrap();
-    write!(tmp_bitfile, include_str!("integration.lvbitx")).unwrap();
+    let session = FpgaBitfile::session_builder("rio://172.22.11.2/RIO0")?.build()?;
+    let registers = FpgaBitfile::take(&session)?;
 
-    let session = Session::open(
-        tmp_bitfile.path().to_str().unwrap(),
-        "D08F17F77A45A5692FA2342C6B86E0EE",
-        "RIO0",
+    full_test_case(&session, "read plain U8", registers.U8.unwrap(), 0b00000001)?;
+    full_test_case(
+        &session,
+        "read plain U16",
+        registers.U16.unwrap(),
+        0b0000001100000001,
+    )?;
+    full_test_case(
+        &session,
+        "read plain U32",
+        registers.U32.unwrap(),
+        0b00001111000001110000001100000001,
+    )?;
+    full_test_case(
+        &session,
+        "read plain U64",
+        registers.U64.unwrap(),
+        0b1111111101111111001111110001111100001111000001110000001100000001,
     )?;
 
-    test_case("read plain U8", session.read::<u8>(98306)?, 0b00000001);
-    test_case(
-        "read plain U16",
-        session.read::<u16>(98310)?,
-        0b0000001100000001,
-    );
-    test_case(
-        "read plain U32",
-        session.read::<u32>(98312)?,
-        0b00001111000001110000001100000001,
-    );
-    test_case(
-        "read plain U64",
-        session.read::<u64>(98316)?,
-        0b1111111101111111001111110001111100001111000001110000001100000001,
-    );
-
-    test_case("read plain I8", session.read::<i8>(98322)?, 0b10000000);
-    test_case(
+    full_test_case(&session, "read plain I8", registers.I8.unwrap(), 0b10000000)?;
+    full_test_case(
+        &session,
         "read plain I16",
-        session.read::<i16>(98326)?,
+        registers.I16.unwrap(),
         0b1100000010000000,
-    );
-    test_case(
+    )?;
+    full_test_case(
+        &session,
         "read plain I32",
-        session.read::<i32>(98328)?,
+        registers.I32.unwrap(),
         0b11110000111000001100000010000000,
-    );
-    test_case(
+    )?;
+    full_test_case(
+        &session,
         "read plain I64",
-        session.read::<i64>(98332)?,
+        registers.I64.unwrap(),
         0b1111111111111110111111001111100011110000111000001100000010000000,
-    );
+    )?;
 
     #[allow(clippy::approx_constant)]
-    test_case("read SGL", session.read::<f32>(98336)?, 3.14);
+    full_test_case(&session, "read SGL", registers.SGL.unwrap(), 3.14)?;
 
-    test_case(
+    full_test_case(
+        &session,
         "read unsigned FXP",
-        session.read::<UnsignedFXP<4, 3>>(98342)?,
+        registers.UnsignedFXP.unwrap(),
         UnsignedFXP::from_float(4.5)?,
-    );
-    test_case(
+    )?;
+    full_test_case(
+        &session,
         "read unsigned FXP",
-        session.read::<SignedFXP<4, 3>>(98346)?,
+        registers.SignedFXP.unwrap(),
         SignedFXP::from_float(-1.5)?,
-    );
+    )?;
 
-    test_case("read true bool", session.read::<bool>(98350)?, true);
-    test_case("read false bool", session.read::<bool>(98354)?, false);
-    test_case(
+    full_test_case(
+        &session,
+        "read true bool",
+        registers.TrueBool.unwrap(),
+        true,
+    )?;
+    full_test_case(
+        &session,
+        "read false bool",
+        registers.FalseBool.unwrap(),
+        false,
+    )?;
+    full_test_case(
+        &session,
         "read bool array",
-        session.read::<[bool; 8]>(98358)?,
+        registers.BoolArray.unwrap(),
         [true, false, true, false, true, false, true, false],
-    );
+    )?;
 
-    test_case(
+    full_test_case(
+        &session,
         "read cluster",
-        session.read::<TestCluster>(98360)?,
-        TestCluster { b: false, u: 1337 },
-    );
-    // TODO: Investigate cluster array memory layout in order to fix this test.
-    // The expected array may be incorrect here, I don't exactly remember what I used for the
-    // fixture bitfile before my LabView FPGA trial expired.
-    test_case(
+        registers.TestCluster.unwrap(),
+        registers::types::TestCluster { b: false, u: 1337 },
+    )?;
+    full_test_case(
+        &session,
         "read cluster array",
-        session.read::<[TestCluster; 2]>(98360)?,
+        registers.TestClusterArray.unwrap(),
         [
-            TestCluster { b: true, u: 255 },
-            TestCluster { b: false, u: 1337 },
+            registers::types::TestClusterArray { b: true, u: 1234 },
+            registers::types::TestClusterArray { b: false, u: 5678 },
         ],
-    );
+    )?;
 
     Ok(())
 }

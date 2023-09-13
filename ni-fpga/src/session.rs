@@ -1,101 +1,326 @@
 use std::ffi::CString;
+use std::marker::PhantomData;
+use std::ops::Deref;
+use std::sync::Arc;
 
-use crate::datatype::{Datatype, FpgaBits};
+use ni_fpga_sys::{CloseAttribute, OpenAttribute};
+
+use crate::datatype::Datatype;
 use crate::errors::Error;
-use crate::ffi;
-use crate::ffi::Offset;
-use crate::status::Status;
+use crate::hmb::Hmb;
+use crate::interrupt_manager::InterruptContext;
+use crate::nifpga::NiFpga;
+use crate::register::{ConstOffset, ReadOnly, Register, RegisterPermission, StoredOffset};
+use crate::session_lifetimes::{ArcStorage, InPlaceStorage, StorageClone};
+use crate::{Offset, Status};
 
-pub struct Session {
-    pub handle: ffi::Session,
-    api: ffi::NiFpgaApiContainer,
+pub struct Session<FpgaStorage> {
+    fpga_storage: FpgaStorage,
 }
 
-impl From<ffi::Error> for Error {
-    fn from(value: ffi::Error) -> Self {
-        match value {
-            // Map the explicit opening errors to what the C API
-            // returns for the same errors.
-            ffi::Error::OpeningLibraryError(_) => Error::FPGA(Status::ResourceNotFound),
-            ffi::Error::SymbolGettingError(_) => Error::FPGA(Status::VersionMismatch),
-            // Map unknowns (Which are impossible to hit)
-            // just as a generic error. All 3 other enum states
-            // for this are impossible with the FPGA library.
-            _ => Error::FPGA(Status::ResourceNotFound),
+impl<'a, FpgaStorage> Session<FpgaStorage>
+where
+    FpgaStorage: StorageClone<'a>,
+    FpgaStorage: Deref<Target = NiFpga>,
+{
+    fn open_local(
+        bitfile: CString,
+        signature: CString,
+        resource: CString,
+        open_attribute: OpenAttribute,
+        close_attribute: CloseAttribute,
+        create_self: impl FnOnce(NiFpga) -> Self,
+    ) -> Result<Self, Error> {
+        Ok(create_self(NiFpga::open(
+            bitfile,
+            signature,
+            resource,
+            open_attribute,
+            close_attribute,
+        )?))
+    }
+
+    fn from_session_local(
+        session: ffi::Session,
+        create_self: impl FnOnce(NiFpga) -> Self,
+    ) -> Result<Self, Error> {
+        Ok(create_self(NiFpga::from_session(session)?))
+    }
+
+    pub unsafe fn open_hmb(
+        &'a self,
+        memory_name: &str,
+    ) -> Result<Hmb<<FpgaStorage as StorageClone<'a>>::Target>, Error>
+    where
+        <FpgaStorage as StorageClone<'a>>::Target: Deref<Target = NiFpga>,
+    {
+        let c_memory_name = CString::new(memory_name).unwrap();
+        Hmb::new(
+            Session {
+                fpga_storage: self.fpga_storage.storage_clone(),
+            },
+            &c_memory_name,
+        )
+    }
+
+    pub fn reserve_irq_context(
+        &'a self,
+    ) -> Result<InterruptContext<<FpgaStorage as StorageClone<'a>>::Target>, Error>
+    where
+        <FpgaStorage as StorageClone<'a>>::Target: Deref<Target = NiFpga>,
+    {
+        InterruptContext::new(Session {
+            fpga_storage: self.fpga_storage.storage_clone(),
+        })
+    }
+}
+
+impl Clone for Session<ArcStorage> {
+    fn clone(&self) -> Self {
+        Self {
+            fpga_storage: self.fpga_storage.clone(),
         }
     }
 }
 
-impl Session {
+impl Session<InPlaceStorage<'_>> {
+    fn create_self(api: NiFpga) -> Self {
+        Self {
+            fpga_storage: InPlaceStorage {
+                api,
+                _marker: PhantomData,
+            },
+        }
+    }
+
+    fn open_inplace(
+        bitfile: CString,
+        signature: CString,
+        resource: CString,
+        open_attribute: OpenAttribute,
+        close_attribute: CloseAttribute,
+    ) -> Result<Self, Error> {
+        Self::open_local(
+            bitfile,
+            signature,
+            resource,
+            open_attribute,
+            close_attribute,
+            Self::create_self,
+        )
+    }
+
     pub fn open(bitfile: &str, signature: &str, resource: &str) -> Result<Self, Error> {
-        let mut handle: ffi::Session = Default::default();
-        let c_bitfile = CString::new(bitfile).unwrap();
-        let c_signature = CString::new(signature).unwrap();
-        let c_resource = CString::new(resource).unwrap();
-        let api = ffi::NiFpgaApi::load()?;
+        SessionBuilder::new()
+            .bitfile_path(bitfile)?
+            .signature(signature)?
+            .resource(resource)?
+            .build()
+    }
 
-        let status = Status::from(unsafe {
-            api.base.NiFpgaDll_Open(
-                c_bitfile.as_ptr(),
-                c_signature.as_ptr(),
-                c_resource.as_ptr(),
-                0,
-                &mut handle as *mut ffi::Session,
-            )
-        });
-        match status {
-            Status::Success => Ok(Session { api, handle }),
-            _ => Err(Error::FPGA(status)),
-        }
-    }
-    pub fn read<T: Datatype>(&self, offset: Offset) -> Result<T, Error>
-    where
-        [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
-    {
-        let mut buffer = [0u8; (T::SIZE_IN_BITS - 1) / 8 + 1];
-        let status = Status::from(unsafe {
-            self.api.base.NiFpgaDll_ReadArrayU8(
-                self.handle,
-                offset,
-                buffer.as_mut_ptr(),
-                (T::SIZE_IN_BITS - 1) / 8 + 1,
-            )
-        });
-        match status {
-            Status::Success => Ok(Datatype::unpack(
-                &FpgaBits::from_slice(&buffer)
-                    [((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],
-            )?),
-            _ => Err(Error::FPGA(status)),
-        }
-    }
-    pub fn write<T: Datatype>(&self, offset: Offset, data: &T) -> Result<(), Error>
-    where
-        [u8; (T::SIZE_IN_BITS - 1) / 8 + 1]: Sized,
-    {
-        let mut buffer = [0u8; (T::SIZE_IN_BITS - 1) / 8 + 1];
-        Datatype::pack(
-            &mut FpgaBits::from_slice_mut(&mut buffer)
-                [((T::SIZE_IN_BITS - 1) / 8 + 1) * 8 - T::SIZE_IN_BITS..],
-            data,
-        )?;
-        let status = Status::from(unsafe {
-            self.api.base.NiFpgaDll_WriteArrayU8(
-                self.handle,
-                offset,
-                buffer.as_ptr(),
-                (T::SIZE_IN_BITS - 1) / 8 + 1,
-            )
-        });
-        match status {
-            Status::Success => Ok(()),
-            _ => Err(Error::FPGA(status)),
-        }
+    pub fn from_session(session: ffi::Session) -> Result<Self, Error> {
+        Self::from_session_local(session, Self::create_self)
     }
 }
 
-impl Drop for Session {
-    fn drop(&mut self) {
-        unsafe { self.api.base.NiFpgaDll_Close(self.handle, 0) };
+impl Session<ArcStorage> {
+    fn create_self(api: NiFpga) -> Self {
+        Self {
+            fpga_storage: ArcStorage { api: Arc::new(api) },
+        }
+    }
+
+    fn open_arc(
+        bitfile: CString,
+        signature: CString,
+        resource: CString,
+        open_attribute: OpenAttribute,
+        close_attribute: CloseAttribute,
+    ) -> Result<Self, Error> {
+        Self::open_local(
+            bitfile,
+            signature,
+            resource,
+            open_attribute,
+            close_attribute,
+            Self::create_self,
+        )
+    }
+
+    pub fn from_session_arc(session: ffi::Session) -> Result<Self, Error> {
+        Self::from_session_local(session, Self::create_self)
+    }
+}
+
+enum BitfileType {
+    Path(CString),
+    Contents(CString),
+}
+
+#[derive(Default)]
+pub struct SessionBuilder {
+    bitfile_type: Option<BitfileType>,
+    signature: Option<CString>,
+    resource: Option<CString>,
+    bitfile_utf8: bool,
+    ignore_signature: bool,
+    no_run: bool,
+    no_reset: bool,
+}
+
+impl SessionBuilder {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    pub fn bitfile_path(mut self, path: impl AsRef<str>) -> Result<Self, Error> {
+        self.bitfile_type = Some(BitfileType::Path(CString::new(path.as_ref())?));
+        Ok(self)
+    }
+
+    pub fn bitfile_contents(mut self, contents: impl AsRef<str>) -> Result<Self, Error> {
+        self.bitfile_type = Some(BitfileType::Contents(CString::new(contents.as_ref())?));
+        Ok(self)
+    }
+
+    pub fn signature(mut self, signature: impl AsRef<str>) -> Result<Self, Error> {
+        self.signature = Some(CString::new(signature.as_ref())?);
+        Ok(self)
+    }
+
+    pub fn resource(mut self, resource: impl AsRef<str>) -> Result<Self, Error> {
+        self.resource = Some(CString::new(resource.as_ref())?);
+        Ok(self)
+    }
+
+    pub fn treat_bitfile_path_as_utf8(mut self) -> Self {
+        self.bitfile_utf8 = true;
+        self
+    }
+
+    pub fn ignore_signature(mut self) -> Self {
+        self.ignore_signature = true;
+        self
+    }
+
+    pub fn no_run(mut self) -> Self {
+        self.no_run = true;
+        self
+    }
+
+    pub fn no_reset_if_last_session(mut self) -> Self {
+        self.no_reset = true;
+        self
+    }
+
+    fn build_args(
+        self,
+    ) -> Result<(CString, CString, CString, OpenAttribute, CloseAttribute), Error> {
+        let mut open_attr = OpenAttribute::empty();
+
+        let bitfile = match self.bitfile_type {
+            Some(BitfileType::Contents(s)) => {
+                open_attr |= OpenAttribute::BitfileContentsNotPath;
+                s
+            }
+            Some(BitfileType::Path(s)) => s,
+            None => return Err(Error::NoBitfileSpecified),
+        };
+        let signature = match self.signature {
+            Some(s) => s,
+            None => match self.ignore_signature {
+                true => CString::new("")?,
+                false => return Err(Error::NoSignatureSpecified),
+            },
+        };
+        let resource = match self.resource {
+            Some(s) => s,
+            None => return Err(Error::NoResourceSpecified),
+        };
+
+        if self.ignore_signature {
+            open_attr |= OpenAttribute::IgnoreSignatureArgument;
+        }
+
+        if self.bitfile_utf8 {
+            open_attr |= OpenAttribute::BitfilePathIsUTF8;
+        }
+
+        if self.no_run {
+            open_attr |= OpenAttribute::NoRun;
+        }
+
+        let close_attr = if self.no_reset {
+            CloseAttribute::NoResetIfLastSession
+        } else {
+            CloseAttribute::empty()
+        };
+
+        Ok((bitfile, signature, resource, open_attr, close_attr))
+    }
+
+    pub fn build(self) -> Result<Session<InPlaceStorage<'static>>, Error> {
+        let (bitfile, signature, resource, open_args, close_args) = self.build_args()?;
+        Session::open_inplace(bitfile, signature, resource, open_args, close_args)
+    }
+
+    pub fn build_arc(self) -> Result<Session<ArcStorage>, Error> {
+        let (bitfile, signature, resource, open_args, close_args) = self.build_args()?;
+        Session::open_arc(bitfile, signature, resource, open_args, close_args)
+    }
+}
+
+pub trait SessionAccess {
+    unsafe fn fpga(&self) -> &NiFpga;
+
+    fn find_offset(&self, name: impl AsRef<str>) -> Result<Offset, Error>;
+
+    unsafe fn open_const_register<T: Datatype, P, const N: Offset>(
+        &self,
+    ) -> Register<T, P, ConstOffset<N>>
+    where
+        P: RegisterPermission,
+    {
+        Register::new_const()
+    }
+
+    unsafe fn open_register<T: Datatype, P>(&self, offset: Offset) -> Register<T, P, StoredOffset>
+    where
+        P: RegisterPermission,
+    {
+        Register::new(offset)
+    }
+
+    unsafe fn open_readonly_const_register<T: Datatype, const N: Offset>(
+        &self,
+    ) -> Register<T, ReadOnly, ConstOffset<N>> {
+        Register::new_const()
+    }
+
+    unsafe fn open_readonly_register<T: Datatype>(
+        &self,
+        offset: Offset,
+    ) -> Register<T, ReadOnly, StoredOffset> {
+        Register::new(offset)
+    }
+}
+
+impl<Fpga> SessionAccess for Session<Fpga>
+where
+    Fpga: Deref<Target = NiFpga>,
+{
+    unsafe fn fpga(&self) -> &NiFpga {
+        &self.fpga_storage
+    }
+
+    fn find_offset(&self, name: impl AsRef<str>) -> Result<Offset, Error> {
+        self.fpga_storage
+            .find_offset(CString::new(name.as_ref())?)
+            .map_err(|e| match e {
+                Error::FPGA(Status::ResourceNotFound) => {
+                    Error::RegisterNotFound(name.as_ref().into())
+                }
+                e => e,
+            })
     }
 }
