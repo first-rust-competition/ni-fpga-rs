@@ -13,6 +13,15 @@ where
     session: Session<Fpga>,
 }
 
+pub trait InterruptWaiter {
+    fn wait_for_interrupt(
+        &self,
+        mask: Irq,
+        ignore_previous: bool,
+        timeout: Duration,
+    ) -> Result<Irq, Error>;
+}
+
 impl<Fpga> InterruptContext<Fpga>
 where
     Fpga: Deref<Target = NiFpga>,
@@ -29,8 +38,14 @@ where
             manager: &MANAGER,
         })
     }
+}
 
-    pub fn wait_for_interrupt(
+
+impl<Fpga> InterruptWaiter for InterruptContext<Fpga>
+where
+    Fpga: Deref<Target = NiFpga>,
+{
+    fn wait_for_interrupt(
         &self,
         mask: Irq,
         ignore_previous: bool,

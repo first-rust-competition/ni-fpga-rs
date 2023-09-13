@@ -13,6 +13,9 @@ mod session;
 pub mod session_lifetimes;
 mod status;
 
+pub use interrupt_manager::InterruptContext;
+pub use interrupt_manager::InterruptWaiter;
+
 // Keep these for backwards compatibility, but don't use them internally
 pub use datatype::{Datatype, DatatypePacker, FpgaBits};
 pub use errors::Error;
