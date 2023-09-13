@@ -8,6 +8,7 @@ use ni_fpga_sys::{CloseAttribute, OpenAttribute};
 use crate::datatype::Datatype;
 use crate::errors::Error;
 use crate::hmb::Hmb;
+use crate::interrupt_manager::InterruptContext;
 use crate::nifpga::NiFpga;
 use crate::register::{ConstOffset, ReadOnly, Register, RegisterPermission, StoredOffset};
 use crate::session_lifetimes::{ArcStorage, InPlaceStorage, StorageClone};
@@ -60,6 +61,17 @@ where
             },
             &c_memory_name,
         )
+    }
+
+    pub fn reserve_irq_context(
+        &'a self,
+    ) -> Result<InterruptContext<<FpgaStorage as StorageClone<'a>>::Target>, Error>
+    where
+        <FpgaStorage as StorageClone<'a>>::Target: Deref<Target = NiFpga>,
+    {
+        InterruptContext::new(Session {
+            fpga_storage: self.fpga_storage.storage_clone(),
+        })
     }
 }
 

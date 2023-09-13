@@ -1,4 +1,4 @@
-use std::ffi::NulError;
+use std::{ffi::NulError, num::TryFromIntError, sync::PoisonError};
 
 use thiserror::Error;
 
@@ -34,6 +34,22 @@ pub enum Error {
     ResourceAlreadyTaken,
     #[error("Register {0} not found")]
     RegisterNotFound(String),
+    #[error("A mutex is poisoned {0}. This is unrecoverable")]
+    MutexPoisoned(String),
+    #[error("Timeout is too big to pass to the FPGA")]
+    TimeoutTooLong,
+}
+
+impl From<TryFromIntError> for Error {
+    fn from(_: TryFromIntError) -> Self {
+        Self::TimeoutTooLong
+    }
+}
+
+impl<T> From<PoisonError<T>> for Error {
+    fn from(value: PoisonError<T>) -> Self {
+        Self::MutexPoisoned(value.to_string())
+    }
 }
 
 impl From<NulError> for Error {

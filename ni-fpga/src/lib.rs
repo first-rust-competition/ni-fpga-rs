@@ -6,6 +6,7 @@ mod datatype;
 mod errors;
 pub mod fxp;
 mod hmb;
+mod interrupt_manager;
 mod nifpga;
 mod register;
 mod session;

@@ -1,8 +1,11 @@
-use std::ffi::CString;
+use std::{convert::TryInto, ffi::CString, ptr::null, time::Duration};
 
 use ni_fpga_sys::{
-    Bool, CloseAttribute, NiFpgaApi, NiFpgaApiContainer, Offset, OpenAttribute, Session,
+    Bool, CloseAttribute, Irq, NiFpgaApi, NiFpgaApiContainer, Offset, OpenAttribute, Session,
 };
+
+#[derive(Clone, Copy)]
+pub struct IrqContext(ni_fpga_sys::IrqContext);
 
 use crate::{Error, Status};
 
@@ -281,6 +284,60 @@ impl NiFpga {
             api.NiFpgaDll_FindRegister(self.session, name.as_ptr(), &mut fifo_number)
                 .to_result()
                 .map(|_| fifo_number)
+        }
+    }
+
+    pub fn reserve_irq_context(&self) -> Result<IrqContext, Error> {
+        let mut context: ni_fpga_sys::IrqContext = null();
+        unsafe {
+            self.api
+                .base
+                .NiFpgaDll_ReserveIrqContext(self.session, &mut context)
+                .to_result()
+                .map(|_| IrqContext(context))
+        }
+    }
+
+    pub fn acknowledge_irqs(&self, mask: Irq) -> Result<(), Error> {
+        unsafe {
+            self.api
+                .base
+                .NiFpgaDll_AcknowledgeIrqs(self.session, mask.bits())
+                .to_result()
+        }
+    }
+
+    pub fn wait_on_irqs(
+        &self,
+        context: IrqContext,
+        mask: Irq,
+        timeout: Duration,
+    ) -> Result<Irq, Error> {
+        unsafe {
+            let mut asserted_irqs: u32 = 0;
+            let mut timed_out: Bool = 0;
+            let timeout: u32 = timeout.as_millis().try_into()?;
+            self.api
+                .base
+                .NiFpgaDll_WaitOnIrqs(
+                    self.session,
+                    context.0,
+                    mask.bits(),
+                    timeout,
+                    &mut asserted_irqs,
+                    &mut timed_out,
+                )
+                .to_result()?;
+            Ok(Irq::from_bits_retain(asserted_irqs))
+        }
+    }
+
+    pub fn unreserve_irq_context(&self, context: IrqContext) -> Result<(), Error> {
+        unsafe {
+            self.api
+                .base
+                .NiFpgaDll_UnreserveIrqContext(self.session, context.0)
+                .to_result()
         }
     }
 

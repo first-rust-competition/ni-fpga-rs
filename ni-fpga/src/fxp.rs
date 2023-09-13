@@ -471,12 +471,10 @@ impl<const WORD_LENGTH: u8, const INTEGER_LENGTH: u8, const SIGNED: bool> Dataty
         Ok(FXP({
             if overflow[0] {
                 u64::MAX
+            } else if WORD_LENGTH > 32 {
+                u64::unpack(fpga_bits)?
             } else {
-                if WORD_LENGTH > 32 {
-                    u64::unpack(fpga_bits)?
-                } else {
-                    u32::unpack(fpga_bits)? as u64
-                }
+                u32::unpack(fpga_bits)? as u64
             }
         }))
     }
